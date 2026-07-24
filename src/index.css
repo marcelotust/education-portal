@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-arcade-black text-slate-100 antialiased;
+    font-family: theme('fontFamily.terminal');
+    /* Subtle CRT scanline wash over the whole cabinet. */
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+}
+
+@layer components {
+  .text-neon {
+    text-shadow:
+      0 0 6px currentColor,
+      0 0 18px currentColor;
+  }
+}
