@@ -10,7 +10,7 @@ The Supabase integration has not been built yet.
 ## Stack
 
 Vite · React 19 · strict TypeScript · Tailwind CSS · React Router · Vitest + React Testing Library
-· Supabase (pending) · deployed on Vercel
+· Supabase (pending) · deployed on Vercel with Web Analytics
 
 ## Scripts
 
