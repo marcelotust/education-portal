@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { RoomRoute } from './RoomRoute';
@@ -12,7 +13,8 @@ export const App = () => (
       <Route path="*" element={<Navigate to="/host" replace />} />
     </Routes>
 
-    {/* Vercel Web Analytics: no-op outside Vercel deployments. */}
+    {/* Vercel telemetry: both are no-ops outside Vercel deployments. */}
     <Analytics />
+    <SpeedInsights />
   </BrowserRouter>
 );
