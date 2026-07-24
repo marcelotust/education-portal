@@ -1,40 +1,18 @@
 import type { RoomState } from './room';
+import type { Database, Json } from './supabase.generated';
+
+export type { Database, Json };
+
+type RoomTable = Database['public']['Tables']['rooms'];
 
 /** The JSONB payload stored in `rooms.state`; PIN and host live in columns. */
 export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId'>;
 
-export interface RoomRow {
-  id: string;
-  pin: string;
-  host_id: string;
-  state: PersistedRoomState;
-  is_open: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export type RoomInsert = Pick<RoomRow, 'pin' | 'host_id'> & Partial<Pick<RoomRow, 'state'>>;
-
-export type RoomUpdate = Partial<Pick<RoomRow, 'state' | 'is_open'>>;
+/** The generated Row types `state` as `Json`; the app knows what it really is. */
+export type RoomRow = Omit<RoomTable['Row'], 'state'> & { state: PersistedRoomState };
 
 /**
- * Minimal hand-written schema for `supabase-js` generics.
- * Regenerate with `npx supabase gen types typescript --linked` once the
- * project is linked, and keep `RoomRow['state']` narrowed to the FSM type.
+ * JSONB is structurally `Json`, but `PersistedRoomState` uses readonly arrays,
+ * which `Json` does not model. The cast is confined to this one boundary.
  */
-export interface Database {
-  public: {
-    Tables: {
-      rooms: {
-        Row: RoomRow;
-        Insert: RoomInsert;
-        Update: RoomUpdate;
-        Relationships: [];
-      };
-    };
-    Views: Record<never, never>;
-    Functions: Record<never, never>;
-    Enums: Record<never, never>;
-    CompositeTypes: Record<never, never>;
-  };
-}
+export const toJson = (state: PersistedRoomState): Json => state as unknown as Json;

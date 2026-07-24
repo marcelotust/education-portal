@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
-import { createMockRoom } from '@/features/lobby/mockRoom';
+import { HostEntryScreen } from '@/features/room/HostEntryScreen';
+import { JoinRoomScreen } from '@/features/room/JoinRoomScreen';
 import { RoomProvider } from '@/hooks/RoomProvider';
+import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 import type { PlayerRole } from '@/types';
+import type { RoomSession } from '@/types/roomService';
 
 interface RoomRouteProps {
   role: PlayerRole;
 }
 
-/** Mounts the room FSM for a given role. Backed by mock data for now. */
+/**
+ * Entry point of a room: shows the create/join screen until there is a
+ * session, then mounts the FSM for the resulting role.
+ */
 export const RoomRoute = ({ role }: RoomRouteProps) => {
-  const [initialState] = useState(createMockRoom);
+  const service = useMemo(() => createSupabaseRoomService(), []);
+  const [session, setSession] = useState<RoomSession | null>(null);
 
   return (
-    <RoomProvider initialState={initialState} role={role}>
-      <AppLayout>
-        <LobbyScreen />
-      </AppLayout>
-    </RoomProvider>
+    <AppLayout>
+      {session === null ? (
+        role === 'HOST' ? (
+          <HostEntryScreen createRoom={service.createRoom} onReady={setSession} />
+        ) : (
+          <JoinRoomScreen joinRoom={service.joinRoom} onReady={setSession} />
+        )
+      ) : (
+        <RoomProvider initialState={session.room} role={session.role}>
+          <LobbyScreen />
+        </RoomProvider>
+      )}
+    </AppLayout>
   );
 };
