@@ -114,12 +114,32 @@ describe('Lobby feature', () => {
       expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
     });
 
-    it('reflects the Host configuring a game without gaining any control', () => {
+    it('sees the same cartridge shelf as the Host, but cannot touch it', () => {
       renderLobby('CLIENT', makeRoom({ status: 'CONFIGURING_GAME' }));
 
       expect(status()).toBe('CONFIGURING_GAME');
       expect(screen.getByText(/choosing the game/i)).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /^stop$/i })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^stop$/i })).toBeDisabled();
+    });
+
+    it('shows which cartridge the Host has picked', () => {
+      const room = { ...makeRoom({ status: 'CONFIGURING_GAME' }), selectedGameId: 'STOP' as const };
+      renderLobby('CLIENT', room);
+
+      expect(screen.getByRole('button', { name: /^stop$/i })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    });
+
+    it('keeps the room untouched when a Client clicks the disabled cartridge', async () => {
+      const user = userEvent.setup();
+      renderLobby('CLIENT', makeRoom({ status: 'CONFIGURING_GAME' }));
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      expect(status()).toBe('CONFIGURING_GAME');
+      expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
     });
   });
 });
