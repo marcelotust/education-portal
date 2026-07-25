@@ -28,6 +28,8 @@ export class RoomJoinError extends Error {
 export type CreateRoom = (nickname: string) => Promise<RoomSession>;
 /** An open room this user still hosts, so a refresh does not abandon a class. */
 export type FindResumableRoom = () => Promise<RoomSession | null>;
+/** Which of these PINs still exist, so no dead door is offered. */
+export type FindLiveRooms = (pins: readonly string[]) => Promise<string[]>;
 export type JoinRoom = (pin: string, nickname: string) => Promise<RoomSession>;
 
 /** Injected into the entry screens so specs never touch the network. */
@@ -35,4 +37,5 @@ export interface RoomService {
   createRoom: CreateRoom;
   joinRoom: JoinRoom;
   findResumableRoom: FindResumableRoom;
+  findLiveRooms: FindLiveRooms;
 }

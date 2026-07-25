@@ -58,6 +58,30 @@ describe('Join room screen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/no room with that pin/i);
   });
 
+  it('does not blame the student when a suggested room has ended', async () => {
+    const user = userEvent.setup();
+    const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
+    render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} initialPin="KPZT" />);
+
+    await user.type(screen.getByLabelText(/nickname/i), 'ANA');
+    await user.click(screen.getByRole('button', { name: /join/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/that room has ended/i);
+  });
+
+  it('still says the PIN is unknown when the student typed it themselves', async () => {
+    const user = userEvent.setup();
+    const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
+    render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} initialPin="KPZT" />);
+
+    await user.clear(screen.getByLabelText(/room pin/i));
+    await user.type(screen.getByLabelText(/room pin/i), 'ZZZZ');
+    await user.type(screen.getByLabelText(/nickname/i), 'ANA');
+    await user.click(screen.getByRole('button', { name: /join/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no room with that pin/i);
+  });
+
   it('tells the student when all 6 seats are taken', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_FULL'));

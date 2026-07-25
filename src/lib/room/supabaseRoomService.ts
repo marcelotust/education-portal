@@ -2,7 +2,7 @@ import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
 import { toJson, type RoomRow } from '@/types/database';
 import { RoomJoinError, type RoomService, type RoomSession } from '@/types/roomService';
-import { countPlayers, generateRoomPin } from '@/utils/room';
+import { ROOM_LIFETIME_HOURS, countPlayers, generateRoomPin } from '@/utils/room';
 import { ensureAnonymousSession } from '../auth';
 import { getSupabaseClient, type EduPartyClient } from '../supabase';
 import { rowToRoomState, toPersistedState } from './roomMapper';
@@ -12,11 +12,6 @@ const AVATARS: readonly AvatarId[] = ['GREEN', 'PINK', 'CYAN', 'YELLOW', 'RED', 
 /** Postgres unique_violation: two Hosts drew the same PIN at the same time. */
 const UNIQUE_VIOLATION = '23505';
 
-/**
- * Matches the expiry sweep in supabase/migrations. Filtering on read means a
- * stale room is never offered, whatever hour the sweep happens to run.
- */
-const RESUMABLE_WINDOW_HOURS = 5;
 const PIN_ATTEMPTS = 5;
 
 const makePlayer = (id: string, nickname: string, seat: number, isHost: boolean): Player => ({
@@ -109,7 +104,7 @@ const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | 
   const hostId = auth.session?.user.id;
   if (hostId === undefined) return null;
 
-  const freshEnough = new Date(Date.now() - RESUMABLE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
+  const freshEnough = new Date(Date.now() - ROOM_LIFETIME_HOURS * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await client
     .from('rooms')
@@ -135,10 +130,32 @@ const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | 
   };
 };
 
+/**
+ * Which of these PINs still exist. One query for the whole list, so the landing
+ * never offers a door that leads nowhere.
+ */
+const findLiveRooms = async (
+  client: EduPartyClient,
+  pins: readonly string[],
+): Promise<string[]> => {
+  if (pins.length === 0) return [];
+
+  const { data, error } = await client
+    .from('rooms')
+    .select('pin')
+    .in('pin', [...pins])
+    .eq('is_open', true);
+
+  if (error !== null || data === null) throw new Error('Could not check which rooms are alive.');
+
+  return data.map((row) => row.pin);
+};
+
 export const createSupabaseRoomService = (
   client: EduPartyClient = getSupabaseClient(),
 ): RoomService => ({
   createRoom: (nickname) => createRoom(client, nickname),
   joinRoom: (pin, nickname) => joinRoom(client, pin, nickname),
   findResumableRoom: () => findResumableRoom(client),
+  findLiveRooms: (pins) => findLiveRooms(client, pins),
 });

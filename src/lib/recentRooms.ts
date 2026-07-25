@@ -1,3 +1,5 @@
+import { ROOM_LIFETIME_HOURS } from '@/utils/room';
+
 const STORAGE_KEY = 'eduparty.recent-rooms';
 
 export const RECENT_ROOMS_LIMIT = 5;
@@ -23,13 +25,17 @@ const isRecentRoom = (value: unknown): value is RecentRoom => {
  * ephemeral and RLS keeps the room Host-writable — so the list lives in this
  * browser. It follows the device, not the person.
  */
-export const listRecentRooms = (): RecentRoom[] => {
+export const listRecentRooms = (now = Date.now()): RecentRoom[] => {
+  // Nothing older than a room can live is worth offering: it is already gone.
+  const oldestAlive = new Date(now - ROOM_LIFETIME_HOURS * 60 * 60 * 1000).toISOString();
+
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
     if (!Array.isArray(parsed)) return [];
 
     return parsed
       .filter(isRecentRoom)
+      .filter((room) => room.joinedAt > oldestAlive)
       .sort((a, b) => b.joinedAt.localeCompare(a.joinedAt))
       .slice(0, RECENT_ROOMS_LIMIT);
   } catch {

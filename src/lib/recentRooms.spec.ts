@@ -7,24 +7,25 @@ describe('recently joined rooms', () => {
     localStorage.clear();
   });
 
-  it('remembers a room the student joined', () => {
-    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' });
+  const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
 
-    expect(listRecentRooms()).toEqual([
-      { pin: 'KPZT', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' },
-    ]);
+  it('remembers a room the student joined', () => {
+    const joinedAt = minutesAgo(1);
+    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt });
+
+    expect(listRecentRooms()).toEqual([{ pin: 'KPZT', nickname: 'ANA', joinedAt }]);
   });
 
   it('puts the most recent room first', () => {
-    rememberRoom({ pin: 'AAAA', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' });
-    rememberRoom({ pin: 'BBBB', nickname: 'ANA', joinedAt: '2026-07-25T11:00:00.000Z' });
+    rememberRoom({ pin: 'AAAA', nickname: 'ANA', joinedAt: minutesAgo(60) });
+    rememberRoom({ pin: 'BBBB', nickname: 'ANA', joinedAt: minutesAgo(10) });
 
     expect(listRecentRooms().map((room) => room.pin)).toEqual(['BBBB', 'AAAA']);
   });
 
   it('keeps one entry per room, refreshed', () => {
-    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' });
-    rememberRoom({ pin: 'KPZT', nickname: 'ANINHA', joinedAt: '2026-07-25T12:00:00.000Z' });
+    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: minutesAgo(60) });
+    rememberRoom({ pin: 'KPZT', nickname: 'ANINHA', joinedAt: minutesAgo(5) });
 
     const rooms = listRecentRooms();
     expect(rooms).toHaveLength(1);
@@ -36,11 +37,19 @@ describe('recently joined rooms', () => {
       rememberRoom({
         pin: `PIN${index}`,
         nickname: 'ANA',
-        joinedAt: new Date(2026, 0, 1, index).toISOString(),
+        joinedAt: minutesAgo(RECENT_ROOMS_LIMIT + 3 - index),
       });
     }
 
     expect(listRecentRooms()).toHaveLength(RECENT_ROOMS_LIMIT);
+  });
+
+  it('hides rooms too old to still exist', () => {
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+    rememberRoom({ pin: 'DEAD', nickname: 'ANA', joinedAt: sixHoursAgo });
+    rememberRoom({ pin: 'LIVE', nickname: 'ANA', joinedAt: new Date().toISOString() });
+
+    expect(listRecentRooms().map((room) => room.pin)).toEqual(['LIVE']);
   });
 
   it('survives storage holding something that is not a room list', () => {

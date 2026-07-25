@@ -11,6 +11,12 @@ const FAILURE_MESSAGES: Record<string, string> = {
   ROOM_FULL: 'That room is full — all 6 seats are taken.',
 };
 
+/**
+ * Arriving with the PIN already filled means the app suggested this room. If it
+ * is gone, that is not the student mistyping.
+ */
+const SUGGESTED_ROOM_GONE = 'That room has ended. Ask for a new PIN.';
+
 const FALLBACK_MESSAGE = 'Could not join the room. Check your connection and try again.';
 
 interface JoinRoomScreenProps {
@@ -56,7 +62,8 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
       onReady(session);
     } catch (cause) {
       const reason = cause instanceof RoomJoinError ? cause.reason : 'UNKNOWN';
-      setError(FAILURE_MESSAGES[reason] ?? FALLBACK_MESSAGE);
+      const wasSuggested = reason === 'ROOM_NOT_FOUND' && normalisedPin === initialPin;
+      setError(wasSuggested ? SUGGESTED_ROOM_GONE : (FAILURE_MESSAGES[reason] ?? FALLBACK_MESSAGE));
       setIsJoining(false);
     }
   };

@@ -60,8 +60,12 @@ describe('Landing screen', () => {
   });
 
   it('lists the rooms this device joined before, most recent first', () => {
-    rememberRoom({ pin: 'AAAA', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' });
-    rememberRoom({ pin: 'BBBB', nickname: 'ANA', joinedAt: '2026-07-25T11:00:00.000Z' });
+    rememberRoom({
+      pin: 'AAAA',
+      nickname: 'ANA',
+      joinedAt: new Date(Date.now() - 60_000).toISOString(),
+    });
+    rememberRoom({ pin: 'BBBB', nickname: 'ANA', joinedAt: new Date().toISOString() });
     renderLanding();
 
     const recent = screen.getAllByRole('button', { name: /rejoin/i });
@@ -71,12 +75,38 @@ describe('Landing screen', () => {
 
   it('takes the student straight back with the PIN already filled', async () => {
     const user = userEvent.setup();
-    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: '2026-07-25T10:00:00.000Z' });
+    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: new Date().toISOString() });
     renderLanding();
 
     await user.click(screen.getByRole('button', { name: /rejoin KPZT/i }));
 
     expect(navigate).toHaveBeenCalledWith('/play?pin=KPZT');
+  });
+
+  it('drops a room the server says is gone', () => {
+    rememberRoom({ pin: 'DEAD', nickname: 'ANA', joinedAt: new Date().toISOString() });
+    rememberRoom({ pin: 'LIVE', nickname: 'ANA', joinedAt: new Date().toISOString() });
+
+    render(
+      <MemoryRouter>
+        <LandingScreen resumableRoom={null} livePins={['LIVE']} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: /rejoin LIVE/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /rejoin DEAD/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the list while the check is still in flight, rather than an empty page', () => {
+    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: new Date().toISOString() });
+
+    render(
+      <MemoryRouter>
+        <LandingScreen resumableRoom={null} livePins={null} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: /rejoin KPZT/i })).toBeInTheDocument();
   });
 
   it('shows no history on a device that never joined anything', () => {

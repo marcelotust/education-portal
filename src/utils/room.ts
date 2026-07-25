@@ -4,6 +4,12 @@ const PIN_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
 export const PIN_LENGTH = 4;
 
+/**
+ * How long a room survives without the Host touching it. Mirrors the expiry
+ * sweep in supabase/migrations — change both together.
+ */
+export const ROOM_LIFETIME_HOURS = 5;
+
 /** Keeps nicknames readable inside a 6-slot grid on a phone screen. */
 export const MAX_NICKNAME_LENGTH = 12;
 

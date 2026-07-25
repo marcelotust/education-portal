@@ -7,13 +7,20 @@ import { listRecentRooms } from '@/lib/recentRooms';
 interface LandingScreenProps {
   /** An open room this visitor still hosts, if any. */
   resumableRoom: { pin: string } | null;
+  /**
+   * PINs confirmed to still exist. `null` while unknown — the list is shown
+   * optimistically rather than hidden behind a round trip.
+   */
+  livePins?: readonly string[] | null | undefined;
 }
 
 /** The front door: what this is, and the two ways in. */
-export const LandingScreen = ({ resumableRoom }: LandingScreenProps) => {
+export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) => {
   const navigate = useNavigate();
   // Read once: the list only changes by leaving this screen.
-  const [recentRooms] = useState(listRecentRooms);
+  const [remembered] = useState(listRecentRooms);
+  const recentRooms =
+    livePins == null ? remembered : remembered.filter((room) => livePins.includes(room.pin));
 
   return (
     <section className="flex flex-col gap-6">
