@@ -6,7 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 EduParty — a gamified, arcade-themed portal for online classes. A teacher (**Host**) creates a persistent room; students (**Clients**) join with a 4-letter PIN. The Host loads game "cartridges" (first one is **STOP**, a categories game) without ever dropping the room.
 
-Status: MVP steps 1–7 of `blueprint.md` are done. The lobby runs on **mock data** (`src/features/lobby/mockRoom.ts`); Supabase (Realtime Broadcast, Presence, Anonymous Auth, Postgres JSONB) is the planned backend but **not yet wired up**. `blueprint.md` is the source of truth for scope and the intended build order.
+Status: the MVP in `blueprint.md` is complete and runs against a live Supabase project. A round of STOP plays end to end: create/join by PIN, lobby, ad break, timed typing, Host validation, scoreboard. Open work lives in GitHub issues (landing page with room resume, room expiry, next cartridges).
+
+## Backend model
+
+Two sources of truth, deliberately split:
+
+- **Seats come from Realtime Presence** (`room:PIN` channel, `src/lib/room/presence.ts`) — ephemeral and live. Never persist a seat as authoritative: `buildSlotsFromPresence` rebuilds the whole board on every sync, which is why `scores` live on `RoomState` and not on `Player`.
+- **The FSM comes from the `public.rooms` row** (`state` JSONB), pushed to everyone via `postgres_changes`. The Host is the only writer, enforced by RLS (`host_id = auth.uid()`), not just by the UI.
+- **Answers travel over Broadcast** (`room-answers:PIN`), never through the table: six students must not fight over one Host-writable row. The Host consolidates them and persists the result.
+
+Every participant is an **anonymous Supabase user**; the session persists in `localStorage`, so a refresh keeps the same identity and score. Two tabs of the same browser share that identity — to test Host and Client together you need a second origin or a private window.
+
+Schema and RLS live in `supabase/migrations/`. Regenerate DB types with `npx supabase gen types typescript --linked --schema public` into `src/types/supabase.generated.ts`; `src/types/database.ts` narrows the JSONB column to the FSM state.
 
 ## Commands
 
@@ -22,6 +34,7 @@ Status: MVP steps 1–7 of `blueprint.md` are done. The lobby runs on **mock dat
 | `npm run typecheck`               | `tsc -b --noEmit`                     |
 
 Run a single test file: `npx vitest run src/features/lobby/LobbyScreen.spec.tsx`
+Inspect the live database: `npx supabase db query --linked "select pin, state->>'status' from public.rooms"`
 Filter by name: `npx vitest run -t "Host clicks Start"`
 
 ## Architecture
@@ -29,13 +42,14 @@ Filter by name: `npx vitest run -t "Host clicks Start"`
 Room state is a **finite state machine**, the core of the app. Everything hangs off it.
 
 - `src/hooks/roomMachine.ts` — a pure reducer (`roomReducer`). States: `LOBBY_IDLE → CONFIGURING_GAME → PLAYING_AD → PLAYING → CALCULATING_SCORES`. **Invalid transitions return the exact same state object** so React bails out of re-rendering — preserve this when adding cases.
-- `src/hooks/RoomProvider.tsx` — wraps the reducer in Context and enforces the role model: **control events are Host-only**. `isHostOnlyEvent` (everything except the `PLAYER_JOINED`/`PLAYER_LEFT` presence events) is dropped when the local `role` is `CLIENT`. Clients are read-only state listeners.
+- `src/hooks/RoomProvider.tsx` — wraps the reducer in Context and enforces the role model: **control events are Host-only**. `isHostOnlyEvent` (everything except the presence, remote-state and answer events) is dropped when the local `role` is `CLIENT`. Clients are read-only state listeners.
 - `src/types/room.ts` — `RoomState`, the `RoomEvent` union (the FSM's alphabet), and `RoomContextValue`. Adding a feature usually means: add an event to the union, handle it in `roomReducer`, and cover the transition in a spec.
-- `src/app/RoomRoute.tsx` mounts the provider for a role; `/host` → `HOST`, `/play` → `CLIENT` (see `src/app/App.tsx`).
+- `src/app/RoomRoute.tsx` shows the create/join screen until there is a session, then mounts the provider plus two bridges that render nothing: `RoomPresenceBridge` (seats) and `RoomStateBridge` (FSM). `/host` → `HOST`, `/play` → `CLIENT` (see `src/app/App.tsx`).
+- `src/features/room/RoomStage.tsx` maps the FSM status to a screen: lobby, ad break, STOP round, validation, scoreboard.
 
-The board is a **fixed 6-slot array** (`MAX_PLAYERS`); `null` means an open slot. The lobby renders it as a "Character Select" grid.
+The board is a **fixed 6-slot array** (`MAX_PLAYERS`); `null` means an open slot. The lobby renders it as a grid, with each seat carrying the session score from `RoomState.scores`.
 
-Directory layout: `src/app` (routing/composition), `src/components` (layout + shared UI), `src/features` (domains: `lobby/`, `gameplay/`), `src/hooks` (FSM + context), `src/types`, `src/utils`, `src/test` (Vitest setup + factories). Import via the `@/` alias (→ `src/`).
+Directory layout: `src/app` (routing/composition), `src/components` (layout + shared UI), `src/features` (domains: `lobby/`, `room/`, `gameplay/`), `src/hooks` (FSM, context, Realtime hooks), `src/lib` (Supabase client, auth, room data access), `src/types`, `src/utils`, `src/test` (Vitest setup + factories). Import via the `@/` alias (→ `src/`).
 
 ## Conventions (enforced by ESLint — see `blueprint.md` §3)
 
