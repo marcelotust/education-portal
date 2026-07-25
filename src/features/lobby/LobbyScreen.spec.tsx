@@ -47,6 +47,34 @@ describe('Lobby feature', () => {
       expect(screen.getByText('4/6 PLAYERS')).toBeInTheDocument();
     });
 
+    it('carries the score of each player into the next round', () => {
+      const room = { ...makeRoom({ playerCount: 2 }), scores: { 'player-0': 30, 'player-1': 20 } };
+      renderLobby('CLIENT', room);
+
+      expect(screen.getByTestId('player-slot-0')).toHaveTextContent('30');
+      expect(screen.getByTestId('player-slot-1')).toHaveTextContent('20');
+    });
+
+    it('shows zero for a player who has not scored yet', () => {
+      renderLobby('CLIENT', makeRoom({ playerCount: 2 }));
+
+      expect(screen.getByTestId('player-slot-0')).toHaveTextContent('0');
+    });
+
+    it('marks the player leading the session', () => {
+      const room = { ...makeRoom({ playerCount: 3 }), scores: { 'player-0': 10, 'player-1': 40 } };
+      renderLobby('CLIENT', room);
+
+      expect(screen.getByTestId('player-slot-1')).toHaveAttribute('data-leader', 'true');
+      expect(screen.getByTestId('player-slot-0')).toHaveAttribute('data-leader', 'false');
+    });
+
+    it('crowns nobody while everyone is still on zero', () => {
+      renderLobby('CLIENT', makeRoom({ playerCount: 3 }));
+
+      expect(screen.getByTestId('player-slot-0')).toHaveAttribute('data-leader', 'false');
+    });
+
     it('shows the room PIN so students can join', () => {
       renderLobby('HOST');
 

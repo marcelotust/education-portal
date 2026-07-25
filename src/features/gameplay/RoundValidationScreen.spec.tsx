@@ -48,6 +48,14 @@ describe('STOP validation screen', () => {
     expect(screen.getByText('BREAD')).toBeInTheDocument();
   });
 
+  it('shows the running score next to each player while the Host judges', () => {
+    const room = { ...judgingRoom(), scores: { 'player-0': 30 } };
+    renderValidation('HOST', room);
+
+    expect(screen.getAllByText(/ANA · 30/)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/BRUNO · 0/)[0]).toBeInTheDocument();
+  });
+
   it('shows a dash for a player who left the field empty', () => {
     const room = judgingRoom();
     renderValidation('HOST', room);

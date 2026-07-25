@@ -13,17 +13,20 @@ const AVATAR_COLORS: Record<AvatarId, string> = {
 interface PlayerSlotCardProps {
   index: number;
   slot: PlayerSlot;
+  /** Points carried over from earlier rounds in this session. */
+  score: number;
+  isLeader: boolean;
 }
 
-/** One seat of the 6-slot "Character Select" board. */
-export const PlayerSlotCard = ({ index, slot }: PlayerSlotCardProps) => (
+/** One seat of the 6-slot board, with the session score it carries. */
+export const PlayerSlotCard = ({ index, slot, score, isLeader }: PlayerSlotCardProps) => (
   <li
     data-testid={`player-slot-${index}`}
+    data-leader={isLeader}
     className={cn(
       'flex aspect-square flex-col items-center justify-center gap-1 rounded-md border-2 p-2 text-center',
-      slot
-        ? 'border-arcade-green/70 bg-slate-800'
-        : 'animate-blink border-dashed border-slate-700 bg-slate-900/60',
+      slot ? 'bg-slate-800' : 'animate-blink border-dashed border-slate-700 bg-slate-900/60',
+      slot && (isLeader ? 'border-arcade-yellow shadow-neon' : 'border-arcade-green/70'),
     )}
   >
     <span
@@ -31,10 +34,19 @@ export const PlayerSlotCard = ({ index, slot }: PlayerSlotCardProps) => (
     >
       {slot ? '◆' : '?'}
     </span>
+
     <span
       className={cn('break-all font-arcade text-[9px]', slot ? 'text-slate-100' : 'text-slate-600')}
     >
       {slot ? slot.nickname : 'OPEN'}
     </span>
+
+    {slot && (
+      <span
+        className={cn('font-arcade text-[9px]', isLeader ? 'text-arcade-yellow' : 'text-slate-500')}
+      >
+        {score}
+      </span>
+    )}
   </li>
 );

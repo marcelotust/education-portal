@@ -4,6 +4,8 @@ import { cn } from '@/utils/cn';
 interface CategoryValidationBlockProps {
   category: string;
   players: readonly Player[];
+  /** Running session score, shown so the Host judges with context. */
+  scores: Readonly<Record<string, number>>;
   answers: readonly StopAnswer[];
   canJudge: boolean;
   onJudge: (playerId: string, isValid: boolean) => void;
@@ -13,6 +15,7 @@ interface CategoryValidationBlockProps {
 export const CategoryValidationBlock = ({
   category,
   players,
+  scores,
   answers,
   canJudge,
   onJudge,
@@ -31,7 +34,9 @@ export const CategoryValidationBlock = ({
             key={player.id}
             className="flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-900/60 px-3 py-2"
           >
-            <span className="font-arcade text-[9px] text-slate-400">{player.nickname}</span>
+            <span className="font-arcade text-[9px] text-slate-400">
+              {player.nickname} · {scores[player.id] ?? 0}
+            </span>
 
             <span
               className={cn(
