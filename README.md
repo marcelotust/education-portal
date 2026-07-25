@@ -13,6 +13,48 @@ tracked in GitHub issues.
 Vite · React 19 · strict TypeScript · Tailwind CSS · React Router · Vitest + React Testing Library
 · Supabase (Postgres, Realtime, Anonymous Auth) · deployed on Vercel with Web Analytics
 
+## Getting started
+
+Node 22 (see `.nvmrc`; Vite 8 needs 20.19+ or 22.12+).
+
+```bash
+npm install
+cp .env.example .env.local
+```
+
+`.env.local` is gitignored and starts with the Supabase URL already filled in. You still need the
+**anon key**: ask a maintainer, or take it from the Supabase dashboard under Project Settings →
+API Keys if you have access to the project. It is a public key by design — it ends up in the client
+bundle either way — but the `service_role` key must never go in a `VITE_` variable.
+
+```bash
+npm run dev
+```
+
+Then open `/host` to create a room and `/play` to join one.
+
+### Testing with two players
+
+Two tabs of the same browser share one `localStorage`, therefore one anonymous identity, therefore
+**one seat**. To have a Host and a Client at the same time, use a private window, another browser,
+or a second origin:
+
+```bash
+npm run dev -- --host 127.0.0.1 --port 5174   # a different origin, so a separate identity
+```
+
+### Working on the database
+
+Schema and the expiry job live in `supabase/migrations/`. Applying them needs access to the
+Supabase project and the database password:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <project-ref>
+npx supabase db push
+npx supabase gen types typescript --linked --schema public > src/types/supabase.generated.ts
+```
+
 ## Scripts
 
 | Command                 | What it does                            |
