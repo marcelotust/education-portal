@@ -98,6 +98,35 @@ describe('room FSM', () => {
       ).toBe(idle);
     });
 
+    /** A round that still has a minute to run, so STOP has something to cut. */
+    const running = (): RoomState => ({
+      ...playing(),
+      currentRound: makeRound({ endsAt: new Date(Date.now() + 60_000).toISOString() }),
+    });
+
+    it('pulls the deadline in when a player calls STOP', () => {
+      const soon = new Date(Date.now() + 2000).toISOString();
+
+      const state = roomReducer(running(), { type: 'STOP_CALLED', endsAt: soon });
+
+      expect(state.currentRound?.endsAt).toBe(soon);
+    });
+
+    it('never lets a STOP push the deadline further away', () => {
+      const started = running();
+      const later = new Date(Date.now() + 999_000).toISOString();
+
+      expect(roomReducer(started, { type: 'STOP_CALLED', endsAt: later })).toBe(started);
+    });
+
+    it('ignores a STOP once the round is no longer running', () => {
+      const idle = withStatus('LOBBY_IDLE');
+
+      expect(roomReducer(idle, { type: 'STOP_CALLED', endsAt: new Date().toISOString() })).toBe(
+        idle,
+      );
+    });
+
     it('moves the round to the validation phase when it ends', () => {
       const state = roomReducer(playing(), { type: 'END_ROUND' });
 

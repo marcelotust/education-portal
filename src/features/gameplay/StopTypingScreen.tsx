@@ -13,29 +13,39 @@ export interface TypedAnswer {
 interface StopTypingScreenProps {
   round: StopRound;
   secondsLeft: number;
-  onSubmit: (answers: readonly TypedAnswer[]) => void;
+  /** `calledStop` is true only when the player finished and hit STOP. */
+  onSubmit: (answers: readonly TypedAnswer[], calledStop: boolean) => void;
 }
 
 export const StopTypingScreen = ({ round, secondsLeft, onSubmit }: StopTypingScreenProps) => {
   const [values, setValues] = useState<Record<string, string>>({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const submit = useCallback(() => {
-    if (hasSubmitted) return;
-    setHasSubmitted(true);
-    onSubmit(
-      round.categories.map((category) => ({
-        category,
-        value: (values[category] ?? '').trim().toUpperCase(),
-      })),
-    );
-  }, [hasSubmitted, onSubmit, round.categories, values]);
+  const submit = useCallback(
+    (calledStop: boolean) => {
+      if (hasSubmitted) return;
+      setHasSubmitted(true);
+      onSubmit(
+        round.categories.map((category) => ({
+          category,
+          value: (values[category] ?? '').trim().toUpperCase(),
+        })),
+        calledStop,
+      );
+    },
+    [hasSubmitted, onSubmit, round.categories, values],
+  );
 
   useEffect(() => {
     // The clock is external state; when it hits zero nothing typed is lost.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (secondsLeft <= 0) submit();
+    if (secondsLeft <= 0) submit(false);
   }, [secondsLeft, submit]);
+
+  // Classic STOP: only the player who filled everything may call it.
+  const missing = round.categories.filter(
+    (category) => (values[category] ?? '').trim() === '',
+  ).length;
 
   return (
     <section className="flex flex-col gap-4">
@@ -81,7 +91,13 @@ export const StopTypingScreen = ({ round, secondsLeft, onSubmit }: StopTypingScr
         ))}
       </div>
 
-      <ArcadeButton tone="pink" disabled={hasSubmitted} onClick={submit}>
+      {missing > 0 && !hasSubmitted && (
+        <p role="status" className="text-center font-terminal text-lg text-slate-500">
+          {missing} to go before you can call STOP
+        </p>
+      )}
+
+      <ArcadeButton tone="pink" disabled={hasSubmitted || missing > 0} onClick={() => submit(true)}>
         {hasSubmitted ? 'ANSWERS SENT' : 'STOP!'}
       </ArcadeButton>
     </section>

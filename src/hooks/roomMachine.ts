@@ -63,6 +63,21 @@ const toggleCategory = (state: RoomState, category: string): RoomState => {
   return { ...state, gameSetup: { ...state.gameSetup, categories: next } };
 };
 
+/**
+ * Someone filled every category and hit STOP. Rather than ending the round on
+ * the spot, the deadline is pulled in to a couple of seconds: every other
+ * player's screen then runs the same countdown it already knows how to run,
+ * auto-submitting whatever they had typed. Nothing in flight is lost.
+ */
+const callStop = (state: RoomState, endsAt: string): RoomState => {
+  const round = state.currentRound;
+  if (state.status !== 'PLAYING' || round === null) return state;
+  // A later deadline never wins: STOP only ever shortens the round.
+  if (round.endsAt !== null && round.endsAt <= endsAt) return state;
+
+  return { ...state, currentRound: { ...round, endsAt } };
+};
+
 const judgeAnswer = (
   state: RoomState,
   event: Extract<RoomEvent, { type: 'ANSWER_JUDGED' }>,
@@ -157,6 +172,9 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'ANSWERS_SUBMITTED':
       return submitAnswers(state, event);
+
+    case 'STOP_CALLED':
+      return callStop(state, event.endsAt);
 
     case 'ANSWER_JUDGED':
       return judgeAnswer(state, event);

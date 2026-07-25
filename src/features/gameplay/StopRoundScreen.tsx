@@ -6,6 +6,12 @@ import { useRoom } from '@/hooks/useRoom';
 import type { StopAnswer } from '@/types';
 import { StopTypingScreen, type TypedAnswer } from './StopTypingScreen';
 
+/**
+ * Breathing room between somebody calling STOP and the round closing, so every
+ * other screen has time to auto-submit what was typed.
+ */
+const STOP_GRACE_MS = 2000;
+
 interface StopRoundScreenProps {
   playerId: string;
 }
@@ -21,9 +27,17 @@ export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
       dispatch({ type: 'ANSWERS_SUBMITTED', playerId: from, answers }),
     [dispatch],
   );
-  const broadcast = useAnswerBroadcast({ pin: state.pin, onAnswers });
 
-  const handleSubmit = (typed: readonly TypedAnswer[]) => {
+  const onStopCalled = useCallback(() => {
+    // Only the Host writes the room, so only it turns a STOP into a deadline.
+    if (isHost) {
+      dispatch({ type: 'STOP_CALLED', endsAt: new Date(Date.now() + STOP_GRACE_MS).toISOString() });
+    }
+  }, [isHost, dispatch]);
+
+  const channel = useAnswerBroadcast({ pin: state.pin, onAnswers, onStopCalled });
+
+  const handleSubmit = (typed: readonly TypedAnswer[], calledStop: boolean) => {
     const answers: StopAnswer[] = typed.map(({ category, value }) => ({
       playerId,
       category,
@@ -32,7 +46,13 @@ export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
     }));
 
     dispatch({ type: 'ANSWERS_SUBMITTED', playerId, answers });
-    broadcast({ playerId, answers });
+    channel.sendAnswers({ playerId, answers });
+
+    // Filling every category is what earns the right to end the round.
+    if (calledStop) {
+      channel.callStop();
+      onStopCalled();
+    }
   };
 
   useEffect(() => {

@@ -25,6 +25,42 @@ describe('STOP typing phase', () => {
     expect(screen.getByTestId('round-timer')).toHaveTextContent('45');
   });
 
+  it('keeps STOP out of reach until every category has something in it', async () => {
+    const user = userEvent.setup();
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={45} />);
+
+    expect(screen.getByRole('button', { name: /stop/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText('ANIMAL'), 'bear');
+    await user.type(screen.getByLabelText('FOOD'), 'bread');
+    expect(screen.getByRole('button', { name: /stop/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText('COUNTRY'), 'brazil');
+    expect(screen.getByRole('button', { name: /stop/i })).toBeEnabled();
+  });
+
+  it('does not count whitespace as an answer', async () => {
+    const user = userEvent.setup();
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={45} />);
+
+    await user.type(screen.getByLabelText('ANIMAL'), 'bear');
+    await user.type(screen.getByLabelText('FOOD'), 'bread');
+    await user.type(screen.getByLabelText('COUNTRY'), '   ');
+
+    expect(screen.getByRole('button', { name: /stop/i })).toBeDisabled();
+  });
+
+  it('tells the player how many fields are still empty', async () => {
+    const user = userEvent.setup();
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={45} />);
+
+    expect(screen.getByRole('status')).toHaveTextContent(/3 to go/i);
+
+    await user.type(screen.getByLabelText('ANIMAL'), 'bear');
+
+    expect(screen.getByRole('status')).toHaveTextContent(/2 to go/i);
+  });
+
   it('sends every category, uppercased, when the player hits STOP', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -32,19 +68,30 @@ describe('STOP typing phase', () => {
 
     await user.type(screen.getByLabelText('ANIMAL'), 'bear');
     await user.type(screen.getByLabelText('FOOD'), 'bread');
+    await user.type(screen.getByLabelText('COUNTRY'), 'brazil');
     await user.click(screen.getByRole('button', { name: /stop/i }));
 
-    expect(onSubmit).toHaveBeenCalledWith([
-      { category: 'ANIMAL', value: 'BEAR' },
-      { category: 'FOOD', value: 'BREAD' },
-      { category: 'COUNTRY', value: '' },
-    ]);
+    expect(onSubmit).toHaveBeenCalledWith(
+      [
+        { category: 'ANIMAL', value: 'BEAR' },
+        { category: 'FOOD', value: 'BREAD' },
+        { category: 'COUNTRY', value: 'BRAZIL' },
+      ],
+      true,
+    );
   });
 
   it('locks the fields once the player has submitted', async () => {
     const user = userEvent.setup();
-    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={45} />);
+    render(
+      <StopTypingScreen
+        round={round({ categories: ['ANIMAL'] })}
+        onSubmit={vi.fn()}
+        secondsLeft={45}
+      />,
+    );
 
+    await user.type(screen.getByLabelText('ANIMAL'), 'bear');
     await user.click(screen.getByRole('button', { name: /stop/i }));
 
     expect(screen.getByLabelText('ANIMAL')).toBeDisabled();
@@ -54,8 +101,15 @@ describe('STOP typing phase', () => {
   it('does not submit twice when the player clicks STOP again', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<StopTypingScreen round={round()} onSubmit={onSubmit} secondsLeft={45} />);
+    render(
+      <StopTypingScreen
+        round={round({ categories: ['ANIMAL'] })}
+        onSubmit={onSubmit}
+        secondsLeft={45}
+      />,
+    );
 
+    await user.type(screen.getByLabelText('ANIMAL'), 'bear');
     await user.click(screen.getByRole('button', { name: /stop/i }));
     await user.click(screen.getByRole('button', { name: /answers sent/i }));
 
@@ -70,6 +124,8 @@ describe('STOP typing phase', () => {
 
     rerender(<StopTypingScreen round={round()} onSubmit={onSubmit} secondsLeft={0} />);
 
+    // Running out of time is not calling STOP.
+    expect(onSubmit).toHaveBeenCalledWith(expect.anything(), false);
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('ANIMAL')).toBeDisabled();
   });
