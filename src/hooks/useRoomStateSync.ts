@@ -19,15 +19,22 @@ interface UseRoomStateSyncOptions {
 }
 
 /**
- * Two halves of one loop: the Host writes every FSM change to the room row,
- * and everyone (Host included) applies the row updates Realtime pushes back.
- * The reducer bails out on an unchanged state, so the echo cannot loop.
+ * The Host writes every FSM change to the room row; the Clients apply what
+ * Realtime pushes back.
+ *
+ * The Host deliberately does **not** listen to itself. RLS makes it the only
+ * writer, so the row can tell it nothing it does not already know — while the
+ * echo arrives late enough to undo a newer local change. Two clicks about a
+ * second apart used to lose the second one: the echo of the first write landed
+ * after the second click and reverted it.
  */
 export const useRoomStateSync = ({ state, isHost, onRemoteState }: UseRoomStateSyncOptions) => {
   const { pin } = state;
   const lastPersisted = useRef<string | null>(null);
 
   useEffect(() => {
+    if (isHost) return;
+
     const client = getSupabaseClient();
     const channel = client
       .channel(`room-row:${pin}`)
@@ -46,7 +53,7 @@ export const useRoomStateSync = ({ state, isHost, onRemoteState }: UseRoomStateS
     };
     // onRemoteState is a stable dispatch wrapper.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin]);
+  }, [pin, isHost]);
 
   useEffect(() => {
     if (!isHost) return;

@@ -32,6 +32,22 @@ is accurate for the `ROOM_FULL` check and for a late joiner.
   answers"; RLS already pushes the same way.
 - **Everything over Broadcast.** Nothing would survive a refresh.
 
+## Amendment (2026-07-25): the Host does not listen to itself
+
+The Host originally applied the row updates it received like everyone else. That
+was wrong, and it corrupted state: the echo of a write arrives asynchronously, so
+a second click landing before the echo of the first was silently reverted about a
+second later. Measured in the browser — the cartridge selection turned on at
++300ms and back off at +1s, with no error anywhere.
+
+RLS makes the Host the only writer, so the row can tell it nothing it does not
+already know. `useRoomStateSync` now subscribes only when the local participant
+is a Client. The rule generalises: **a single writer must not treat its own
+broadcast as input**.
+
+Known limit: two Host tabs sharing one identity (see #4) would both write and
+neither would hear the other. Out of scope while a Host is one tab.
+
 ## Consequences
 
 - `buildSlotsFromPresence` rebuilds the whole board on every sync, so nothing
