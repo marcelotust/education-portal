@@ -10,7 +10,7 @@ import { StopTypingScreen, type TypedAnswer } from './StopTypingScreen';
  * Breathing room between somebody calling STOP and the round closing, so every
  * other screen has time to auto-submit what was typed.
  */
-const STOP_GRACE_MS = 2000;
+const STOP_GRACE_MS = 5000;
 
 interface StopRoundScreenProps {
   playerId: string;
@@ -28,12 +28,19 @@ export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
     [dispatch],
   );
 
-  const onStopCalled = useCallback(() => {
-    // Only the Host writes the room, so only it turns a STOP into a deadline.
-    if (isHost) {
-      dispatch({ type: 'STOP_CALLED', endsAt: new Date(Date.now() + STOP_GRACE_MS).toISOString() });
-    }
-  }, [isHost, dispatch]);
+  const onStopCalled = useCallback(
+    (calledBy: string) => {
+      // Only the Host writes the room, so only it turns a STOP into a deadline.
+      if (isHost) {
+        dispatch({
+          type: 'STOP_CALLED',
+          playerId: calledBy,
+          endsAt: new Date(Date.now() + STOP_GRACE_MS).toISOString(),
+        });
+      }
+    },
+    [isHost, dispatch],
+  );
 
   const channel = useAnswerBroadcast({ pin: state.pin, onAnswers, onStopCalled });
 
@@ -50,8 +57,8 @@ export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
 
     // Filling every category is what earns the right to end the round.
     if (calledStop) {
-      channel.callStop();
-      onStopCalled();
+      channel.callStop(playerId);
+      onStopCalled(playerId);
     }
   };
 
@@ -62,5 +69,14 @@ export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
 
   if (round === null) return null;
 
-  return <StopTypingScreen round={round} secondsLeft={secondsLeft} onSubmit={handleSubmit} />;
+  const caller = state.slots.find((slot) => slot?.id === round.stoppedBy);
+
+  return (
+    <StopTypingScreen
+      round={round}
+      secondsLeft={secondsLeft}
+      stoppedByNickname={caller?.nickname}
+      onSubmit={handleSubmit}
+    />
+  );
 };

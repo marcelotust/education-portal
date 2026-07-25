@@ -41,7 +41,7 @@ export type RoomEvent =
   | { type: 'START_GAME' }
   | { type: 'AD_FINISHED'; round: StopRound }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }
-  | { type: 'STOP_CALLED'; endsAt: string }
+  | { type: 'STOP_CALLED'; playerId: string; endsAt: string }
   | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
   | { type: 'REMAINING_ANSWERS_APPROVED' }
   | { type: 'ROUND_SCORED' }

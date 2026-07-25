@@ -107,24 +107,51 @@ describe('room FSM', () => {
     it('pulls the deadline in when a player calls STOP', () => {
       const soon = new Date(Date.now() + 2000).toISOString();
 
-      const state = roomReducer(running(), { type: 'STOP_CALLED', endsAt: soon });
+      const state = roomReducer(running(), {
+        type: 'STOP_CALLED',
+        playerId: 'player-1',
+        endsAt: soon,
+      });
 
       expect(state.currentRound?.endsAt).toBe(soon);
+      expect(state.currentRound?.stoppedBy).toBe('player-1');
+    });
+
+    it('credits the first caller when a second STOP lands right after', () => {
+      const first = roomReducer(running(), {
+        type: 'STOP_CALLED',
+        playerId: 'player-1',
+        endsAt: new Date(Date.now() + 5000).toISOString(),
+      });
+
+      const second = roomReducer(first, {
+        type: 'STOP_CALLED',
+        playerId: 'player-2',
+        endsAt: new Date(Date.now() + 4000).toISOString(),
+      });
+
+      expect(second.currentRound?.stoppedBy).toBe('player-1');
     });
 
     it('never lets a STOP push the deadline further away', () => {
       const started = running();
       const later = new Date(Date.now() + 999_000).toISOString();
 
-      expect(roomReducer(started, { type: 'STOP_CALLED', endsAt: later })).toBe(started);
+      expect(
+        roomReducer(started, { type: 'STOP_CALLED', playerId: 'player-1', endsAt: later }),
+      ).toBe(started);
     });
 
     it('ignores a STOP once the round is no longer running', () => {
       const idle = withStatus('LOBBY_IDLE');
 
-      expect(roomReducer(idle, { type: 'STOP_CALLED', endsAt: new Date().toISOString() })).toBe(
-        idle,
-      );
+      expect(
+        roomReducer(idle, {
+          type: 'STOP_CALLED',
+          playerId: 'player-1',
+          endsAt: new Date().toISOString(),
+        }),
+      ).toBe(idle);
     });
 
     it('moves the round to the validation phase when it ends', () => {

@@ -69,13 +69,14 @@ const toggleCategory = (state: RoomState, category: string): RoomState => {
  * player's screen then runs the same countdown it already knows how to run,
  * auto-submitting whatever they had typed. Nothing in flight is lost.
  */
-const callStop = (state: RoomState, endsAt: string): RoomState => {
+const callStop = (state: RoomState, playerId: string, endsAt: string): RoomState => {
   const round = state.currentRound;
   if (state.status !== 'PLAYING' || round === null) return state;
   // A later deadline never wins: STOP only ever shortens the round.
   if (round.endsAt !== null && round.endsAt <= endsAt) return state;
 
-  return { ...state, currentRound: { ...round, endsAt } };
+  // The first caller keeps the credit even if a second STOP lands.
+  return { ...state, currentRound: { ...round, endsAt, stoppedBy: round.stoppedBy ?? playerId } };
 };
 
 const judgeAnswer = (
@@ -174,7 +175,7 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return submitAnswers(state, event);
 
     case 'STOP_CALLED':
-      return callStop(state, event.endsAt);
+      return callStop(state, event.playerId, event.endsAt);
 
     case 'ANSWER_JUDGED':
       return judgeAnswer(state, event);

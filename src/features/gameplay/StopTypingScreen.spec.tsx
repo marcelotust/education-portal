@@ -130,3 +130,42 @@ describe('STOP typing phase', () => {
     expect(screen.getByLabelText('ANIMAL')).toBeDisabled();
   });
 });
+
+describe('the closing seconds', () => {
+  it('stays calm while there is plenty of time', () => {
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={45} />);
+
+    expect(screen.getByTestId('round-timer')).toHaveAttribute('data-urgency', 'calm');
+  });
+
+  it('warns from ten seconds out', () => {
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={10} />);
+
+    expect(screen.getByTestId('round-timer')).toHaveAttribute('data-urgency', 'warning');
+  });
+
+  it('turns critical for the last five', () => {
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={5} />);
+
+    expect(screen.getByTestId('round-timer')).toHaveAttribute('data-urgency', 'critical');
+  });
+
+  it('announces who called STOP, so nobody wonders why the clock jumped', () => {
+    render(
+      <StopTypingScreen
+        round={round({ stoppedBy: 'player-1' })}
+        stoppedByNickname="ANA"
+        onSubmit={vi.fn()}
+        secondsLeft={5}
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/ANA called STOP/i);
+  });
+
+  it('says nothing while the round is running normally', () => {
+    render(<StopTypingScreen round={round()} onSubmit={vi.fn()} secondsLeft={20} />);
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ArcadeButton } from '@/components/ui/ArcadeButton';
 import { ArcadeInput } from '@/components/ui/ArcadeInput';
 import type { StopRound } from '@/types';
+import { cn } from '@/utils/cn';
 
 /** One typed field, before it becomes a judged StopAnswer. */
 export interface TypedAnswer {
@@ -10,14 +11,34 @@ export interface TypedAnswer {
   value: string;
 }
 
+/** Three bands the closing seconds are shown in, so the pressure is visible. */
+const urgencyFor = (secondsLeft: number): 'calm' | 'warning' | 'critical' => {
+  if (secondsLeft <= 5) return 'critical';
+  if (secondsLeft <= 10) return 'warning';
+  return 'calm';
+};
+
+const URGENCY_STYLES = {
+  calm: 'text-arcade-cyan',
+  warning: 'text-arcade-yellow scale-110',
+  critical: 'animate-blink text-arcade-pink scale-125',
+} as const;
+
 interface StopTypingScreenProps {
   round: StopRound;
   secondsLeft: number;
+  /** Set once somebody called STOP, so everyone knows why the clock jumped. */
+  stoppedByNickname?: string | undefined;
   /** `calledStop` is true only when the player finished and hit STOP. */
   onSubmit: (answers: readonly TypedAnswer[], calledStop: boolean) => void;
 }
 
-export const StopTypingScreen = ({ round, secondsLeft, onSubmit }: StopTypingScreenProps) => {
+export const StopTypingScreen = ({
+  round,
+  secondsLeft,
+  stoppedByNickname,
+  onSubmit,
+}: StopTypingScreenProps) => {
   const [values, setValues] = useState<Record<string, string>>({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -68,12 +89,25 @@ export const StopTypingScreen = ({ round, secondsLeft, onSubmit }: StopTypingScr
           </span>
           <span
             data-testid="round-timer"
-            className={`font-arcade text-2xl ${secondsLeft <= 10 ? 'animate-blink text-arcade-pink' : 'text-arcade-cyan'}`}
+            data-urgency={urgencyFor(secondsLeft)}
+            className={cn(
+              'font-arcade text-2xl transition-transform duration-300',
+              URGENCY_STYLES[urgencyFor(secondsLeft)],
+            )}
           >
             {secondsLeft}
           </span>
         </div>
       </header>
+
+      {round.stoppedBy !== null && (
+        <p
+          role="alert"
+          className="animate-blink rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+        >
+          {stoppedByNickname ?? 'SOMEBODY'} CALLED STOP! LAST SECONDS
+        </p>
+      )}
 
       <div className="flex flex-col gap-3">
         {round.categories.map((category) => (

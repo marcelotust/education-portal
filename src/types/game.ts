@@ -39,6 +39,8 @@ export interface StopRound {
   categories: readonly string[];
   answers: readonly StopAnswer[];
   endsAt: string | null;
+  /** Who filled everything first and called STOP; `null` if time ran out. */
+  stoppedBy: string | null;
   /** Guards against the Host scoring the same round twice. */
   isScored: boolean;
 }

@@ -15,12 +15,12 @@ interface UseAnswerBroadcastOptions {
   pin: string;
   onAnswers: (message: AnswersMessage) => void;
   /** Somebody filled every category and called STOP. */
-  onStopCalled: () => void;
+  onStopCalled: (playerId: string) => void;
 }
 
 export interface AnswerChannel {
   sendAnswers: (message: AnswersMessage) => void;
-  callStop: () => void;
+  callStop: (playerId: string) => void;
 }
 
 /**
@@ -43,8 +43,8 @@ export const useAnswerBroadcast = ({
       .on('broadcast', { event: ANSWERS_EVENT }, ({ payload }) => {
         onAnswers(payload as AnswersMessage);
       })
-      .on('broadcast', { event: STOP_EVENT }, () => {
-        onStopCalled();
+      .on('broadcast', { event: STOP_EVENT }, ({ payload }) => {
+        onStopCalled((payload as { playerId: string }).playerId);
       })
       .subscribe();
 
@@ -52,8 +52,8 @@ export const useAnswerBroadcast = ({
       sendAnswers: (message) => {
         void channel.send({ type: 'broadcast', event: ANSWERS_EVENT, payload: message });
       },
-      callStop: () => {
-        void channel.send({ type: 'broadcast', event: STOP_EVENT, payload: {} });
+      callStop: (playerId) => {
+        void channel.send({ type: 'broadcast', event: STOP_EVENT, payload: { playerId } });
       },
     };
 
@@ -69,7 +69,7 @@ export const useAnswerBroadcast = ({
     (message: AnswersMessage) => channelRef.current?.sendAnswers(message),
     [],
   );
-  const callStop = useCallback(() => channelRef.current?.callStop(), []);
+  const callStop = useCallback((playerId: string) => channelRef.current?.callStop(playerId), []);
 
   return { sendAnswers, callStop };
 };

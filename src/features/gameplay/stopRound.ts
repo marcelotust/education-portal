@@ -32,6 +32,7 @@ export const createStopRound = (setup: StopSetup, now = new Date()): StopRound =
   letter: drawLetter(),
   categories: setup.categories,
   answers: [],
+  stoppedBy: null,
   isScored: false,
   endsAt: new Date(now.getTime() + setup.roundDurationSeconds * 1000).toISOString(),
 });

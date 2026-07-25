@@ -21,6 +21,7 @@ export const makeRound = (overrides: Partial<StopRound> = {}): StopRound => ({
   letter: 'B',
   categories: ['ANIMAL', 'FOOD'],
   answers: [],
+  stoppedBy: null,
   endsAt: '2026-07-24T12:01:00.000Z',
   isScored: false,
   ...overrides,
