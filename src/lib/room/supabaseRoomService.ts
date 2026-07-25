@@ -90,9 +90,43 @@ const joinRoom = async (
   return { room, playerId, role: 'CLIENT', nickname, joinedAt: new Date().toISOString() };
 };
 
+/**
+ * The room outlives the tab that created it, so a returning Host should walk
+ * back in instead of minting a new room and stranding the students.
+ * Never signs in: no session means there is nothing to resume.
+ */
+const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | null> => {
+  const { data: auth } = await client.auth.getSession();
+  const hostId = auth.session?.user.id;
+  if (hostId === undefined) return null;
+
+  const { data, error } = await client
+    .from('rooms')
+    .select()
+    .eq('host_id', hostId)
+    .eq('is_open', true)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle<RoomRow>();
+
+  if (error !== null || data === null) return null;
+
+  const room = rowToRoomState(data);
+  const seat = room.slots.find((slot) => slot?.id === hostId);
+
+  return {
+    room,
+    playerId: hostId,
+    role: 'HOST',
+    nickname: seat?.nickname ?? 'HOST',
+    joinedAt: new Date().toISOString(),
+  };
+};
+
 export const createSupabaseRoomService = (
   client: EduPartyClient = getSupabaseClient(),
 ): RoomService => ({
   createRoom: (nickname) => createRoom(client, nickname),
   joinRoom: (pin, nickname) => joinRoom(client, pin, nickname),
+  findResumableRoom: () => findResumableRoom(client),
 });

@@ -4,14 +4,23 @@ import { ArcadeButton } from '@/components/ui/ArcadeButton';
 import { ArcadeInput } from '@/components/ui/ArcadeInput';
 import type { CreateRoom, RoomSession } from '@/types/roomService';
 import { MAX_NICKNAME_LENGTH } from '@/utils/room';
+import { ResumeRoomBanner } from './ResumeRoomBanner';
 
 interface HostEntryScreenProps {
   createRoom: CreateRoom;
   onReady: (session: RoomSession) => void;
+  /** An open room this teacher already owns, if any. */
+  resumableRoom?: RoomSession | null | undefined;
+  onResume?: ((session: RoomSession) => void) | undefined;
 }
 
 /** First screen of /host: anyone can open a room, and takes seat 1 in it. */
-export const HostEntryScreen = ({ createRoom, onReady }: HostEntryScreenProps) => {
+export const HostEntryScreen = ({
+  createRoom,
+  onReady,
+  resumableRoom,
+  onResume,
+}: HostEntryScreenProps) => {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -38,8 +47,14 @@ export const HostEntryScreen = ({ createRoom, onReady }: HostEntryScreenProps) =
 
   return (
     <form className="flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>
+      {resumableRoom != null && onResume !== undefined && (
+        <ResumeRoomBanner session={resumableRoom} onResume={onResume} />
+      )}
+
       <header className="flex flex-col items-center gap-2">
-        <h1 className="text-neon font-arcade text-sm text-arcade-pink">NEW ROOM</h1>
+        <h1 className="text-neon font-arcade text-sm text-arcade-pink">
+          {resumableRoom == null ? 'NEW ROOM' : 'OR START A NEW ROOM'}
+        </h1>
         <p className="text-center font-terminal text-lg text-slate-400">
           You host the room and play as player 1 of 6.
         </p>

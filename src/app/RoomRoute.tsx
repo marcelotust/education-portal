@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { HostEntryScreen } from '@/features/room/HostEntryScreen';
@@ -22,16 +22,30 @@ interface RoomRouteProps {
 export const RoomRoute = ({ role }: RoomRouteProps) => {
   const service = useMemo(() => createSupabaseRoomService(), []);
   const [session, setSession] = useState<RoomSession | null>(null);
+  const [resumableRoom, setResumableRoom] = useState<RoomSession | null>(null);
 
-  return (
-    <AppLayout>
-      {session === null ? (
-        role === 'HOST' ? (
-          <HostEntryScreen createRoom={service.createRoom} onReady={setSession} />
-        ) : (
-          <JoinRoomScreen joinRoom={service.joinRoom} onReady={setSession} />
-        )
-      ) : (
+  useEffect(() => {
+    if (role !== 'HOST') return;
+
+    let isCurrent = true;
+    // A Host coming back must not mint a new room over the one still running.
+    void service
+      .findResumableRoom()
+      .then((found) => {
+        if (isCurrent) setResumableRoom(found);
+      })
+      .catch(() => {
+        // Nothing to resume is a perfectly normal outcome.
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [role, service]);
+
+  if (session !== null) {
+    return (
+      <AppLayout>
         <RoomProvider initialState={session.room} role={session.role}>
           <RoomPresenceBridge
             me={{
@@ -44,6 +58,21 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
           <RoomStateBridge />
           <RoomStage playerId={session.playerId} />
         </RoomProvider>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      {role === 'HOST' ? (
+        <HostEntryScreen
+          createRoom={service.createRoom}
+          onReady={setSession}
+          resumableRoom={resumableRoom}
+          onResume={setSession}
+        />
+      ) : (
+        <JoinRoomScreen joinRoom={service.joinRoom} onReady={setSession} />
       )}
     </AppLayout>
   );

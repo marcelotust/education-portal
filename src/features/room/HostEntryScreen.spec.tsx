@@ -15,6 +15,65 @@ const session = (): RoomSession => ({
 });
 
 describe('Host entry screen', () => {
+  describe('resuming a room the teacher already owns', () => {
+    it('offers the open room instead of silently abandoning it', () => {
+      const resumable = { ...session(), room: { ...makeRoom({ playerCount: 3 }), pin: 'KPZT' } };
+      render(
+        <HostEntryScreen
+          createRoom={vi.fn()}
+          onReady={vi.fn()}
+          resumableRoom={resumable}
+          onResume={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText('KPZT')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /resume room/i })).toBeInTheDocument();
+    });
+
+    it('hands the existing session back when the teacher resumes', async () => {
+      const user = userEvent.setup();
+      const resumable = session();
+      const onResume = vi.fn();
+      render(
+        <HostEntryScreen
+          createRoom={vi.fn()}
+          onReady={vi.fn()}
+          resumableRoom={resumable}
+          onResume={onResume}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /resume room/i }));
+
+      expect(onResume).toHaveBeenCalledWith(resumable);
+    });
+
+    it('still lets the teacher start a fresh room instead', async () => {
+      const user = userEvent.setup();
+      const createRoom = vi.fn().mockResolvedValue(session());
+      render(
+        <HostEntryScreen
+          createRoom={createRoom}
+          onReady={vi.fn()}
+          resumableRoom={session()}
+          onResume={vi.fn()}
+        />,
+      );
+
+      await user.type(screen.getByLabelText(/nickname/i), 'TEACHER');
+      await user.click(screen.getByRole('button', { name: /create room/i }));
+
+      expect(createRoom).toHaveBeenCalledWith('TEACHER');
+    });
+
+    it('shows no resume offer when there is no open room', () => {
+      render(<HostEntryScreen createRoom={vi.fn()} onReady={vi.fn()} />);
+
+      expect(screen.queryByRole('button', { name: /resume room/i })).not.toBeInTheDocument();
+    });
+  });
+
   it('creates a room with the nickname the teacher typed', async () => {
     const user = userEvent.setup();
     const createRoom = vi.fn().mockResolvedValue(session());
