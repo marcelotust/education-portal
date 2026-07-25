@@ -18,6 +18,9 @@ export interface RoomState {
   currentRound: StopRound | null;
 }
 
+/** The room row stores everything except the PIN and host, which are columns. */
+export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId'>;
+
 /**
  * Events the FSM understands. Control events (everything except the
  * `PLAYER_*` presence events) are Host-only and are dropped for Clients.
@@ -32,7 +35,8 @@ export type RoomEvent =
   | { type: 'RETURN_TO_LOBBY' }
   | { type: 'PLAYER_JOINED'; player: Player }
   | { type: 'PLAYER_LEFT'; playerId: string }
-  | { type: 'PLAYERS_SYNCED'; slots: readonly PlayerSlot[] };
+  | { type: 'PLAYERS_SYNCED'; slots: readonly PlayerSlot[] }
+  | { type: 'ROOM_STATE_RECEIVED'; state: PersistedRoomState };
 
 export type RoomEventType = RoomEvent['type'];
 

@@ -86,4 +86,45 @@ describe('room FSM', () => {
 
     expect(roomReducer(room, { type: 'PLAYERS_SYNCED', slots: room.slots })).toBe(room);
   });
+
+  describe('remote state received from the Host', () => {
+    const remote = (over: Partial<RoomState> = {}) => ({
+      status: 'PLAYING' as const,
+      slots: [],
+      selectedGameId: 'STOP' as const,
+      currentRound: null,
+      ...over,
+    });
+
+    it('applies the flow the Host broadcast', () => {
+      const next = roomReducer(makeRoom(), { type: 'ROOM_STATE_RECEIVED', state: remote() });
+
+      expect(next.status).toBe('PLAYING');
+      expect(next.selectedGameId).toBe('STOP');
+    });
+
+    it('never lets the remote row overwrite the presence-driven board', () => {
+      const room = makeRoom({ playerCount: 3 });
+
+      const next = roomReducer(room, { type: 'ROOM_STATE_RECEIVED', state: remote() });
+
+      expect(next.slots).toBe(room.slots);
+    });
+
+    it('keeps the same state object when the remote row matches the local flow', () => {
+      const room = makeRoom({ playerCount: 3 });
+      const echo = {
+        status: room.status,
+        slots: room.slots,
+        selectedGameId: room.selectedGameId,
+        currentRound: room.currentRound,
+      };
+
+      expect(roomReducer(room, { type: 'ROOM_STATE_RECEIVED', state: echo })).toBe(room);
+    });
+
+    it('is not a Host-only event: Clients must be able to apply it', () => {
+      expect(isHostOnlyEvent({ type: 'ROOM_STATE_RECEIVED', state: remote() })).toBe(false);
+    });
+  });
 });

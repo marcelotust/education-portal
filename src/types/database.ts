@@ -1,12 +1,9 @@
-import type { RoomState } from './room';
+import type { PersistedRoomState } from './room';
 import type { Database, Json } from './supabase.generated';
 
-export type { Database, Json };
+export type { Database, Json, PersistedRoomState };
 
 type RoomTable = Database['public']['Tables']['rooms'];
-
-/** The JSONB payload stored in `rooms.state`; PIN and host live in columns. */
-export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId'>;
 
 /** The generated Row types `state` as `Json`; the app knows what it really is. */
 export type RoomRow = Omit<RoomTable['Row'], 'state'> & { state: PersistedRoomState };

@@ -5,6 +5,7 @@ import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { HostEntryScreen } from '@/features/room/HostEntryScreen';
 import { JoinRoomScreen } from '@/features/room/JoinRoomScreen';
 import { RoomPresenceBridge } from '@/features/room/RoomPresenceBridge';
+import { RoomStateBridge } from '@/features/room/RoomStateBridge';
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 import type { PlayerRole } from '@/types';
@@ -40,6 +41,7 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
               joinedAt: session.joinedAt,
             }}
           />
+          <RoomStateBridge />
           <LobbyScreen />
         </RoomProvider>
       )}

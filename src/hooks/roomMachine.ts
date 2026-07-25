@@ -11,6 +11,8 @@ const PRESENCE_EVENTS: readonly RoomEventType[] = [
   'PLAYER_JOINED',
   'PLAYER_LEFT',
   'PLAYERS_SYNCED',
+  // Broadcast by the room row, which only the Host can write anyway.
+  'ROOM_STATE_RECEIVED',
 ];
 
 const sameBoard = (a: readonly PlayerSlot[], b: readonly PlayerSlot[]): boolean =>
@@ -75,6 +77,17 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'PLAYER_LEFT':
       return releaseSlot(state, event.playerId);
+
+    case 'ROOM_STATE_RECEIVED': {
+      const { status, selectedGameId, currentRound } = event.state;
+      const unchanged =
+        state.status === status &&
+        state.selectedGameId === selectedGameId &&
+        state.currentRound === currentRound;
+
+      // Seats come from Presence; the row never overwrites the live board.
+      return unchanged ? state : { ...state, status, selectedGameId, currentRound };
+    }
 
     case 'PLAYERS_SYNCED': {
       // Realtime Presence owns the board; it arrives already normalised to 6.
