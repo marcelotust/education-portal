@@ -10,17 +10,19 @@ const normalise = (value: string): string => value.trim().toUpperCase();
 const counts = (isValid: boolean | null, value: string): boolean =>
   isValid !== false && normalise(value) !== '';
 
+export interface AnswerPoints {
+  playerId: string;
+  category: string;
+  points: number;
+}
+
 /**
- * Points per player for a finished round. Duplicates are compared per category
- * and only among answers that count, so a rejected copy of a word never drags
- * down the player who wrote it legitimately.
+ * What every single answer is worth, so the Host can see the duplicate rule at
+ * work while judging: rejecting one copy of a word hands the other player the
+ * full points back.
  */
-export const computeRoundScores = (
-  round: StopRound,
-  playerIds: readonly string[] = [],
-): Record<string, number> => {
-  const scores: Record<string, number> = {};
-  for (const playerId of playerIds) scores[playerId] = 0;
+export const computeAnswerPoints = (round: StopRound): AnswerPoints[] => {
+  const points: AnswerPoints[] = [];
 
   for (const category of round.categories) {
     const valid = round.answers.filter(
@@ -33,11 +35,34 @@ export const computeRoundScores = (
       timesUsed.set(word, (timesUsed.get(word) ?? 0) + 1);
     }
 
-    for (const answer of valid) {
-      const shared = (timesUsed.get(normalise(answer.value)) ?? 1) > 1;
-      const points = shared ? DUPLICATE_POINTS : UNIQUE_POINTS;
-      scores[answer.playerId] = (scores[answer.playerId] ?? 0) + points;
+    for (const answer of round.answers.filter((entry) => entry.category === category)) {
+      const shared = (timesUsed.get(normalise(answer.value)) ?? 0) > 1;
+      const earned = counts(answer.isValid, answer.value)
+        ? shared
+          ? DUPLICATE_POINTS
+          : UNIQUE_POINTS
+        : 0;
+      points.push({ playerId: answer.playerId, category, points: earned });
     }
+  }
+
+  return points;
+};
+
+/**
+ * Points per player for a finished round. Duplicates are compared per category
+ * and only among answers that count, so a rejected copy of a word never drags
+ * down the player who wrote it legitimately.
+ */
+export const computeRoundScores = (
+  round: StopRound,
+  playerIds: readonly string[] = [],
+): Record<string, number> => {
+  const scores: Record<string, number> = {};
+  for (const playerId of playerIds) scores[playerId] = 0;
+
+  for (const { playerId, points } of computeAnswerPoints(round)) {
+    scores[playerId] = (scores[playerId] ?? 0) + points;
   }
 
   // Players who answered nothing still belong on the scoreboard.

@@ -64,22 +64,70 @@ describe('STOP validation screen', () => {
     expect(screen.getAllByText('—').length).toBeGreaterThan(0);
   });
 
-  it('lets the Host reject an answer', async () => {
+  it('offers an explicit approve and reject for every answer', () => {
+    renderValidation('HOST');
+
+    expect(screen.getByRole('button', { name: /approve BEAR from ANA/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reject BEAR from ANA/i })).toBeInTheDocument();
+  });
+
+  it('marks an answer approved, and lets the Host change its mind', async () => {
     const user = userEvent.setup();
     renderValidation('HOST');
 
-    await user.click(screen.getAllByRole('button', { name: /reject BEAR from ANA/i })[0]!);
-
-    expect(screen.getAllByRole('button', { name: /reject BEAR from ANA/i })[0]).toHaveAttribute(
+    await user.click(screen.getByRole('button', { name: /approve BEAR from ANA/i }));
+    expect(screen.getByRole('button', { name: /approve BEAR from ANA/i })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
+
+    await user.click(screen.getByRole('button', { name: /reject BEAR from ANA/i }));
+    expect(screen.getByRole('button', { name: /reject BEAR from ANA/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /approve BEAR from ANA/i })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('shows what each answer is worth, and updates it when one is rejected', async () => {
+    const user = userEvent.setup();
+    renderValidation('HOST');
+
+    // Both wrote BEAR, so each is worth half.
+    expect(screen.getAllByTestId('answer-points').map((node) => node.textContent)).toContain('5');
+
+    await user.click(screen.getByRole('button', { name: /reject BEAR from BRUNO/i }));
+
+    // ANA's BEAR is unique again.
+    expect(screen.getAllByTestId('answer-points').map((node) => node.textContent)).toContain('10');
+  });
+
+  it('tracks how much is left to judge', () => {
+    renderValidation('HOST');
+
+    expect(screen.getByTestId('judged-progress')).toHaveTextContent('0/3');
+  });
+
+  it('blocks CONFIRM SCORES until every answer has been judged', async () => {
+    const user = userEvent.setup();
+    renderValidation('HOST');
+
+    expect(screen.getByRole('button', { name: /confirm scores/i })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: /approve all remaining/i }));
+
+    expect(screen.getByTestId('judged-progress')).toHaveTextContent('3/3');
+    expect(screen.getByRole('button', { name: /confirm scores/i })).toBeEnabled();
   });
 
   it('scores the round the Host confirmed, halving the duplicated word', async () => {
     const user = userEvent.setup();
     renderValidation('HOST');
 
+    await user.click(screen.getByRole('button', { name: /approve all remaining/i }));
     await user.click(screen.getByRole('button', { name: /confirm scores/i }));
 
     // BEAR was written by both players: 5 each. BREAD was unique: 10.
@@ -90,7 +138,8 @@ describe('STOP validation screen', () => {
     const user = userEvent.setup();
     renderValidation('HOST');
 
-    await user.click(screen.getAllByRole('button', { name: /reject BEAR from BRUNO/i })[0]!);
+    await user.click(screen.getByRole('button', { name: /reject BEAR from BRUNO/i }));
+    await user.click(screen.getByRole('button', { name: /approve all remaining/i }));
     await user.click(screen.getByRole('button', { name: /confirm scores/i }));
 
     // With BRUNO's copy rejected, ANA's BEAR is unique again.
@@ -102,6 +151,9 @@ describe('STOP validation screen', () => {
 
     expect(screen.getByRole('heading', { name: 'ANIMAL' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /confirm scores/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /approve all remaining/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /reject/i })[0]).toBeDisabled();
   });
 
@@ -119,8 +171,9 @@ describe('STOP validation screen', () => {
     };
     renderValidation('HOST', room);
 
+    await user.click(screen.getByRole('button', { name: /approve all remaining/i }));
     await user.click(screen.getByRole('button', { name: /confirm scores/i }));
-    await user.click(screen.getByRole('button', { name: /see the scoreboard|scores confirmed/i }));
+    await user.click(screen.getByRole('button', { name: /scores confirmed/i }));
 
     expect(scores()).toEqual({ 'player-0': 15, 'player-1': 5 });
   });

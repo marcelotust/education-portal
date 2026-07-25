@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { makeRound } from '@/test/factories';
 import type { StopAnswer } from '@/types';
-import { DUPLICATE_POINTS, UNIQUE_POINTS, computeRoundScores } from './scoring';
+import {
+  DUPLICATE_POINTS,
+  UNIQUE_POINTS,
+  computeAnswerPoints,
+  computeRoundScores,
+} from './scoring';
 
 const answer = (playerId: string, value: string, isValid: boolean | null = true): StopAnswer => ({
   playerId,
@@ -73,5 +78,43 @@ describe('STOP scoring', () => {
     const scores = computeRoundScores(roundWith([answer('p1', 'BEAR')]), ['p1', 'p2']);
 
     expect(scores.p2).toBe(0);
+  });
+});
+
+describe('per-answer points', () => {
+  const pointsFor = (round: ReturnType<typeof roundWith>, playerId: string) =>
+    computeAnswerPoints(round).find((entry) => entry.playerId === playerId)?.points;
+
+  it('shows what each answer is worth while the Host judges', () => {
+    const round = roundWith([answer('p1', 'BEAR'), answer('p2', 'BAT')]);
+
+    expect(pointsFor(round, 'p1')).toBe(UNIQUE_POINTS);
+  });
+
+  it('halves a word two players share', () => {
+    const round = roundWith([answer('p1', 'BEAR'), answer('p2', 'BEAR')]);
+
+    expect(pointsFor(round, 'p1')).toBe(DUPLICATE_POINTS);
+  });
+
+  it('gives a rejected answer nothing, and hands the points back to the other player', () => {
+    const round = roundWith([answer('p1', 'BEAR'), answer('p2', 'BEAR', false)]);
+
+    expect(pointsFor(round, 'p2')).toBe(0);
+    expect(pointsFor(round, 'p1')).toBe(UNIQUE_POINTS);
+  });
+
+  it('adds up to the same totals the scoreboard shows', () => {
+    const round = roundWith([answer('p1', 'BEAR'), answer('p2', 'BEAR'), answer('p3', 'BEE')]);
+
+    const totals = computeRoundScores(round);
+    const perAnswer = computeAnswerPoints(round);
+
+    for (const playerId of ['p1', 'p2', 'p3']) {
+      const summed = perAnswer
+        .filter((entry) => entry.playerId === playerId)
+        .reduce((total, entry) => total + entry.points, 0);
+      expect(summed).toBe(totals[playerId]);
+    }
   });
 });

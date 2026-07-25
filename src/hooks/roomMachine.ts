@@ -78,6 +78,22 @@ const judgeAnswer = (
   return { ...state, currentRound: { ...state.currentRound, answers } };
 };
 
+/**
+ * Judging every answer one by one is the honest default, but eight categories
+ * across six players is forty-eight taps. This accepts everything still
+ * pending, leaving whatever the Host already rejected untouched.
+ */
+const approveRemaining = (state: RoomState): RoomState => {
+  const round = state.currentRound;
+  if (round === null) return state;
+
+  const answers = round.answers.map((answer) =>
+    answer.isValid === null ? { ...answer, isValid: true } : answer,
+  );
+
+  return { ...state, currentRound: { ...round, answers } };
+};
+
 /** Points are added to the running total, never replacing earlier rounds. */
 const scoreRound = (state: RoomState): RoomState => {
   const round = state.currentRound;
@@ -144,6 +160,9 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'ANSWER_JUDGED':
       return judgeAnswer(state, event);
+
+    case 'REMAINING_ANSWERS_APPROVED':
+      return approveRemaining(state);
 
     case 'ROUND_SCORED':
       return scoreRound(state);

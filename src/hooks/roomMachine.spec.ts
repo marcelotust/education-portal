@@ -187,7 +187,23 @@ describe('room FSM', () => {
       expect(lobby.currentRound).toBeNull();
     });
 
+    it('approves everything still pending, leaving rejections alone', () => {
+      const judged = roomReducer(judging(), {
+        type: 'ANSWER_JUDGED',
+        playerId: 'player-1',
+        category: 'ANIMAL',
+        isValid: false,
+      });
+
+      const state = roomReducer(judged, { type: 'REMAINING_ANSWERS_APPROVED' });
+      const answers = state.currentRound?.answers ?? [];
+
+      expect(answers.find((a) => a.playerId === 'player-0')?.isValid).toBe(true);
+      expect(answers.find((a) => a.playerId === 'player-1')?.isValid).toBe(false);
+    });
+
     it('keeps judging and scoring Host-only', () => {
+      expect(isHostOnlyEvent({ type: 'REMAINING_ANSWERS_APPROVED' })).toBe(true);
       expect(
         isHostOnlyEvent({
           type: 'ANSWER_JUDGED',
