@@ -18,7 +18,7 @@ Two sources of truth, deliberately split:
 
 Every participant is an **anonymous Supabase user**; the session persists in `localStorage`, so a refresh keeps the same identity and score. Two tabs of the same browser share that identity — to test Host and Client together you need a second origin or a private window.
 
-Schema and RLS live in `supabase/migrations/`. Regenerate DB types with `npx supabase gen types typescript --linked --schema public` into `src/types/supabase.generated.ts`; `src/types/database.ts` narrows the JSONB column to the FSM state.
+Schema, RLS and the hourly `pg_cron` sweep that deletes rooms untouched for 5 hours live in `supabase/migrations/`. `findResumableRoom` applies the same 5-hour window on read, so a stale room is never offered no matter when the sweep runs. Regenerate DB types with `npx supabase gen types typescript --linked --schema public` into `src/types/supabase.generated.ts`; `src/types/database.ts` narrows the JSONB column to the FSM state.
 
 ## Commands
 

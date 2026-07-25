@@ -10,6 +10,12 @@ const AVATARS: readonly AvatarId[] = ['GREEN', 'PINK', 'CYAN', 'YELLOW', 'RED', 
 
 /** Postgres unique_violation: two Hosts drew the same PIN at the same time. */
 const UNIQUE_VIOLATION = '23505';
+
+/**
+ * Matches the expiry sweep in supabase/migrations. Filtering on read means a
+ * stale room is never offered, whatever hour the sweep happens to run.
+ */
+const RESUMABLE_WINDOW_HOURS = 5;
 const PIN_ATTEMPTS = 5;
 
 const makePlayer = (id: string, nickname: string, seat: number, isHost: boolean): Player => ({
@@ -100,11 +106,14 @@ const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | 
   const hostId = auth.session?.user.id;
   if (hostId === undefined) return null;
 
+  const freshEnough = new Date(Date.now() - RESUMABLE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
+
   const { data, error } = await client
     .from('rooms')
     .select()
     .eq('host_id', hostId)
     .eq('is_open', true)
+    .gt('updated_at', freshEnough)
     .order('updated_at', { ascending: false })
     .limit(1)
     .maybeSingle<RoomRow>();
