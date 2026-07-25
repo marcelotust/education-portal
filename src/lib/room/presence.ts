@@ -18,7 +18,6 @@ const toPlayer = (payload: PresencePayload, seat: number, hostId: string): Playe
   // The room row decides who hosts; a client cannot promote itself by lying.
   role: payload.playerId === hostId ? 'HOST' : 'CLIENT',
   isReady: true,
-  score: 0,
   joinedAt: payload.joinedAt,
 });
 

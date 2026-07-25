@@ -11,7 +11,6 @@ export interface Player {
   avatarId: AvatarId;
   role: PlayerRole;
   isReady: boolean;
-  score: number;
   /** ISO timestamp, used to keep slot ordering stable across presence syncs. */
   joinedAt: string;
 }

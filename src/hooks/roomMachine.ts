@@ -1,3 +1,4 @@
+import { computeRoundScores } from '@/features/gameplay/scoring';
 import {
   MAX_PLAYERS,
   type PlayerSlot,
@@ -51,6 +52,37 @@ const submitAnswers = (
   };
 };
 
+const judgeAnswer = (
+  state: RoomState,
+  event: Extract<RoomEvent, { type: 'ANSWER_JUDGED' }>,
+): RoomState => {
+  if (state.currentRound === null) return state;
+
+  const answers = state.currentRound.answers.map((answer) =>
+    answer.playerId === event.playerId && answer.category === event.category
+      ? { ...answer, isValid: event.isValid }
+      : answer,
+  );
+
+  return { ...state, currentRound: { ...state.currentRound, answers } };
+};
+
+/** Points are added to the running total, never replacing earlier rounds. */
+const scoreRound = (state: RoomState): RoomState => {
+  const round = state.currentRound;
+  if (round === null || round.isScored) return state;
+
+  const seated = state.slots.filter((slot) => slot !== null).map((slot) => slot.id);
+  const earned = computeRoundScores(round, seated);
+
+  const scores = { ...state.scores };
+  for (const [playerId, points] of Object.entries(earned)) {
+    scores[playerId] = (scores[playerId] ?? 0) + points;
+  }
+
+  return { ...state, scores, currentRound: { ...round, isScored: true } };
+};
+
 const releaseSlot = (state: RoomState, playerId: string): RoomState => {
   const slots = state.slots.map((slot) => (slot?.id === playerId ? null : slot));
   return { ...state, slots };
@@ -88,6 +120,12 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
     case 'ANSWERS_SUBMITTED':
       return submitAnswers(state, event);
 
+    case 'ANSWER_JUDGED':
+      return judgeAnswer(state, event);
+
+    case 'ROUND_SCORED':
+      return scoreRound(state);
+
     case 'END_ROUND':
       return state.status === 'PLAYING'
         ? {
@@ -112,14 +150,15 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return releaseSlot(state, event.playerId);
 
     case 'ROOM_STATE_RECEIVED': {
-      const { status, selectedGameId, currentRound } = event.state;
+      const { status, selectedGameId, currentRound, scores } = event.state;
       const unchanged =
         state.status === status &&
         state.selectedGameId === selectedGameId &&
-        state.currentRound === currentRound;
+        state.currentRound === currentRound &&
+        state.scores === scores;
 
       // Seats come from Presence; the row never overwrites the live board.
-      return unchanged ? state : { ...state, status, selectedGameId, currentRound };
+      return unchanged ? state : { ...state, status, selectedGameId, currentRound, scores };
     }
 
     case 'PLAYERS_SYNCED': {

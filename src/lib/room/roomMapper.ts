@@ -27,6 +27,8 @@ export const rowToRoomState = (row: RoomRow): RoomState => ({
   slots: toSlots(row.state.slots),
   selectedGameId: row.state.selectedGameId,
   currentRound: row.state.currentRound,
+  // Rows written before scores existed must not crash the scoreboard.
+  scores: row.state.scores ?? {},
 });
 
 /** PIN and host live in their own columns; never duplicate them in the payload. */
@@ -35,4 +37,5 @@ export const toPersistedState = (state: RoomState): PersistedRoomState => ({
   slots: state.slots,
   selectedGameId: state.selectedGameId,
   currentRound: state.currentRound,
+  scores: state.scores,
 });

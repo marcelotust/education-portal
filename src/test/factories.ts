@@ -11,7 +11,6 @@ export const makePlayer = (index: number, overrides: Partial<Player> = {}): Play
   avatarId: AVATARS[index % AVATARS.length] ?? 'RED',
   role: 'CLIENT',
   isReady: true,
-  score: 0,
   joinedAt: new Date(2026, 0, 1, 10, index).toISOString(),
   ...overrides,
 });
@@ -22,6 +21,7 @@ export const makeRound = (overrides: Partial<StopRound> = {}): StopRound => ({
   categories: ['ANIMAL', 'FOOD'],
   answers: [],
   endsAt: '2026-07-24T12:01:00.000Z',
+  isScored: false,
   ...overrides,
 });
 
@@ -46,5 +46,6 @@ export const makeRoom = ({
     slots,
     selectedGameId: null,
     currentRound: null,
+    scores: {},
   };
 };

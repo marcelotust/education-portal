@@ -16,6 +16,11 @@ export interface RoomState {
   selectedGameId: GameId | null;
   /** Only present while the STOP cartridge is running. */
   currentRound: StopRound | null;
+  /**
+   * Points per player id, accumulated across rounds. Kept out of the slots
+   * because Presence rebuilds those on every sync and would wipe them.
+   */
+  scores: Readonly<Record<string, number>>;
 }
 
 /** The room row stores everything except the PIN and host, which are columns. */
@@ -32,6 +37,8 @@ export type RoomEvent =
   | { type: 'START_GAME' }
   | { type: 'AD_FINISHED'; round: StopRound }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }
+  | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
+  | { type: 'ROUND_SCORED' }
   | { type: 'END_ROUND' }
   | { type: 'RETURN_TO_LOBBY' }
   | { type: 'PLAYER_JOINED'; player: Player }

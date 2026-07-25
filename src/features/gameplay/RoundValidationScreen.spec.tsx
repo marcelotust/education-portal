@@ -1,0 +1,119 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it } from 'vitest';
+
+import { RoomProvider } from '@/hooks/RoomProvider';
+import { useRoom } from '@/hooks/useRoom';
+import { makePlayer, makeRoom, makeRound } from '@/test/factories';
+import type { PlayerRole, RoomState } from '@/types';
+import { RoundValidationScreen } from './RoundValidationScreen';
+
+const judgingRoom = (): RoomState => ({
+  ...makeRoom({ playerCount: 2, status: 'CALCULATING_SCORES' }),
+  currentRound: makeRound({
+    phase: 'VALIDATION_PHASE',
+    categories: ['ANIMAL', 'FOOD'],
+    answers: [
+      { playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null },
+      { playerId: 'player-1', category: 'ANIMAL', value: 'BEAR', isValid: null },
+      { playerId: 'player-0', category: 'FOOD', value: 'BREAD', isValid: null },
+    ],
+  }),
+});
+
+const ScoreProbe = () => {
+  const { state } = useRoom();
+  return <span data-testid="scores">{JSON.stringify(state.scores)}</span>;
+};
+
+const renderValidation = (role: PlayerRole, room: RoomState = judgingRoom()): void => {
+  render(
+    <RoomProvider initialState={room} role={role}>
+      <ScoreProbe />
+      <RoundValidationScreen />
+    </RoomProvider>,
+  );
+};
+
+const scores = (): Record<string, number> =>
+  JSON.parse(screen.getByTestId('scores').textContent ?? '{}') as Record<string, number>;
+
+describe('STOP validation screen', () => {
+  it('lays out every category with each player answer', () => {
+    renderValidation('HOST');
+
+    expect(screen.getByRole('heading', { name: 'ANIMAL' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'FOOD' })).toBeInTheDocument();
+    expect(screen.getAllByText('BEAR')).toHaveLength(2);
+    expect(screen.getByText('BREAD')).toBeInTheDocument();
+  });
+
+  it('shows a dash for a player who left the field empty', () => {
+    const room = judgingRoom();
+    renderValidation('HOST', room);
+
+    // ANA answered ANIMAL but not FOOD.
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+  });
+
+  it('lets the Host reject an answer', async () => {
+    const user = userEvent.setup();
+    renderValidation('HOST');
+
+    await user.click(screen.getAllByRole('button', { name: /reject BEAR from ANA/i })[0]!);
+
+    expect(screen.getAllByRole('button', { name: /reject BEAR from ANA/i })[0]).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('scores the round the Host confirmed, halving the duplicated word', async () => {
+    const user = userEvent.setup();
+    renderValidation('HOST');
+
+    await user.click(screen.getByRole('button', { name: /confirm scores/i }));
+
+    // BEAR was written by both players: 5 each. BREAD was unique: 10.
+    expect(scores()).toEqual({ 'player-0': 15, 'player-1': 5 });
+  });
+
+  it('drops the points of an answer the Host rejected', async () => {
+    const user = userEvent.setup();
+    renderValidation('HOST');
+
+    await user.click(screen.getAllByRole('button', { name: /reject BEAR from BRUNO/i })[0]!);
+    await user.click(screen.getByRole('button', { name: /confirm scores/i }));
+
+    // With BRUNO's copy rejected, ANA's BEAR is unique again.
+    expect(scores()).toEqual({ 'player-0': 20, 'player-1': 0 });
+  });
+
+  it('shows the same table to a Client, with no way to judge or confirm', () => {
+    renderValidation('CLIENT');
+
+    expect(screen.getByRole('heading', { name: 'ANIMAL' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /confirm scores/i })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /reject/i })[0]).toBeDisabled();
+  });
+
+  it('tells the Client the Host is still judging', () => {
+    renderValidation('CLIENT');
+
+    expect(screen.getByText(/checking the answers/i)).toBeInTheDocument();
+  });
+
+  it('never scores twice when the Host double-clicks confirm', async () => {
+    const user = userEvent.setup();
+    const room = {
+      ...judgingRoom(),
+      slots: [makePlayer(0), makePlayer(1), null, null, null, null],
+    };
+    renderValidation('HOST', room);
+
+    await user.click(screen.getByRole('button', { name: /confirm scores/i }));
+    await user.click(screen.getByRole('button', { name: /see the scoreboard|scores confirmed/i }));
+
+    expect(scores()).toEqual({ 'player-0': 15, 'player-1': 5 });
+  });
+});

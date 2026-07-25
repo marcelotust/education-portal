@@ -1,5 +1,6 @@
 import { AdBreakScreen } from '@/features/gameplay/AdBreakScreen';
-import { RoundResultsScreen } from '@/features/gameplay/RoundResultsScreen';
+import { RoundValidationScreen } from '@/features/gameplay/RoundValidationScreen';
+import { ScoreboardScreen } from '@/features/gameplay/ScoreboardScreen';
 import { StopRoundScreen } from '@/features/gameplay/StopRoundScreen';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { useRoom } from '@/hooks/useRoom';
@@ -21,6 +22,11 @@ export const RoomStage = ({ playerId }: RoomStageProps) => {
     case 'PLAYING':
       return <StopRoundScreen playerId={playerId} />;
     case 'CALCULATING_SCORES':
-      return <RoundResultsScreen />;
+      // The Host judges first; the standings replace the table once confirmed.
+      return state.currentRound?.isScored === true ? (
+        <ScoreboardScreen />
+      ) : (
+        <RoundValidationScreen />
+      );
   }
 };

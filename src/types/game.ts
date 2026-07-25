@@ -26,4 +26,6 @@ export interface StopRound {
   categories: readonly string[];
   answers: readonly StopAnswer[];
   endsAt: string | null;
+  /** Guards against the Host scoring the same round twice. */
+  isScored: boolean;
 }

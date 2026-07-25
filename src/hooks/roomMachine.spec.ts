@@ -111,6 +111,94 @@ describe('room FSM', () => {
     });
   });
 
+  describe('STOP validation phase', () => {
+    const judging = (): RoomState => ({
+      ...withStatus('CALCULATING_SCORES'),
+      currentRound: makeRound({
+        phase: 'VALIDATION_PHASE',
+        categories: ['ANIMAL'],
+        answers: [
+          { playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null },
+          { playerId: 'player-1', category: 'ANIMAL', value: 'BANANA', isValid: null },
+        ],
+      }),
+    });
+
+    it('records the Host rejecting one answer without touching the others', () => {
+      const state = roomReducer(judging(), {
+        type: 'ANSWER_JUDGED',
+        playerId: 'player-1',
+        category: 'ANIMAL',
+        isValid: false,
+      });
+
+      const answers = state.currentRound?.answers ?? [];
+      expect(answers.find((a) => a.playerId === 'player-1')?.isValid).toBe(false);
+      expect(answers.find((a) => a.playerId === 'player-0')?.isValid).toBeNull();
+    });
+
+    it('lets the Host change its mind about an answer', () => {
+      let state = roomReducer(judging(), {
+        type: 'ANSWER_JUDGED',
+        playerId: 'player-0',
+        category: 'ANIMAL',
+        isValid: false,
+      });
+      state = roomReducer(state, {
+        type: 'ANSWER_JUDGED',
+        playerId: 'player-0',
+        category: 'ANIMAL',
+        isValid: true,
+      });
+
+      expect(state.currentRound?.answers[0]?.isValid).toBe(true);
+    });
+
+    it('adds the round points to the running scores and marks the round scored', () => {
+      const state = roomReducer(judging(), { type: 'ROUND_SCORED' });
+
+      expect(state.scores['player-0']).toBe(10);
+      expect(state.scores['player-1']).toBe(10);
+      expect(state.currentRound?.isScored).toBe(true);
+    });
+
+    it('accumulates points across rounds instead of replacing them', () => {
+      const state = roomReducer(
+        { ...judging(), scores: { 'player-0': 25 } },
+        { type: 'ROUND_SCORED' },
+      );
+
+      expect(state.scores['player-0']).toBe(35);
+    });
+
+    it('refuses to score the same round twice', () => {
+      const scored = roomReducer(judging(), { type: 'ROUND_SCORED' });
+
+      expect(roomReducer(scored, { type: 'ROUND_SCORED' })).toBe(scored);
+    });
+
+    it('keeps the scores when the room goes back to the lobby', () => {
+      const scored = roomReducer(judging(), { type: 'ROUND_SCORED' });
+
+      const lobby = roomReducer(scored, { type: 'RETURN_TO_LOBBY' });
+
+      expect(lobby.scores['player-0']).toBe(10);
+      expect(lobby.currentRound).toBeNull();
+    });
+
+    it('keeps judging and scoring Host-only', () => {
+      expect(
+        isHostOnlyEvent({
+          type: 'ANSWER_JUDGED',
+          playerId: 'player-0',
+          category: 'ANIMAL',
+          isValid: true,
+        }),
+      ).toBe(true);
+      expect(isHostOnlyEvent({ type: 'ROUND_SCORED' })).toBe(true);
+    });
+  });
+
   it('ignores events that are not valid for the current state', () => {
     const idle = withStatus('LOBBY_IDLE');
 
@@ -176,6 +264,7 @@ describe('room FSM', () => {
       slots: [],
       selectedGameId: 'STOP' as const,
       currentRound: null,
+      scores: {},
       ...over,
     });
 
@@ -201,6 +290,7 @@ describe('room FSM', () => {
         slots: room.slots,
         selectedGameId: room.selectedGameId,
         currentRound: room.currentRound,
+        scores: room.scores,
       };
 
       expect(roomReducer(room, { type: 'ROOM_STATE_RECEIVED', state: echo })).toBe(room);

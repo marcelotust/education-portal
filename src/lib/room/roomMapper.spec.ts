@@ -13,6 +13,7 @@ const makeRow = (state: Partial<RoomRow['state']> = {}): RoomRow => ({
     slots: [null, null, null, null, null, null],
     selectedGameId: null,
     currentRound: null,
+    scores: {},
     ...state,
   },
   is_open: true,

@@ -20,6 +20,7 @@ export const createStopRound = (durationSeconds: number, now = new Date()): Stop
   letter: drawLetter(),
   categories: STOP_CATEGORIES,
   answers: [],
+  isScored: false,
   endsAt: new Date(now.getTime() + durationSeconds * 1000).toISOString(),
 });
 

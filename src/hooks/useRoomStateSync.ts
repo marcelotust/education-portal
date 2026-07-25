@@ -9,6 +9,7 @@ const toPayload = (state: RoomState): PersistedRoomState => ({
   slots: state.slots,
   selectedGameId: state.selectedGameId,
   currentRound: state.currentRound,
+  scores: state.scores,
 });
 
 interface UseRoomStateSyncOptions {

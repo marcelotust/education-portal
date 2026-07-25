@@ -18,7 +18,6 @@ const makePlayer = (id: string, nickname: string, seat: number, isHost: boolean)
   avatarId: AVATARS[seat % AVATARS.length] ?? 'GREEN',
   role: isHost ? 'HOST' : 'CLIENT',
   isReady: isHost,
-  score: 0,
   joinedAt: new Date().toISOString(),
 });
 
@@ -44,6 +43,7 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
             slots,
             selectedGameId: null,
             currentRound: null,
+            scores: {},
           }),
         ),
       })
