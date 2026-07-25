@@ -211,6 +211,21 @@ describe('room FSM', () => {
       expect(state.currentRound?.answers[0]?.isValid).toBe(true);
     });
 
+    it('remembers what the round was worth, so the result outlives the scoreboard', () => {
+      const state = roomReducer(
+        { ...judging(), scores: { 'player-0': 40 } },
+        {
+          type: 'ROUND_SCORED',
+        },
+      );
+
+      expect(state.lastRoundPoints['player-0']).toBe(10);
+      expect(state.scores['player-0']).toBe(50);
+
+      const lobby = roomReducer(state, { type: 'RETURN_TO_LOBBY' });
+      expect(lobby.lastRoundPoints['player-0']).toBe(10);
+    });
+
     it('adds the round points to the running scores and marks the round scored', () => {
       const state = roomReducer(judging(), { type: 'ROUND_SCORED' });
 
@@ -393,6 +408,7 @@ describe('room FSM', () => {
       currentRound: null,
       gameSetup: DEFAULT_STOP_SETUP,
       scores: {},
+      lastRoundPoints: {},
       ...over,
     });
 
@@ -432,6 +448,7 @@ describe('room FSM', () => {
         currentRound: room.currentRound,
         gameSetup: room.gameSetup,
         scores: room.scores,
+        lastRoundPoints: room.lastRoundPoints,
       };
 
       expect(roomReducer(room, { type: 'ROOM_STATE_RECEIVED', state: echo })).toBe(room);

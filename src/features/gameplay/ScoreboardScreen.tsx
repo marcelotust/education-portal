@@ -11,7 +11,11 @@ export const ScoreboardScreen = () => {
 
   const ranked = state.slots
     .filter((slot): slot is Player => slot !== null)
-    .map((player) => ({ player, score: state.scores[player.id] ?? 0 }))
+    .map((player) => ({
+      player,
+      score: state.scores[player.id] ?? 0,
+      gained: state.lastRoundPoints[player.id] ?? 0,
+    }))
     .sort((a, b) => b.score - a.score);
 
   return (
@@ -19,7 +23,7 @@ export const ScoreboardScreen = () => {
       <h1 className="text-neon text-center font-arcade text-sm text-arcade-yellow">SCOREBOARD</h1>
 
       <ol className="flex flex-col gap-2">
-        {ranked.map(({ player, score }, position) => (
+        {ranked.map(({ player, score, gained }, position) => (
           <li
             key={player.id}
             data-testid="scoreboard-row"
@@ -32,6 +36,9 @@ export const ScoreboardScreen = () => {
               {MEDALS[position] ?? `${position + 1}TH`}
             </span>
             <span className="flex-1 font-arcade text-[10px] text-slate-100">{player.nickname}</span>
+            <span data-testid="round-gain" className="font-arcade text-[9px] text-arcade-cyan">
+              {gained > 0 ? `+${gained}` : '—'}
+            </span>
             <span className="font-arcade text-sm text-arcade-green">{score}</span>
           </li>
         ))}

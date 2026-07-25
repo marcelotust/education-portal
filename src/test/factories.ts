@@ -50,5 +50,6 @@ export const makeRoom = ({
     currentRound: null,
     gameSetup: DEFAULT_STOP_SETUP,
     scores: {},
+    lastRoundPoints: {},
   };
 };

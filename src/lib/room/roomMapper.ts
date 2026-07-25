@@ -31,6 +31,7 @@ export const rowToRoomState = (row: RoomRow): RoomState => ({
   gameSetup: row.state.gameSetup ?? DEFAULT_STOP_SETUP,
   // Rows written before scores existed must not crash the scoreboard.
   scores: row.state.scores ?? {},
+  lastRoundPoints: row.state.lastRoundPoints ?? {},
 });
 
 /** PIN and host live in their own columns; never duplicate them in the payload. */
@@ -41,4 +42,5 @@ export const toPersistedState = (state: RoomState): PersistedRoomState => ({
   currentRound: state.currentRound,
   gameSetup: state.gameSetup,
   scores: state.scores,
+  lastRoundPoints: state.lastRoundPoints,
 });

@@ -16,6 +16,7 @@ const makeRow = (state: Partial<RoomRow['state']> = {}): RoomRow => ({
     currentRound: null,
     gameSetup: DEFAULT_STOP_SETUP,
     scores: {},
+    lastRoundPoints: {},
     ...state,
   },
   is_open: true,

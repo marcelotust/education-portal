@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -73,6 +73,41 @@ describe('Lobby feature', () => {
       renderLobby('CLIENT', makeRoom({ playerCount: 3 }));
 
       expect(screen.getByTestId('player-slot-0')).toHaveAttribute('data-leader', 'false');
+    });
+
+    it('keeps the last round result visible after the scoreboard is gone', () => {
+      const room = {
+        ...makeRoom({ playerCount: 2 }),
+        scores: { 'player-0': 30, 'player-1': 45 },
+        lastRoundPoints: { 'player-0': 10, 'player-1': 25 },
+      };
+      renderLobby('CLIENT', room);
+
+      const standings = screen.getByTestId('last-round-standings');
+      expect(standings).toHaveTextContent('BRUNO');
+      expect(standings).toHaveTextContent('+25');
+      expect(standings).toHaveTextContent('+10');
+    });
+
+    it('ranks the standings by total, not by seat', () => {
+      const room = {
+        ...makeRoom({ playerCount: 2 }),
+        scores: { 'player-0': 30, 'player-1': 45 },
+        lastRoundPoints: { 'player-0': 10, 'player-1': 25 },
+      };
+      renderLobby('CLIENT', room);
+
+      const names = within(screen.getByTestId('last-round-standings'))
+        .getAllByRole('listitem')
+        .map((row) => row.textContent);
+      expect(names[0]).toContain('BRUNO');
+      expect(names[1]).toContain('ANA');
+    });
+
+    it('shows no standings before the first round has been scored', () => {
+      renderLobby('CLIENT', makeRoom({ playerCount: 2 }));
+
+      expect(screen.queryByTestId('last-round-standings')).not.toBeInTheDocument();
     });
 
     it('shows the room PIN so students can join', () => {

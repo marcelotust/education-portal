@@ -23,6 +23,11 @@ export interface RoomState {
    * because Presence rebuilds those on every sync and would wipe them.
    */
   scores: Readonly<Record<string, number>>;
+  /**
+   * What the last scored round was worth, per player. Kept after returning to
+   * the lobby so the result outlives the scoreboard screen.
+   */
+  lastRoundPoints: Readonly<Record<string, number>>;
 }
 
 /** The room row stores everything except the PIN and host, which are columns. */

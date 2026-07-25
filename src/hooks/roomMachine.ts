@@ -123,7 +123,7 @@ const scoreRound = (state: RoomState): RoomState => {
     scores[playerId] = (scores[playerId] ?? 0) + points;
   }
 
-  return { ...state, scores, currentRound: { ...round, isScored: true } };
+  return { ...state, scores, lastRoundPoints: earned, currentRound: { ...round, isScored: true } };
 };
 
 const releaseSlot = (state: RoomState, playerId: string): RoomState => {
@@ -210,18 +210,15 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return releaseSlot(state, event.playerId);
 
     case 'ROOM_STATE_RECEIVED': {
-      const { status, selectedGameId, currentRound, gameSetup, scores } = event.state;
-      const unchanged =
-        state.status === status &&
-        state.selectedGameId === selectedGameId &&
-        state.currentRound === currentRound &&
-        state.gameSetup === gameSetup &&
-        state.scores === scores;
+      // Everything the row carries is applied except the board: seats come from
+      // Presence. Spreading rather than listing fields means a field added later
+      // syncs on its own — listing them silently dropped one twice already.
+      const { slots: _presenceOwnsSeats, ...flow } = event.state;
+      const unchanged = Object.entries(flow).every(
+        ([key, value]) => state[key as keyof typeof flow] === value,
+      );
 
-      // Seats come from Presence; the row never overwrites the live board.
-      return unchanged
-        ? state
-        : { ...state, status, selectedGameId, currentRound, gameSetup, scores };
+      return unchanged ? state : { ...state, ...flow };
     }
 
     case 'PLAYERS_SYNCED': {

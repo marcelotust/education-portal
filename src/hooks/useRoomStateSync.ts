@@ -11,6 +11,7 @@ const toPayload = (state: RoomState): PersistedRoomState => ({
   currentRound: state.currentRound,
   gameSetup: state.gameSetup,
   scores: state.scores,
+  lastRoundPoints: state.lastRoundPoints,
 });
 
 interface UseRoomStateSyncOptions {

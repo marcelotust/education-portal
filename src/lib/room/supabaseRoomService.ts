@@ -52,6 +52,7 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
             currentRound: null,
             gameSetup: DEFAULT_STOP_SETUP,
             scores: {},
+            lastRoundPoints: {},
           }),
         ),
       })

@@ -1,7 +1,8 @@
 import { useRoom } from '@/hooks/useRoom';
-import { MAX_PLAYERS } from '@/types';
+import { MAX_PLAYERS, type Player } from '@/types';
 import { countPlayers } from '@/utils/room';
 import { CharacterSelectGrid } from './components/CharacterSelectGrid';
+import { LastRoundStandings } from './components/LastRoundStandings';
 import { ClientLobbyControls } from './components/ClientLobbyControls';
 import { HostLobbyControls } from './components/HostLobbyControls';
 import { RoomPinBanner } from './components/RoomPinBanner';
@@ -15,6 +16,14 @@ export const LobbyScreen = () => {
       <RoomPinBanner pin={state.pin} playerCount={countPlayers(state)} maxPlayers={MAX_PLAYERS} />
 
       <CharacterSelectGrid slots={state.slots} scores={state.scores} />
+
+      {Object.keys(state.lastRoundPoints).length > 0 && (
+        <LastRoundStandings
+          players={state.slots.filter((slot): slot is Player => slot !== null)}
+          scores={state.scores}
+          lastRoundPoints={state.lastRoundPoints}
+        />
+      )}
 
       {isHost ? <HostLobbyControls /> : <ClientLobbyControls />}
     </section>
