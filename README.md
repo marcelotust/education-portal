@@ -54,6 +54,11 @@ Seats come from Realtime Presence, the FSM from the `rooms` row, and answers fro
 that two tabs of the same browser share one anonymous identity, so testing Host and Client together
 needs a second origin or a private window.
 
+## Decisions
+
+Choices that were genuinely contested are recorded in [`docs/decisions/`](docs/decisions/), so a
+reader does not have to reverse-engineer the reasoning from the code.
+
 ## Conventions
 
 - React components are always arrow functions, **one component per file**

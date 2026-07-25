@@ -8,6 +8,10 @@ EduParty — a gamified, arcade-themed portal for online classes. A teacher (**H
 
 Status: the MVP in `blueprint.md` is complete and runs against a live Supabase project. A round of STOP plays end to end: create/join by PIN, lobby, ad break, timed typing, Host validation, scoreboard. Open work lives in GitHub issues (landing page with room resume, room expiry, next cartridges).
 
+## Decisions
+
+Contested choices are recorded in `docs/decisions/` — read it before reversing something that looks odd. Notably: why seats, FSM and answers use three different transports; why scores live on the room and not on the player; and why rooms expire after 5 hours.
+
 ## Backend model
 
 Two sources of truth, deliberately split:
