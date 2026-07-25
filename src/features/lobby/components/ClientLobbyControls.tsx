@@ -1,3 +1,4 @@
+import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { ClientLobbyStatus } from './ClientLobbyStatus';
@@ -17,7 +18,12 @@ export const ClientLobbyControls = () => {
       {state.status === 'CONFIGURING_GAME' && (
         <>
           <GameCartridgePicker selectedGameId={state.selectedGameId} />
-          {state.selectedGameId !== null && <StopSetupPanel setup={state.gameSetup} />}
+          {state.selectedGameId !== null && state.gameSetup.game === 'STOP' && (
+            <StopSetupPanel setup={state.gameSetup} />
+          )}
+          {state.selectedGameId !== null && state.gameSetup.game === 'QUIZ' && (
+            <QuizSetupPanel setup={state.gameSetup} />
+          )}
         </>
       )}
     </div>

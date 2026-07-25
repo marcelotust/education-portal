@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { makePlayer, makeRoom, makeRound } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
 import { MAX_PLAYERS, type RoomState } from '@/types';
 
 const withStatus = (status: RoomState['status']): RoomState => makeRoom({ status });
+
+/** The STOP specs only ever look at STOP rounds; this narrows for them. */
+const stopRoundOf = (state: RoomState) =>
+  state.currentRound?.game === 'STOP' ? state.currentRound : null;
 
 describe('room FSM', () => {
   it('walks the happy path LOBBY_IDLE -> ... -> CALCULATING_SCORES -> LOBBY_IDLE', () => {
@@ -20,7 +24,7 @@ describe('room FSM', () => {
 
     state = roomReducer(state, { type: 'AD_FINISHED', round: makeRound() });
     expect(state.status).toBe('PLAYING');
-    expect(state.currentRound?.letter).toBe('B');
+    expect(stopRoundOf(state)?.letter).toBe('B');
 
     state = roomReducer(state, { type: 'END_ROUND' });
     expect(state.status).toBe('CALCULATING_SCORES');
@@ -43,9 +47,9 @@ describe('room FSM', () => {
     it('opens the round in the typing phase with the drawn letter', () => {
       const state = playing();
 
-      expect(state.currentRound?.phase).toBe('TYPING_PHASE');
-      expect(state.currentRound?.categories).toEqual(['ANIMAL', 'FOOD']);
-      expect(state.currentRound?.answers).toEqual([]);
+      expect(stopRoundOf(state)?.phase).toBe('TYPING_PHASE');
+      expect(stopRoundOf(state)?.categories).toEqual(['ANIMAL', 'FOOD']);
+      expect(stopRoundOf(state)?.answers).toEqual([]);
     });
 
     it('collects the answers a player submits', () => {
@@ -55,8 +59,8 @@ describe('room FSM', () => {
         answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null }],
       });
 
-      expect(state.currentRound?.answers).toHaveLength(1);
-      expect(state.currentRound?.answers[0]?.value).toBe('BEAR');
+      expect(stopRoundOf(state)?.answers).toHaveLength(1);
+      expect(stopRoundOf(state)?.answers[0]?.value).toBe('BEAR');
     });
 
     it('lets a player resubmit without duplicating their answers', () => {
@@ -71,8 +75,8 @@ describe('room FSM', () => {
         answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEE', isValid: null }],
       });
 
-      expect(state.currentRound?.answers).toHaveLength(1);
-      expect(state.currentRound?.answers[0]?.value).toBe('BEE');
+      expect(stopRoundOf(state)?.answers).toHaveLength(1);
+      expect(stopRoundOf(state)?.answers[0]?.value).toBe('BEE');
     });
 
     it('keeps answers from different players side by side', () => {
@@ -87,7 +91,7 @@ describe('room FSM', () => {
         answers: [{ playerId: 'player-1', category: 'ANIMAL', value: 'BAT', isValid: null }],
       });
 
-      expect(state.currentRound?.answers).toHaveLength(2);
+      expect(stopRoundOf(state)?.answers).toHaveLength(2);
     });
 
     it('ignores answers arriving when no round is running', () => {
@@ -114,7 +118,7 @@ describe('room FSM', () => {
       });
 
       expect(state.currentRound?.endsAt).toBe(soon);
-      expect(state.currentRound?.stoppedBy).toBe('player-1');
+      expect(stopRoundOf(state)?.stoppedBy).toBe('player-1');
     });
 
     it('credits the first caller when a second STOP lands right after', () => {
@@ -130,7 +134,7 @@ describe('room FSM', () => {
         endsAt: new Date(Date.now() + 4000).toISOString(),
       });
 
-      expect(second.currentRound?.stoppedBy).toBe('player-1');
+      expect(stopRoundOf(second)?.stoppedBy).toBe('player-1');
     });
 
     it('never lets a STOP push the deadline further away', () => {
@@ -158,7 +162,7 @@ describe('room FSM', () => {
       const state = roomReducer(playing(), { type: 'END_ROUND' });
 
       expect(state.status).toBe('CALCULATING_SCORES');
-      expect(state.currentRound?.phase).toBe('VALIDATION_PHASE');
+      expect(stopRoundOf(state)?.phase).toBe('VALIDATION_PHASE');
     });
 
     it('is a shared event: a Client must be able to send its own answers', () => {
@@ -189,7 +193,7 @@ describe('room FSM', () => {
         isValid: false,
       });
 
-      const answers = state.currentRound?.answers ?? [];
+      const answers = stopRoundOf(state)?.answers ?? [];
       expect(answers.find((a) => a.playerId === 'player-1')?.isValid).toBe(false);
       expect(answers.find((a) => a.playerId === 'player-0')?.isValid).toBeNull();
     });
@@ -208,7 +212,7 @@ describe('room FSM', () => {
         isValid: true,
       });
 
-      expect(state.currentRound?.answers[0]?.isValid).toBe(true);
+      expect(stopRoundOf(state)?.answers[0]?.isValid).toBe(true);
     });
 
     it('remembers what the round was worth, so the result outlives the scoreboard', () => {
@@ -231,7 +235,7 @@ describe('room FSM', () => {
 
       expect(state.scores['player-0']).toBe(10);
       expect(state.scores['player-1']).toBe(10);
-      expect(state.currentRound?.isScored).toBe(true);
+      expect(stopRoundOf(state)?.isScored).toBe(true);
     });
 
     it('accumulates points across rounds instead of replacing them', () => {
@@ -267,7 +271,7 @@ describe('room FSM', () => {
       });
 
       const state = roomReducer(judged, { type: 'REMAINING_ANSWERS_APPROVED' });
-      const answers = state.currentRound?.answers ?? [];
+      const answers = stopRoundOf(state)?.answers ?? [];
 
       expect(answers.find((a) => a.playerId === 'player-0')?.isValid).toBe(true);
       expect(answers.find((a) => a.playerId === 'player-1')?.isValid).toBe(false);
@@ -284,6 +288,95 @@ describe('room FSM', () => {
         }),
       ).toBe(true);
       expect(isHostOnlyEvent({ type: 'ROUND_SCORED' })).toBe(true);
+    });
+  });
+
+  describe('QUIZ cartridge', () => {
+    const quizRound = (answers: RoomState['currentRound'] extends null ? never : never[]) =>
+      answers;
+    void quizRound;
+
+    const configuringQuiz = (): RoomState =>
+      roomReducer(withStatus('CONFIGURING_GAME'), { type: 'SELECT_GAME', gameId: 'QUIZ' });
+
+    const playingQuiz = (): RoomState => {
+      const started = roomReducer(configuringQuiz(), { type: 'START_GAME' });
+      return roomReducer(started, {
+        type: 'AD_FINISHED',
+        round: {
+          game: 'QUIZ',
+          question: {
+            id: 'q1',
+            prompt: 'Closest planet to the Sun?',
+            options: ['Venus', 'Mercury'],
+            correctIndex: 1,
+          },
+          answers: [],
+          endsAt: new Date(Date.now() + 30_000).toISOString(),
+          isScored: false,
+        },
+      });
+    };
+
+    it('swaps the setup panel when the cartridge changes', () => {
+      expect(configuringQuiz().gameSetup.game).toBe('QUIZ');
+
+      const backToStop = roomReducer(configuringQuiz(), { type: 'SELECT_GAME', gameId: 'STOP' });
+      expect(backToStop.gameSetup.game).toBe('STOP');
+    });
+
+    it('starts without needing categories, which QUIZ does not have', () => {
+      expect(roomReducer(configuringQuiz(), { type: 'START_GAME' }).status).toBe('PLAYING_AD');
+    });
+
+    it('records an answer once, and refuses a change of mind', () => {
+      const answered = roomReducer(playingQuiz(), {
+        type: 'QUIZ_ANSWERED',
+        answer: { playerId: 'player-0', choice: 1, elapsedMs: 900 },
+      });
+      const again = roomReducer(answered, {
+        type: 'QUIZ_ANSWERED',
+        answer: { playerId: 'player-0', choice: 0, elapsedMs: 1500 },
+      });
+
+      const round = again.currentRound;
+      expect(round?.game === 'QUIZ' && round.answers).toHaveLength(1);
+      expect(round?.game === 'QUIZ' && round.answers[0]?.choice).toBe(1);
+    });
+
+    it('scores itself when the round ends, with no Host judging anything', () => {
+      const answered = roomReducer(playingQuiz(), {
+        type: 'QUIZ_ANSWERED',
+        answer: { playerId: 'player-0', choice: 1, elapsedMs: 900 },
+      });
+
+      const ended = roomReducer(answered, { type: 'END_ROUND' });
+
+      expect(ended.status).toBe('CALCULATING_SCORES');
+      expect(ended.currentRound?.isScored).toBe(true);
+      // Correct and fastest: ten points plus the speed bonus.
+      expect(ended.scores['player-0']).toBe(15);
+      expect(ended.lastRoundPoints['player-0']).toBe(15);
+    });
+
+    it('gives a wrong answer nothing', () => {
+      const answered = roomReducer(playingQuiz(), {
+        type: 'QUIZ_ANSWERED',
+        answer: { playerId: 'player-0', choice: 0, elapsedMs: 400 },
+      });
+
+      expect(roomReducer(answered, { type: 'END_ROUND' }).scores['player-0']).toBe(0);
+    });
+
+    it('ignores the STOP-only events, which have nothing to act on', () => {
+      const playing = playingQuiz();
+
+      expect(roomReducer(playing, { type: 'STOP_CALLED', playerId: 'player-0', endsAt: 'x' })).toBe(
+        playing,
+      );
+      expect(
+        roomReducer(playing, { type: 'ANSWERS_SUBMITTED', playerId: 'player-0', answers: [] }),
+      ).toBe(playing);
     });
   });
 
@@ -315,19 +408,34 @@ describe('room FSM', () => {
 
     it('adds a category the Host tapped and removes it when tapped again', () => {
       const start = configuring({
-        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL'] },
+        gameSetup: {
+          game: 'STOP' as const,
+          roundDurationSeconds: 60,
+          categories: ['NAME', 'ANIMAL'],
+        },
       });
 
       const added = roomReducer(start, { type: 'CATEGORY_TOGGLED', category: 'CITY' });
-      expect(added.gameSetup.categories).toEqual(['NAME', 'ANIMAL', 'CITY']);
+      expect(added.gameSetup.game === 'STOP' && added.gameSetup.categories).toEqual([
+        'NAME',
+        'ANIMAL',
+        'CITY',
+      ]);
 
       const removed = roomReducer(added, { type: 'CATEGORY_TOGGLED', category: 'ANIMAL' });
-      expect(removed.gameSetup.categories).toEqual(['NAME', 'CITY']);
+      expect(removed.gameSetup.game === 'STOP' && removed.gameSetup.categories).toEqual([
+        'NAME',
+        'CITY',
+      ]);
     });
 
     it('refuses to start with fewer than four categories, whatever the UI shows', () => {
       const tooFew = configuring({
-        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL', 'FOOD'] },
+        gameSetup: {
+          game: 'STOP' as const,
+          roundDurationSeconds: 60,
+          categories: ['NAME', 'ANIMAL', 'FOOD'],
+        },
       });
 
       expect(roomReducer(tooFew, { type: 'START_GAME' })).toBe(tooFew);
@@ -335,7 +443,11 @@ describe('room FSM', () => {
 
     it('starts once the fourth category is picked', () => {
       const enough = configuring({
-        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL', 'FOOD', 'CITY'] },
+        gameSetup: {
+          game: 'STOP' as const,
+          roundDurationSeconds: 60,
+          categories: ['NAME', 'ANIMAL', 'FOOD', 'CITY'],
+        },
       });
 
       expect(roomReducer(enough, { type: 'START_GAME' }).status).toBe('PLAYING_AD');
@@ -406,7 +518,7 @@ describe('room FSM', () => {
       slots: [],
       selectedGameId: 'STOP' as const,
       currentRound: null,
-      gameSetup: DEFAULT_STOP_SETUP,
+      gameSetup: DEFAULT_STOP_GAME_SETUP,
       scores: {},
       lastRoundPoints: {},
       ...over,
@@ -423,12 +535,16 @@ describe('room FSM', () => {
       const next = roomReducer(makeRoom(), {
         type: 'ROOM_STATE_RECEIVED',
         state: remote({
-          gameSetup: { roundDurationSeconds: 120, categories: ['NAME', 'CITY', 'MOVIE', 'FOOD'] },
+          gameSetup: {
+            game: 'STOP' as const,
+            roundDurationSeconds: 120,
+            categories: ['NAME', 'CITY', 'MOVIE', 'FOOD'],
+          },
         }),
       });
 
       expect(next.gameSetup.roundDurationSeconds).toBe(120);
-      expect(next.gameSetup.categories).toContain('MOVIE');
+      expect(next.gameSetup.game === 'STOP' && next.gameSetup.categories).toContain('MOVIE');
     });
 
     it('never lets the remote row overwrite the presence-driven board', () => {

@@ -1,4 +1,4 @@
-import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { MAX_PLAYERS, type PlayerSlot, type RoomState, type RoomStatus } from '@/types';
 import type { PersistedRoomState, RoomRow } from '@/types/database';
 
@@ -28,7 +28,7 @@ export const rowToRoomState = (row: RoomRow): RoomState => ({
   slots: toSlots(row.state.slots),
   selectedGameId: row.state.selectedGameId,
   currentRound: row.state.currentRound,
-  gameSetup: row.state.gameSetup ?? DEFAULT_STOP_SETUP,
+  gameSetup: row.state.gameSetup ?? DEFAULT_STOP_GAME_SETUP,
   // Rows written before scores existed must not crash the scoreboard.
   scores: row.state.scores ?? {},
   lastRoundPoints: row.state.lastRoundPoints ?? {},

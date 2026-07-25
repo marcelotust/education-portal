@@ -22,12 +22,16 @@ export const DEFAULT_STOP_SETUP: StopSetup = {
   categories: ['NAME', 'ANIMAL', 'FOOD', 'COUNTRY'],
 };
 
+/** The room stores the setup tagged with its cartridge. */
+export const DEFAULT_STOP_GAME_SETUP = { game: 'STOP', ...DEFAULT_STOP_SETUP } as const;
+
 /** Letters that actually give students a fair chance in every category. */
 const LETTERS = 'ABCDEFGHIJLMNOPRSTUV';
 
 export const drawLetter = (): string => LETTERS[Math.floor(Math.random() * LETTERS.length)] ?? 'A';
 
 export const createStopRound = (setup: StopSetup, now = new Date()): StopRound => ({
+  game: 'STOP',
   phase: 'TYPING_PHASE',
   letter: drawLetter(),
   categories: setup.categories,

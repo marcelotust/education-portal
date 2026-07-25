@@ -254,7 +254,11 @@ describe('Lobby feature', () => {
       const room = {
         ...makeRoom({ status: 'CONFIGURING_GAME' }),
         selectedGameId: 'STOP' as const,
-        gameSetup: { roundDurationSeconds: 90 as const, categories: ['NAME', 'ANIMAL', 'FOOD'] },
+        gameSetup: {
+          game: 'STOP' as const,
+          roundDurationSeconds: 90 as const,
+          categories: ['NAME', 'ANIMAL', 'FOOD'],
+        },
       };
       renderLobby('CLIENT', room);
 

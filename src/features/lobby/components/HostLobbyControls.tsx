@@ -1,4 +1,5 @@
 import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { MIN_CATEGORIES } from '@/types';
@@ -25,7 +26,7 @@ export const HostLobbyControls = () => {
         onSelect={(gameId) => dispatch({ type: 'SELECT_GAME', gameId })}
       />
 
-      {state.selectedGameId !== null && (
+      {state.gameSetup.game === 'STOP' && state.selectedGameId !== null && (
         <StopSetupPanel
           setup={state.gameSetup}
           onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
@@ -33,10 +34,19 @@ export const HostLobbyControls = () => {
         />
       )}
 
+      {state.gameSetup.game === 'QUIZ' && state.selectedGameId !== null && (
+        <QuizSetupPanel
+          setup={state.gameSetup}
+          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+          onSelectTopic={(topic) => dispatch({ type: 'QUIZ_TOPIC_SELECTED', topic })}
+        />
+      )}
+
       <ArcadeButton
         tone="green"
         disabled={
-          state.selectedGameId === null || state.gameSetup.categories.length < MIN_CATEGORIES
+          state.selectedGameId === null ||
+          (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES)
         }
         onClick={() => dispatch({ type: 'START_GAME' })}
       >

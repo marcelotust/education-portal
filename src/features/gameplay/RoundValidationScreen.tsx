@@ -7,7 +7,8 @@ import { computeAnswerPoints } from './scoring';
 /** The Host judges all six players on a single screen; Clients watch it happen. */
 export const RoundValidationScreen = () => {
   const { state, isHost, dispatch } = useRoom();
-  const round = state.currentRound;
+  // Only STOP reaches this screen; QUIZ scores itself and skips it.
+  const round = state.currentRound?.game === 'STOP' ? state.currentRound : null;
 
   if (round === null) return null;
 

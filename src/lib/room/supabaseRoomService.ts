@@ -1,4 +1,4 @@
-import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
 import { toJson, type RoomRow } from '@/types/database';
 import { RoomJoinError, type RoomService, type RoomSession } from '@/types/roomService';
@@ -50,7 +50,7 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
             slots,
             selectedGameId: null,
             currentRound: null,
-            gameSetup: DEFAULT_STOP_SETUP,
+            gameSetup: DEFAULT_STOP_GAME_SETUP,
             scores: {},
             lastRoundPoints: {},
           }),

@@ -3,6 +3,12 @@ export { MAX_PLAYERS } from './player';
 export type {
   GameCartridge,
   GameId,
+  GameSetup,
+  QuizAnswer,
+  QuizQuestion,
+  QuizRound,
+  QuizSetup,
+  Round,
   RoundDuration,
   StopAnswer,
   StopPhase,

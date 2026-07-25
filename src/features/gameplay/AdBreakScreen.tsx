@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useRoom } from '@/hooks/useRoom';
+import { createQuizRound } from './quiz/quizRound';
 import { createStopRound } from './stopRound';
 
 const BREAK_SECONDS = 5;
@@ -26,7 +27,13 @@ export const AdBreakScreen = () => {
     if (!isHost || secondsLeft > 0) return;
 
     // Only the Host draws the letter, so everyone plays the same round.
-    dispatch({ type: 'AD_FINISHED', round: createStopRound(state.gameSetup) });
+    dispatch({
+      type: 'AD_FINISHED',
+      round:
+        state.gameSetup.game === 'QUIZ'
+          ? createQuizRound(state.gameSetup)
+          : createStopRound(state.gameSetup),
+    });
   }, [isHost, secondsLeft, state.gameSetup, dispatch]);
 
   return (

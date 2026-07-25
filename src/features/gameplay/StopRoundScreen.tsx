@@ -19,7 +19,7 @@ interface StopRoundScreenProps {
 /** Runs the typing phase: local clock, own answers out, everyone's answers in. */
 export const StopRoundScreen = ({ playerId }: StopRoundScreenProps) => {
   const { state, isHost, dispatch } = useRoom();
-  const round = state.currentRound;
+  const round = state.currentRound?.game === 'STOP' ? state.currentRound : null;
   const secondsLeft = useCountdown(round?.endsAt ?? null);
 
   const onAnswers = useCallback(

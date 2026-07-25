@@ -1,7 +1,12 @@
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_QUIZ_SETUP, computeQuizScores } from '@/features/gameplay/quiz/quizRound';
 import { computeRoundScores } from '@/features/gameplay/scoring';
 import {
   MAX_PLAYERS,
   MIN_CATEGORIES,
+  type GameId,
+  type GameSetup,
+  type QuizAnswer,
   type PlayerSlot,
   type RoomEvent,
   type RoomEventType,
@@ -44,17 +49,67 @@ const submitAnswers = (
   state: RoomState,
   event: Extract<RoomEvent, { type: 'ANSWERS_SUBMITTED' }>,
 ): RoomState => {
-  if (state.currentRound === null) return state;
+  const round = state.currentRound;
+  if (round?.game !== 'STOP') return state;
 
-  const others = state.currentRound.answers.filter((answer) => answer.playerId !== event.playerId);
+  const others = round.answers.filter((answer) => answer.playerId !== event.playerId);
+  return { ...state, currentRound: { ...round, answers: [...others, ...event.answers] } };
+};
+
+const defaultSetupFor = (gameId: GameId): GameSetup =>
+  gameId === 'QUIZ' ? { game: 'QUIZ', ...DEFAULT_QUIZ_SETUP } : DEFAULT_STOP_GAME_SETUP;
+
+/** STOP needs four categories; QUIZ ships with its packs and is always ready. */
+const isSetupPlayable = (state: RoomState): boolean => {
+  if (state.selectedGameId === null) return false;
+  return state.gameSetup.game === 'STOP'
+    ? state.gameSetup.categories.length >= MIN_CATEGORIES
+    : true;
+};
+
+const answerQuiz = (state: RoomState, answer: QuizAnswer): RoomState => {
+  const round = state.currentRound;
+  if (state.status !== 'PLAYING' || round?.game !== 'QUIZ') return state;
+  // First answer stands: nobody changes their mind after seeing a reaction.
+  if (round.answers.some((entry) => entry.playerId === answer.playerId)) return state;
+
+  return { ...state, currentRound: { ...round, answers: [...round.answers, answer] } };
+};
+
+/**
+ * STOP hands the round to the Host to judge. QUIZ has nothing to judge, so it
+ * scores itself on the spot and everyone lands straight on the scoreboard.
+ */
+const endRound = (state: RoomState): RoomState => {
+  const round = state.currentRound;
+  if (round === null) return { ...state, status: 'CALCULATING_SCORES' };
+
+  if (round.game === 'STOP') {
+    return {
+      ...state,
+      status: 'CALCULATING_SCORES',
+      currentRound: { ...round, phase: 'VALIDATION_PHASE' },
+    };
+  }
+
+  const earned = computeQuizScores(round);
+  const scores = { ...state.scores };
+  for (const [playerId, points] of Object.entries(earned)) {
+    scores[playerId] = (scores[playerId] ?? 0) + points;
+  }
+
   return {
     ...state,
-    currentRound: { ...state.currentRound, answers: [...others, ...event.answers] },
+    status: 'CALCULATING_SCORES',
+    scores,
+    lastRoundPoints: earned,
+    currentRound: { ...round, isScored: true },
   };
 };
 
 /** Order matters: categories appear in the round exactly as the Host picked them. */
 const toggleCategory = (state: RoomState, category: string): RoomState => {
+  if (state.gameSetup.game !== 'STOP') return state;
   const { categories } = state.gameSetup;
   const next = categories.includes(category)
     ? categories.filter((entry) => entry !== category)
@@ -71,7 +126,7 @@ const toggleCategory = (state: RoomState, category: string): RoomState => {
  */
 const callStop = (state: RoomState, playerId: string, endsAt: string): RoomState => {
   const round = state.currentRound;
-  if (state.status !== 'PLAYING' || round === null) return state;
+  if (state.status !== 'PLAYING' || round?.game !== 'STOP') return state;
   // A later deadline never wins: STOP only ever shortens the round.
   if (round.endsAt !== null && round.endsAt <= endsAt) return state;
 
@@ -83,15 +138,17 @@ const judgeAnswer = (
   state: RoomState,
   event: Extract<RoomEvent, { type: 'ANSWER_JUDGED' }>,
 ): RoomState => {
-  if (state.currentRound === null) return state;
+  const round = state.currentRound;
+  // Only STOP has anything to judge; QUIZ marks itself.
+  if (round?.game !== 'STOP') return state;
 
-  const answers = state.currentRound.answers.map((answer) =>
+  const answers = round.answers.map((answer) =>
     answer.playerId === event.playerId && answer.category === event.category
       ? { ...answer, isValid: event.isValid }
       : answer,
   );
 
-  return { ...state, currentRound: { ...state.currentRound, answers } };
+  return { ...state, currentRound: { ...round, answers } };
 };
 
 /**
@@ -101,7 +158,7 @@ const judgeAnswer = (
  */
 const approveRemaining = (state: RoomState): RoomState => {
   const round = state.currentRound;
-  if (round === null) return state;
+  if (round?.game !== 'STOP') return state;
 
   const answers = round.answers.map((answer) =>
     answer.isValid === null ? { ...answer, isValid: true } : answer,
@@ -113,7 +170,8 @@ const approveRemaining = (state: RoomState): RoomState => {
 /** Points are added to the running total, never replacing earlier rounds. */
 const scoreRound = (state: RoomState): RoomState => {
   const round = state.currentRound;
-  if (round === null || round.isScored) return state;
+  // QUIZ scores itself when the round ends; this is the Host confirming STOP.
+  if (round?.game !== 'STOP' || round.isScored) return state;
 
   const seated = state.slots.filter((slot) => slot !== null).map((slot) => slot.id);
   const earned = computeRoundScores(round, seated);
@@ -146,8 +204,9 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         : state;
 
     case 'SELECT_GAME':
+      // Each cartridge brings its own setup panel, so the setup swaps with it.
       return state.status === 'CONFIGURING_GAME'
-        ? { ...state, selectedGameId: event.gameId }
+        ? { ...state, selectedGameId: event.gameId, gameSetup: defaultSetupFor(event.gameId) }
         : state;
 
     case 'ROUND_DURATION_SELECTED':
@@ -156,13 +215,21 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         : state;
 
     case 'CATEGORY_TOGGLED':
-      return state.status === 'CONFIGURING_GAME' ? toggleCategory(state, event.category) : state;
+      return state.status === 'CONFIGURING_GAME' && state.gameSetup.game === 'STOP'
+        ? toggleCategory(state, event.category)
+        : state;
+
+    case 'QUIZ_TOPIC_SELECTED':
+      return state.status === 'CONFIGURING_GAME' && state.gameSetup.game === 'QUIZ'
+        ? { ...state, gameSetup: { ...state.gameSetup, topic: event.topic } }
+        : state;
+
+    case 'QUIZ_ANSWERED':
+      return answerQuiz(state, event.answer);
 
     case 'START_GAME':
-      // The four-category floor lives here too, not just in the disabled button.
-      return state.status === 'CONFIGURING_GAME' &&
-        state.selectedGameId !== null &&
-        state.gameSetup.categories.length >= MIN_CATEGORIES
+      // Each cartridge decides what "ready" means, here and not just in the UI.
+      return state.status === 'CONFIGURING_GAME' && isSetupPlayable(state)
         ? { ...state, status: 'PLAYING_AD' }
         : state;
 
@@ -187,16 +254,7 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return scoreRound(state);
 
     case 'END_ROUND':
-      return state.status === 'PLAYING'
-        ? {
-            ...state,
-            status: 'CALCULATING_SCORES',
-            currentRound:
-              state.currentRound === null
-                ? null
-                : { ...state.currentRound, phase: 'VALIDATION_PHASE' },
-          }
-        : state;
+      return state.status === 'PLAYING' ? endRound(state) : state;
 
     case 'RETURN_TO_LOBBY':
       return state.status === 'CALCULATING_SCORES'

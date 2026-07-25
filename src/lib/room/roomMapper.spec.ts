@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { makePlayer } from '@/test/factories';
 import type { RoomRow } from '@/types/database';
 import { rowToRoomState, toPersistedState } from './roomMapper';
@@ -14,7 +14,7 @@ const makeRow = (state: Partial<RoomRow['state']> = {}): RoomRow => ({
     slots: [null, null, null, null, null, null],
     selectedGameId: null,
     currentRound: null,
-    gameSetup: DEFAULT_STOP_SETUP,
+    gameSetup: DEFAULT_STOP_GAME_SETUP,
     scores: {},
     lastRoundPoints: {},
     ...state,

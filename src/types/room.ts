@@ -1,4 +1,4 @@
-import type { GameId, RoundDuration, StopAnswer, StopRound, StopSetup } from './game';
+import type { GameId, GameSetup, QuizAnswer, Round, RoundDuration, StopAnswer } from './game';
 import type { Player, PlayerRole, PlayerSlot } from './player';
 
 /** Finite State Machine states for a persistent room. */
@@ -15,9 +15,9 @@ export interface RoomState {
   /** Cartridge chosen in CONFIGURING_GAME; `null` while none is loaded. */
   selectedGameId: GameId | null;
   /** Only present while the STOP cartridge is running. */
-  currentRound: StopRound | null;
+  currentRound: Round | null;
   /** Chosen by the Host during CONFIGURING_GAME, watched by everyone. */
-  gameSetup: StopSetup;
+  gameSetup: GameSetup;
   /**
    * Points per player id, accumulated across rounds. Kept out of the slots
    * because Presence rebuilds those on every sync and would wipe them.
@@ -43,9 +43,11 @@ export type RoomEvent =
   | { type: 'SELECT_GAME'; gameId: GameId }
   | { type: 'ROUND_DURATION_SELECTED'; seconds: RoundDuration }
   | { type: 'CATEGORY_TOGGLED'; category: string }
+  | { type: 'QUIZ_TOPIC_SELECTED'; topic: string }
   | { type: 'START_GAME' }
-  | { type: 'AD_FINISHED'; round: StopRound }
+  | { type: 'AD_FINISHED'; round: Round }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }
+  | { type: 'QUIZ_ANSWERED'; answer: QuizAnswer }
   | { type: 'STOP_CALLED'; playerId: string; endsAt: string }
   | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
   | { type: 'REMAINING_ANSWERS_APPROVED' }

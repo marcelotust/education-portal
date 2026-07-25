@@ -1,5 +1,5 @@
 import { MAX_PLAYERS, type AvatarId, type Player, type StopRound } from '@/types';
-import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
+import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import type { RoomState } from '@/types';
 
 const AVATARS: readonly AvatarId[] = ['RED', 'BLUE', 'GREEN', 'PINK', 'CYAN', 'YELLOW'];
@@ -17,6 +17,7 @@ export const makePlayer = (index: number, overrides: Partial<Player> = {}): Play
 });
 
 export const makeRound = (overrides: Partial<StopRound> = {}): StopRound => ({
+  game: 'STOP',
   phase: 'TYPING_PHASE',
   letter: 'B',
   categories: ['ANIMAL', 'FOOD'],
@@ -48,7 +49,7 @@ export const makeRoom = ({
     slots,
     selectedGameId: null,
     currentRound: null,
-    gameSetup: DEFAULT_STOP_SETUP,
+    gameSetup: DEFAULT_STOP_GAME_SETUP,
     scores: {},
     lastRoundPoints: {},
   };

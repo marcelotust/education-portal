@@ -8,4 +8,10 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     tagline: 'Categories against the clock',
     roundDurationSeconds: 60,
   },
+  {
+    id: 'QUIZ',
+    title: 'QUIZ',
+    tagline: 'Multiple choice, fastest wins',
+    roundDurationSeconds: 30,
+  },
 ];
