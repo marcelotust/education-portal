@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makePlayer, makeRoom } from '@/test/factories';
+import { makePlayer, makeRoom, makeRound } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
 import { MAX_PLAYERS, type RoomState } from '@/types';
 
@@ -17,8 +17,9 @@ describe('room FSM', () => {
     state = roomReducer(state, { type: 'START_GAME' });
     expect(state.status).toBe('PLAYING_AD');
 
-    state = roomReducer(state, { type: 'AD_FINISHED' });
+    state = roomReducer(state, { type: 'AD_FINISHED', round: makeRound() });
     expect(state.status).toBe('PLAYING');
+    expect(state.currentRound?.letter).toBe('B');
 
     state = roomReducer(state, { type: 'END_ROUND' });
     expect(state.status).toBe('CALCULATING_SCORES');
@@ -26,12 +27,94 @@ describe('room FSM', () => {
     state = roomReducer(state, { type: 'RETURN_TO_LOBBY' });
     expect(state.status).toBe('LOBBY_IDLE');
     expect(state.selectedGameId).toBeNull();
+    expect(state.currentRound).toBeNull();
+  });
+
+  describe('STOP typing phase', () => {
+    const playing = (): RoomState => {
+      const state = roomReducer(
+        { ...withStatus('CONFIGURING_GAME'), selectedGameId: 'STOP' },
+        { type: 'START_GAME' },
+      );
+      return roomReducer(state, { type: 'AD_FINISHED', round: makeRound() });
+    };
+
+    it('opens the round in the typing phase with the drawn letter', () => {
+      const state = playing();
+
+      expect(state.currentRound?.phase).toBe('TYPING_PHASE');
+      expect(state.currentRound?.categories).toEqual(['ANIMAL', 'FOOD']);
+      expect(state.currentRound?.answers).toEqual([]);
+    });
+
+    it('collects the answers a player submits', () => {
+      const state = roomReducer(playing(), {
+        type: 'ANSWERS_SUBMITTED',
+        playerId: 'player-0',
+        answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null }],
+      });
+
+      expect(state.currentRound?.answers).toHaveLength(1);
+      expect(state.currentRound?.answers[0]?.value).toBe('BEAR');
+    });
+
+    it('lets a player resubmit without duplicating their answers', () => {
+      let state = roomReducer(playing(), {
+        type: 'ANSWERS_SUBMITTED',
+        playerId: 'player-0',
+        answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null }],
+      });
+      state = roomReducer(state, {
+        type: 'ANSWERS_SUBMITTED',
+        playerId: 'player-0',
+        answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEE', isValid: null }],
+      });
+
+      expect(state.currentRound?.answers).toHaveLength(1);
+      expect(state.currentRound?.answers[0]?.value).toBe('BEE');
+    });
+
+    it('keeps answers from different players side by side', () => {
+      let state = roomReducer(playing(), {
+        type: 'ANSWERS_SUBMITTED',
+        playerId: 'player-0',
+        answers: [{ playerId: 'player-0', category: 'ANIMAL', value: 'BEAR', isValid: null }],
+      });
+      state = roomReducer(state, {
+        type: 'ANSWERS_SUBMITTED',
+        playerId: 'player-1',
+        answers: [{ playerId: 'player-1', category: 'ANIMAL', value: 'BAT', isValid: null }],
+      });
+
+      expect(state.currentRound?.answers).toHaveLength(2);
+    });
+
+    it('ignores answers arriving when no round is running', () => {
+      const idle = withStatus('LOBBY_IDLE');
+
+      expect(
+        roomReducer(idle, { type: 'ANSWERS_SUBMITTED', playerId: 'player-0', answers: [] }),
+      ).toBe(idle);
+    });
+
+    it('moves the round to the validation phase when it ends', () => {
+      const state = roomReducer(playing(), { type: 'END_ROUND' });
+
+      expect(state.status).toBe('CALCULATING_SCORES');
+      expect(state.currentRound?.phase).toBe('VALIDATION_PHASE');
+    });
+
+    it('is a shared event: a Client must be able to send its own answers', () => {
+      expect(
+        isHostOnlyEvent({ type: 'ANSWERS_SUBMITTED', playerId: 'player-0', answers: [] }),
+      ).toBe(false);
+    });
   });
 
   it('ignores events that are not valid for the current state', () => {
     const idle = withStatus('LOBBY_IDLE');
 
-    expect(roomReducer(idle, { type: 'AD_FINISHED' })).toBe(idle);
+    expect(roomReducer(idle, { type: 'AD_FINISHED', round: makeRound() })).toBe(idle);
     expect(roomReducer(idle, { type: 'END_ROUND' })).toBe(idle);
   });
 

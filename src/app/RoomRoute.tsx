@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
-import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { HostEntryScreen } from '@/features/room/HostEntryScreen';
 import { JoinRoomScreen } from '@/features/room/JoinRoomScreen';
 import { RoomPresenceBridge } from '@/features/room/RoomPresenceBridge';
 import { RoomStateBridge } from '@/features/room/RoomStateBridge';
+import { RoomStage } from '@/features/room/RoomStage';
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 import type { PlayerRole } from '@/types';
@@ -42,7 +42,7 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
             }}
           />
           <RoomStateBridge />
-          <LobbyScreen />
+          <RoomStage playerId={session.playerId} />
         </RoomProvider>
       )}
     </AppLayout>

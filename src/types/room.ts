@@ -1,4 +1,4 @@
-import type { GameId, StopRound } from './game';
+import type { GameId, StopAnswer, StopRound } from './game';
 import type { Player, PlayerRole, PlayerSlot } from './player';
 
 /** Finite State Machine states for a persistent room. */
@@ -30,7 +30,8 @@ export type RoomEvent =
   | { type: 'CANCEL_GAME_CONFIG' }
   | { type: 'SELECT_GAME'; gameId: GameId }
   | { type: 'START_GAME' }
-  | { type: 'AD_FINISHED' }
+  | { type: 'AD_FINISHED'; round: StopRound }
+  | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }
   | { type: 'END_ROUND' }
   | { type: 'RETURN_TO_LOBBY' }
   | { type: 'PLAYER_JOINED'; player: Player }

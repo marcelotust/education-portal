@@ -13,6 +13,8 @@ const PRESENCE_EVENTS: readonly RoomEventType[] = [
   'PLAYERS_SYNCED',
   // Broadcast by the room row, which only the Host can write anyway.
   'ROOM_STATE_RECEIVED',
+  // Every player broadcasts its own answers; the Host consolidates them.
+  'ANSWERS_SUBMITTED',
 ];
 
 const sameBoard = (a: readonly PlayerSlot[], b: readonly PlayerSlot[]): boolean =>
@@ -30,6 +32,23 @@ const seatPlayer = (state: RoomState, event: Extract<RoomEvent, { type: 'PLAYER_
 
   const slots = state.slots.map((slot, index) => (index === openSlot ? event.player : slot));
   return { ...state, slots };
+};
+
+/**
+ * Answers arrive over Broadcast, so the same player can send twice (retry,
+ * reconnect, or STOP right as the timer fires). The last submission wins.
+ */
+const submitAnswers = (
+  state: RoomState,
+  event: Extract<RoomEvent, { type: 'ANSWERS_SUBMITTED' }>,
+): RoomState => {
+  if (state.currentRound === null) return state;
+
+  const others = state.currentRound.answers.filter((answer) => answer.playerId !== event.playerId);
+  return {
+    ...state,
+    currentRound: { ...state.currentRound, answers: [...others, ...event.answers] },
+  };
 };
 
 const releaseSlot = (state: RoomState, playerId: string): RoomState => {
@@ -62,10 +81,24 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         : state;
 
     case 'AD_FINISHED':
-      return state.status === 'PLAYING_AD' ? { ...state, status: 'PLAYING' } : state;
+      return state.status === 'PLAYING_AD'
+        ? { ...state, status: 'PLAYING', currentRound: event.round }
+        : state;
+
+    case 'ANSWERS_SUBMITTED':
+      return submitAnswers(state, event);
 
     case 'END_ROUND':
-      return state.status === 'PLAYING' ? { ...state, status: 'CALCULATING_SCORES' } : state;
+      return state.status === 'PLAYING'
+        ? {
+            ...state,
+            status: 'CALCULATING_SCORES',
+            currentRound:
+              state.currentRound === null
+                ? null
+                : { ...state.currentRound, phase: 'VALIDATION_PHASE' },
+          }
+        : state;
 
     case 'RETURN_TO_LOBBY':
       return state.status === 'CALCULATING_SCORES'

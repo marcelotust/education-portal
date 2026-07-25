@@ -1,4 +1,4 @@
-import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
+import { MAX_PLAYERS, type AvatarId, type Player, type StopRound } from '@/types';
 import type { RoomState } from '@/types';
 
 const AVATARS: readonly AvatarId[] = ['RED', 'BLUE', 'GREEN', 'PINK', 'CYAN', 'YELLOW'];
@@ -13,6 +13,15 @@ export const makePlayer = (index: number, overrides: Partial<Player> = {}): Play
   isReady: true,
   score: 0,
   joinedAt: new Date(2026, 0, 1, 10, index).toISOString(),
+  ...overrides,
+});
+
+export const makeRound = (overrides: Partial<StopRound> = {}): StopRound => ({
+  phase: 'TYPING_PHASE',
+  letter: 'B',
+  categories: ['ANIMAL', 'FOOD'],
+  answers: [],
+  endsAt: '2026-07-24T12:01:00.000Z',
   ...overrides,
 });
 
