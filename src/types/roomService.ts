@@ -7,6 +7,9 @@ export interface RoomSession {
   /** Supabase anonymous user id of the local participant. */
   playerId: string;
   role: PlayerRole;
+  /** Broadcast over Presence so the others can render this seat. */
+  nickname: string;
+  joinedAt: string;
 }
 
 export type RoomJoinFailure = 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'UNKNOWN';

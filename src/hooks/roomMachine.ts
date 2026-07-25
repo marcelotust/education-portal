@@ -1,7 +1,24 @@
-import { MAX_PLAYERS, type RoomEvent, type RoomEventType, type RoomState } from '@/types';
+import {
+  MAX_PLAYERS,
+  type PlayerSlot,
+  type RoomEvent,
+  type RoomEventType,
+  type RoomState,
+} from '@/types';
 
 /** Presence events are broadcast by the infrastructure, not by the Host. */
-const PRESENCE_EVENTS: readonly RoomEventType[] = ['PLAYER_JOINED', 'PLAYER_LEFT'];
+const PRESENCE_EVENTS: readonly RoomEventType[] = [
+  'PLAYER_JOINED',
+  'PLAYER_LEFT',
+  'PLAYERS_SYNCED',
+];
+
+const sameBoard = (a: readonly PlayerSlot[], b: readonly PlayerSlot[]): boolean =>
+  a.length === b.length &&
+  a.every((slot, index) => {
+    const other = b[index];
+    return slot === other || (slot?.id === other?.id && slot?.nickname === other?.nickname);
+  });
 
 export const isHostOnlyEvent = (event: RoomEvent): boolean => !PRESENCE_EVENTS.includes(event.type);
 
@@ -58,5 +75,11 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'PLAYER_LEFT':
       return releaseSlot(state, event.playerId);
+
+    case 'PLAYERS_SYNCED': {
+      // Realtime Presence owns the board; it arrives already normalised to 6.
+      const slots = Array.from({ length: MAX_PLAYERS }, (_, index) => event.slots[index] ?? null);
+      return sameBoard(state.slots, slots) ? state : { ...state, slots };
+    }
   }
 };

@@ -31,7 +31,8 @@ export type RoomEvent =
   | { type: 'END_ROUND' }
   | { type: 'RETURN_TO_LOBBY' }
   | { type: 'PLAYER_JOINED'; player: Player }
-  | { type: 'PLAYER_LEFT'; playerId: string };
+  | { type: 'PLAYER_LEFT'; playerId: string }
+  | { type: 'PLAYERS_SYNCED'; slots: readonly PlayerSlot[] };
 
 export type RoomEventType = RoomEvent['type'];
 

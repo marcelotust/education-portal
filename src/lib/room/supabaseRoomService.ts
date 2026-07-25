@@ -51,7 +51,13 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
       .single<RoomRow>();
 
     if (error === null) {
-      return { room: rowToRoomState(data), playerId: hostId, role: 'HOST' };
+      return {
+        room: rowToRoomState(data),
+        playerId: hostId,
+        role: 'HOST',
+        nickname,
+        joinedAt: new Date().toISOString(),
+      };
     }
     if (error.code !== UNIQUE_VIOLATION) {
       throw new Error(`Could not create the room: ${error.message}`);
@@ -64,7 +70,7 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
 const joinRoom = async (
   client: EduPartyClient,
   pin: string,
-  _nickname: string,
+  nickname: string,
 ): Promise<RoomSession> => {
   const playerId = await ensureAnonymousSession(client);
 
@@ -81,7 +87,7 @@ const joinRoom = async (
   const room = rowToRoomState(data);
   if (countPlayers(room) >= MAX_PLAYERS) throw new RoomJoinError('ROOM_FULL');
 
-  return { room, playerId, role: 'CLIENT' };
+  return { room, playerId, role: 'CLIENT', nickname, joinedAt: new Date().toISOString() };
 };
 
 export const createSupabaseRoomService = (

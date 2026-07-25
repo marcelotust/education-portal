@@ -11,6 +11,8 @@ const session = (): RoomSession => ({
   room: makeRoom({ playerCount: 2 }),
   playerId: 'player-1',
   role: 'CLIENT',
+  nickname: 'ANA',
+  joinedAt: '2026-07-24T12:06:00.000Z',
 });
 
 describe('Join room screen', () => {

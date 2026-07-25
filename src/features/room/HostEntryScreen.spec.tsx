@@ -10,6 +10,8 @@ const session = (): RoomSession => ({
   room: makeRoom({ playerCount: 1 }),
   playerId: 'player-0',
   role: 'HOST',
+  nickname: 'TEACHER',
+  joinedAt: '2026-07-24T12:00:00.000Z',
 });
 
 describe('Host entry screen', () => {

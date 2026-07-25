@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { HostEntryScreen } from '@/features/room/HostEntryScreen';
 import { JoinRoomScreen } from '@/features/room/JoinRoomScreen';
+import { RoomPresenceBridge } from '@/features/room/RoomPresenceBridge';
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 import type { PlayerRole } from '@/types';
@@ -31,6 +32,14 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
         )
       ) : (
         <RoomProvider initialState={session.room} role={session.role}>
+          <RoomPresenceBridge
+            me={{
+              playerId: session.playerId,
+              nickname: session.nickname,
+              role: session.role,
+              joinedAt: session.joinedAt,
+            }}
+          />
           <LobbyScreen />
         </RoomProvider>
       )}

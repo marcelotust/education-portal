@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { makePlayer, makeRoom } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
-import type { RoomState } from '@/types';
+import { MAX_PLAYERS, type RoomState } from '@/types';
 
 const withStatus = (status: RoomState['status']): RoomState => makeRoom({ status });
 
@@ -68,5 +68,22 @@ describe('room FSM', () => {
     expect(isHostOnlyEvent({ type: 'START_GAME' })).toBe(true);
     expect(isHostOnlyEvent({ type: 'OPEN_GAME_CONFIG' })).toBe(true);
     expect(isHostOnlyEvent({ type: 'PLAYER_LEFT', playerId: 'player-1' })).toBe(false);
+    expect(isHostOnlyEvent({ type: 'PLAYERS_SYNCED', slots: [] })).toBe(false);
+  });
+
+  it('replaces the whole board when Realtime Presence syncs, keeping 6 seats', () => {
+    const room = makeRoom({ playerCount: 3 });
+
+    const next = roomReducer(room, { type: 'PLAYERS_SYNCED', slots: [makePlayer(7)] });
+
+    expect(next.slots).toHaveLength(MAX_PLAYERS);
+    expect(next.slots[0]?.id).toBe('player-7');
+    expect(next.slots[1]).toBeNull();
+  });
+
+  it('keeps the same state object when a presence sync changes nothing', () => {
+    const room = makeRoom({ playerCount: 2 });
+
+    expect(roomReducer(room, { type: 'PLAYERS_SYNCED', slots: room.slots })).toBe(room);
   });
 });
