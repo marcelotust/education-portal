@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 
 import { ArcadeButton } from '@/components/ui/ArcadeButton';
 import { ArcadeInput } from '@/components/ui/ArcadeInput';
+import { rememberRoom } from '@/lib/recentRooms';
 import { RoomJoinError, type JoinRoom, type RoomSession } from '@/types/roomService';
 import { MAX_NICKNAME_LENGTH, PIN_LENGTH, isValidPin } from '@/utils/room';
 
@@ -15,11 +16,13 @@ const FALLBACK_MESSAGE = 'Could not join the room. Check your connection and try
 interface JoinRoomScreenProps {
   joinRoom: JoinRoom;
   onReady: (session: RoomSession) => void;
+  /** Prefilled when arriving from the landing page's history. */
+  initialPin?: string | undefined;
 }
 
 /** First screen of /play: the student types the PIN the Host is showing. */
-export const JoinRoomScreen = ({ joinRoom, onReady }: JoinRoomScreenProps) => {
-  const [pin, setPin] = useState('');
+export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreenProps) => {
+  const [pin, setPin] = useState(initialPin ?? '');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
@@ -43,7 +46,14 @@ export const JoinRoomScreen = ({ joinRoom, onReady }: JoinRoomScreenProps) => {
     setError(null);
     setIsJoining(true);
     try {
-      onReady(await joinRoom(normalisedPin, trimmedNickname));
+      const session = await joinRoom(normalisedPin, trimmedNickname);
+      // Presence leaves no trace, so the way back lives in this browser.
+      rememberRoom({
+        pin: normalisedPin,
+        nickname: trimmedNickname,
+        joinedAt: new Date().toISOString(),
+      });
+      onReady(session);
     } catch (cause) {
       const reason = cause instanceof RoomJoinError ? cause.reason : 'UNKNOWN';
       setError(FAILURE_MESSAGES[reason] ?? FALLBACK_MESSAGE);

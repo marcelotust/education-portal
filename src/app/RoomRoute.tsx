@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { HostEntryScreen } from '@/features/room/HostEntryScreen';
@@ -23,6 +24,7 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
   const service = useMemo(() => createSupabaseRoomService(), []);
   const [session, setSession] = useState<RoomSession | null>(null);
   const [resumableRoom, setResumableRoom] = useState<RoomSession | null>(null);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (role !== 'HOST') return;
@@ -72,7 +74,11 @@ export const RoomRoute = ({ role }: RoomRouteProps) => {
           onResume={setSession}
         />
       ) : (
-        <JoinRoomScreen joinRoom={service.joinRoom} onReady={setSession} />
+        <JoinRoomScreen
+          joinRoom={service.joinRoom}
+          onReady={setSession}
+          initialPin={searchParams.get('pin') ?? undefined}
+        />
       )}
     </AppLayout>
   );
