@@ -9,6 +9,7 @@ const toPayload = (state: RoomState): PersistedRoomState => ({
   slots: state.slots,
   selectedGameId: state.selectedGameId,
   currentRound: state.currentRound,
+  gameSetup: state.gameSetup,
   scores: state.scores,
 });
 

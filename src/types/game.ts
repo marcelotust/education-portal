@@ -9,6 +9,19 @@ export interface GameCartridge {
   roundDurationSeconds: number;
 }
 
+/** Round lengths the Host can pick, in seconds. */
+export const ROUND_DURATIONS = [30, 60, 90, 120] as const;
+export type RoundDuration = (typeof ROUND_DURATIONS)[number];
+
+/** A match needs enough categories to be worth playing. */
+export const MIN_CATEGORIES = 4;
+
+/** What the Host configures before starting STOP; everyone watches it. */
+export interface StopSetup {
+  roundDurationSeconds: RoundDuration;
+  categories: readonly string[];
+}
+
 /** Internal phases of the STOP cartridge. */
 export type StopPhase = 'TYPING_PHASE' | 'VALIDATION_PHASE';
 

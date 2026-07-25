@@ -1,6 +1,7 @@
 import { computeRoundScores } from '@/features/gameplay/scoring';
 import {
   MAX_PLAYERS,
+  MIN_CATEGORIES,
   type PlayerSlot,
   type RoomEvent,
   type RoomEventType,
@@ -50,6 +51,16 @@ const submitAnswers = (
     ...state,
     currentRound: { ...state.currentRound, answers: [...others, ...event.answers] },
   };
+};
+
+/** Order matters: categories appear in the round exactly as the Host picked them. */
+const toggleCategory = (state: RoomState, category: string): RoomState => {
+  const { categories } = state.gameSetup;
+  const next = categories.includes(category)
+    ? categories.filter((entry) => entry !== category)
+    : [...categories, category];
+
+  return { ...state, gameSetup: { ...state.gameSetup, categories: next } };
 };
 
 const judgeAnswer = (
@@ -107,8 +118,19 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         ? { ...state, selectedGameId: event.gameId }
         : state;
 
+    case 'ROUND_DURATION_SELECTED':
+      return state.status === 'CONFIGURING_GAME'
+        ? { ...state, gameSetup: { ...state.gameSetup, roundDurationSeconds: event.seconds } }
+        : state;
+
+    case 'CATEGORY_TOGGLED':
+      return state.status === 'CONFIGURING_GAME' ? toggleCategory(state, event.category) : state;
+
     case 'START_GAME':
-      return state.status === 'CONFIGURING_GAME' && state.selectedGameId !== null
+      // The four-category floor lives here too, not just in the disabled button.
+      return state.status === 'CONFIGURING_GAME' &&
+        state.selectedGameId !== null &&
+        state.gameSetup.categories.length >= MIN_CATEGORIES
         ? { ...state, status: 'PLAYING_AD' }
         : state;
 
@@ -150,15 +172,18 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return releaseSlot(state, event.playerId);
 
     case 'ROOM_STATE_RECEIVED': {
-      const { status, selectedGameId, currentRound, scores } = event.state;
+      const { status, selectedGameId, currentRound, gameSetup, scores } = event.state;
       const unchanged =
         state.status === status &&
         state.selectedGameId === selectedGameId &&
         state.currentRound === currentRound &&
+        state.gameSetup === gameSetup &&
         state.scores === scores;
 
       // Seats come from Presence; the row never overwrites the live board.
-      return unchanged ? state : { ...state, status, selectedGameId, currentRound, scores };
+      return unchanged
+        ? state
+        : { ...state, status, selectedGameId, currentRound, gameSetup, scores };
     }
 
     case 'PLAYERS_SYNCED': {

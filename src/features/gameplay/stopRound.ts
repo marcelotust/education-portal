@@ -1,27 +1,39 @@
-import type { StopRound } from '@/types';
+import type { StopRound, StopSetup } from '@/types';
 
-/** Fixed category set for the MVP. */
-export const STOP_CATEGORIES: readonly string[] = [
+/** Everything the Host can pick from when setting up a match. */
+export const STOP_CATEGORY_CATALOG: readonly string[] = [
   'NAME',
   'ANIMAL',
   'FOOD',
   'COUNTRY',
+  'CITY',
   'OBJECT',
   'COLOR',
+  'PROFESSION',
+  'BRAND',
+  'MOVIE',
+  'SPORT',
+  'BODY PART',
 ];
+
+/** A fresh room is playable without touching the setup. */
+export const DEFAULT_STOP_SETUP: StopSetup = {
+  roundDurationSeconds: 60,
+  categories: ['NAME', 'ANIMAL', 'FOOD', 'COUNTRY'],
+};
 
 /** Letters that actually give students a fair chance in every category. */
 const LETTERS = 'ABCDEFGHIJLMNOPRSTUV';
 
 export const drawLetter = (): string => LETTERS[Math.floor(Math.random() * LETTERS.length)] ?? 'A';
 
-export const createStopRound = (durationSeconds: number, now = new Date()): StopRound => ({
+export const createStopRound = (setup: StopSetup, now = new Date()): StopRound => ({
   phase: 'TYPING_PHASE',
   letter: drawLetter(),
-  categories: STOP_CATEGORIES,
+  categories: setup.categories,
   answers: [],
   isScored: false,
-  endsAt: new Date(now.getTime() + durationSeconds * 1000).toISOString(),
+  endsAt: new Date(now.getTime() + setup.roundDurationSeconds * 1000).toISOString(),
 });
 
 /** Whole seconds left, floored at zero; drives the on-screen clock. */

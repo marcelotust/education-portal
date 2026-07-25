@@ -1,4 +1,5 @@
 import { MAX_PLAYERS, type AvatarId, type Player, type StopRound } from '@/types';
+import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
 import type { RoomState } from '@/types';
 
 const AVATARS: readonly AvatarId[] = ['RED', 'BLUE', 'GREEN', 'PINK', 'CYAN', 'YELLOW'];
@@ -46,6 +47,7 @@ export const makeRoom = ({
     slots,
     selectedGameId: null,
     currentRound: null,
+    gameSetup: DEFAULT_STOP_SETUP,
     scores: {},
   };
 };

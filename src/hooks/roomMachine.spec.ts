@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_STOP_SETUP } from '@/features/gameplay/stopRound';
 import { makePlayer, makeRoom, makeRound } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
 import { MAX_PLAYERS, type RoomState } from '@/types';
@@ -212,6 +213,60 @@ describe('room FSM', () => {
     expect(roomReducer(configuring, { type: 'START_GAME' })).toBe(configuring);
   });
 
+  describe('game setup', () => {
+    const configuring = (over: Partial<RoomState> = {}): RoomState => ({
+      ...withStatus('CONFIGURING_GAME'),
+      selectedGameId: 'STOP',
+      ...over,
+    });
+
+    it('records the round length the Host picked', () => {
+      const state = roomReducer(configuring(), { type: 'ROUND_DURATION_SELECTED', seconds: 90 });
+
+      expect(state.gameSetup.roundDurationSeconds).toBe(90);
+    });
+
+    it('adds a category the Host tapped and removes it when tapped again', () => {
+      const start = configuring({
+        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL'] },
+      });
+
+      const added = roomReducer(start, { type: 'CATEGORY_TOGGLED', category: 'CITY' });
+      expect(added.gameSetup.categories).toEqual(['NAME', 'ANIMAL', 'CITY']);
+
+      const removed = roomReducer(added, { type: 'CATEGORY_TOGGLED', category: 'ANIMAL' });
+      expect(removed.gameSetup.categories).toEqual(['NAME', 'CITY']);
+    });
+
+    it('refuses to start with fewer than four categories, whatever the UI shows', () => {
+      const tooFew = configuring({
+        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL', 'FOOD'] },
+      });
+
+      expect(roomReducer(tooFew, { type: 'START_GAME' })).toBe(tooFew);
+    });
+
+    it('starts once the fourth category is picked', () => {
+      const enough = configuring({
+        gameSetup: { roundDurationSeconds: 60, categories: ['NAME', 'ANIMAL', 'FOOD', 'CITY'] },
+      });
+
+      expect(roomReducer(enough, { type: 'START_GAME' }).status).toBe('PLAYING_AD');
+    });
+
+    it('only accepts setup changes while the room is configuring', () => {
+      const idle = withStatus('LOBBY_IDLE');
+
+      expect(roomReducer(idle, { type: 'ROUND_DURATION_SELECTED', seconds: 30 })).toBe(idle);
+      expect(roomReducer(idle, { type: 'CATEGORY_TOGGLED', category: 'CITY' })).toBe(idle);
+    });
+
+    it('keeps the setup Host-only', () => {
+      expect(isHostOnlyEvent({ type: 'ROUND_DURATION_SELECTED', seconds: 30 })).toBe(true);
+      expect(isHostOnlyEvent({ type: 'CATEGORY_TOGGLED', category: 'CITY' })).toBe(true);
+    });
+  });
+
   it('seats a joining player in the first open slot', () => {
     const room = makeRoom({ playerCount: 1 });
 
@@ -264,6 +319,7 @@ describe('room FSM', () => {
       slots: [],
       selectedGameId: 'STOP' as const,
       currentRound: null,
+      gameSetup: DEFAULT_STOP_SETUP,
       scores: {},
       ...over,
     });
@@ -273,6 +329,18 @@ describe('room FSM', () => {
 
       expect(next.status).toBe('PLAYING');
       expect(next.selectedGameId).toBe('STOP');
+    });
+
+    it('carries the match setup so Clients watch it being configured', () => {
+      const next = roomReducer(makeRoom(), {
+        type: 'ROOM_STATE_RECEIVED',
+        state: remote({
+          gameSetup: { roundDurationSeconds: 120, categories: ['NAME', 'CITY', 'MOVIE', 'FOOD'] },
+        }),
+      });
+
+      expect(next.gameSetup.roundDurationSeconds).toBe(120);
+      expect(next.gameSetup.categories).toContain('MOVIE');
     });
 
     it('never lets the remote row overwrite the presence-driven board', () => {
@@ -290,6 +358,7 @@ describe('room FSM', () => {
         slots: room.slots,
         selectedGameId: room.selectedGameId,
         currentRound: room.currentRound,
+        gameSetup: room.gameSetup,
         scores: room.scores,
       };
 

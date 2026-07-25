@@ -1,4 +1,4 @@
-import type { GameId, StopAnswer, StopRound } from './game';
+import type { GameId, RoundDuration, StopAnswer, StopRound, StopSetup } from './game';
 import type { Player, PlayerRole, PlayerSlot } from './player';
 
 /** Finite State Machine states for a persistent room. */
@@ -16,6 +16,8 @@ export interface RoomState {
   selectedGameId: GameId | null;
   /** Only present while the STOP cartridge is running. */
   currentRound: StopRound | null;
+  /** Chosen by the Host during CONFIGURING_GAME, watched by everyone. */
+  gameSetup: StopSetup;
   /**
    * Points per player id, accumulated across rounds. Kept out of the slots
    * because Presence rebuilds those on every sync and would wipe them.
@@ -34,6 +36,8 @@ export type RoomEvent =
   | { type: 'OPEN_GAME_CONFIG' }
   | { type: 'CANCEL_GAME_CONFIG' }
   | { type: 'SELECT_GAME'; gameId: GameId }
+  | { type: 'ROUND_DURATION_SELECTED'; seconds: RoundDuration }
+  | { type: 'CATEGORY_TOGGLED'; category: string }
   | { type: 'START_GAME' }
   | { type: 'AD_FINISHED'; round: StopRound }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }

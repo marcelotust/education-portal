@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { GAME_CARTRIDGES } from '@/features/lobby/cartridges';
 import { useRoom } from '@/hooks/useRoom';
 import { createStopRound } from './stopRound';
 
@@ -27,12 +26,8 @@ export const AdBreakScreen = () => {
     if (!isHost || secondsLeft > 0) return;
 
     // Only the Host draws the letter, so everyone plays the same round.
-    const cartridge = GAME_CARTRIDGES.find(({ id }) => id === state.selectedGameId);
-    dispatch({
-      type: 'AD_FINISHED',
-      round: createStopRound(cartridge?.roundDurationSeconds ?? 60),
-    });
-  }, [isHost, secondsLeft, state.selectedGameId, dispatch]);
+    dispatch({ type: 'AD_FINISHED', round: createStopRound(state.gameSetup) });
+  }, [isHost, secondsLeft, state.gameSetup, dispatch]);
 
   return (
     <section className="flex flex-col items-center gap-6 py-10 text-center">

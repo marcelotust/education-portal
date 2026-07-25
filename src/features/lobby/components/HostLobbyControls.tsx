@@ -1,5 +1,7 @@
 import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
+import { MIN_CATEGORIES } from '@/types';
 import { GameCartridgePicker } from './GameCartridgePicker';
 
 /** Write-side of the lobby: only ever rendered for the Host. */
@@ -23,9 +25,19 @@ export const HostLobbyControls = () => {
         onSelect={(gameId) => dispatch({ type: 'SELECT_GAME', gameId })}
       />
 
+      {state.selectedGameId !== null && (
+        <StopSetupPanel
+          setup={state.gameSetup}
+          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+          onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
+        />
+      )}
+
       <ArcadeButton
         tone="green"
-        disabled={state.selectedGameId === null}
+        disabled={
+          state.selectedGameId === null || state.gameSetup.categories.length < MIN_CATEGORIES
+        }
         onClick={() => dispatch({ type: 'START_GAME' })}
       >
         START GAME

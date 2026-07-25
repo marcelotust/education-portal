@@ -1,3 +1,4 @@
+import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { ClientLobbyStatus } from './ClientLobbyStatus';
 import { GameCartridgePicker } from './GameCartridgePicker';
@@ -14,7 +15,10 @@ export const ClientLobbyControls = () => {
       <ClientLobbyStatus status={state.status} />
 
       {state.status === 'CONFIGURING_GAME' && (
-        <GameCartridgePicker selectedGameId={state.selectedGameId} />
+        <>
+          <GameCartridgePicker selectedGameId={state.selectedGameId} />
+          {state.selectedGameId !== null && <StopSetupPanel setup={state.gameSetup} />}
+        </>
       )}
     </div>
   );

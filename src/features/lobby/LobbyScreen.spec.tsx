@@ -116,6 +116,60 @@ describe('Lobby feature', () => {
       expect(status()).toBe('PLAYING_AD');
     });
 
+    it('reveals the match setup once a cartridge is chosen', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      expect(screen.queryByRole('button', { name: /60 seconds/i })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      expect(screen.getByRole('button', { name: /60 seconds/i })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(screen.getByRole('button', { name: /^ANIMAL$/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    });
+
+    it('lets the Host change the round length', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+      await user.click(screen.getByRole('button', { name: /90 seconds/i }));
+
+      expect(screen.getByRole('button', { name: /90 seconds/i })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(screen.getByRole('button', { name: /60 seconds/i })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+    });
+
+    it('blocks the start until four categories are picked', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+      // The default four are enough; dropping one must block the start.
+      await user.click(screen.getByRole('button', { name: /^ANIMAL$/ }));
+
+      expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
+      expect(screen.getByRole('status')).toHaveTextContent(/pick 1 more/i);
+
+      await user.click(screen.getByRole('button', { name: /^CITY$/ }));
+
+      expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
+    });
+
     it('goes back to LOBBY_IDLE when the Host cancels the configuration', async () => {
       const user = userEvent.setup();
       renderLobby('HOST');
@@ -157,6 +211,30 @@ describe('Lobby feature', () => {
       expect(screen.getByRole('button', { name: /^stop$/i })).toHaveAttribute(
         'aria-pressed',
         'true',
+      );
+    });
+
+    it('watches the match setup take shape, without being able to change it', async () => {
+      const user = userEvent.setup();
+      const room = {
+        ...makeRoom({ status: 'CONFIGURING_GAME' }),
+        selectedGameId: 'STOP' as const,
+        gameSetup: { roundDurationSeconds: 90 as const, categories: ['NAME', 'ANIMAL', 'FOOD'] },
+      };
+      renderLobby('CLIENT', room);
+
+      expect(screen.getByRole('button', { name: /90 seconds/i })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(screen.getByRole('button', { name: /^ANIMAL$/ })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /30 seconds/i })).toBeDisabled();
+
+      await user.click(screen.getByRole('button', { name: /^CITY$/ }));
+
+      expect(screen.getByRole('button', { name: /^CITY$/ })).toHaveAttribute(
+        'aria-pressed',
+        'false',
       );
     });
 
