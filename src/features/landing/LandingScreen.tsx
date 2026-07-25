@@ -62,7 +62,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
               type="button"
               aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
               onClick={() => void navigate(`/play?pin=${room.pin}`)}
-              className="flex items-center justify-between gap-3 rounded border-2 border-slate-800 px-3 py-2 font-arcade text-[10px] text-slate-300 transition-colors hover:border-arcade-cyan"
+              className="flex min-h-11 items-center justify-between gap-3 rounded border-2 border-slate-800 px-3 py-3 font-arcade text-[10px] text-slate-300 transition-colors hover:border-arcade-cyan"
             >
               <span className="tracking-[0.3em] text-arcade-cyan">{room.pin}</span>
               <span className="text-slate-500">{room.nickname}</span>

@@ -70,7 +70,9 @@ export const StopTypingScreen = ({
 
   return (
     <section className="flex flex-col gap-4">
-      <header className="flex items-center justify-between gap-3">
+      {/* Sticky: with eight categories the fields scroll, and losing sight of
+          the clock in a timed game is losing the game. */}
+      <header className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-slate-900/95 px-1 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
           <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
             Letter

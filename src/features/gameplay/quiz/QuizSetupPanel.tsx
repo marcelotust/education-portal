@@ -28,7 +28,7 @@ export const QuizSetupPanel = ({ setup, onSelectDuration, onSelectTopic }: QuizS
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'rounded border-2 py-2 font-arcade text-[10px] transition-colors',
+                'min-h-11 rounded border-2 py-2 font-arcade text-[10px] transition-colors',
                 setup.roundDurationSeconds === seconds
                   ? 'border-arcade-cyan text-arcade-cyan disabled:border-arcade-cyan disabled:text-arcade-cyan'
                   : 'border-slate-700 text-slate-500',
@@ -53,7 +53,7 @@ export const QuizSetupPanel = ({ setup, onSelectDuration, onSelectTopic }: QuizS
               disabled={isReadOnly}
               onClick={() => onSelectTopic?.(topic)}
               className={cn(
-                'rounded border-2 px-2 py-1 font-arcade text-[9px] transition-colors',
+                'min-h-11 rounded border-2 px-3 py-2 font-arcade text-[9px] transition-colors',
                 setup.topic === topic
                   ? 'border-arcade-green text-arcade-green disabled:border-arcade-green disabled:text-arcade-green'
                   : 'border-slate-800 text-slate-600',

@@ -26,7 +26,7 @@ export const ArcadeButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'rounded-md border-2 px-4 py-3 font-arcade text-[10px] tracking-wider transition-colors',
+      'min-h-11 rounded-md border-2 px-4 py-3 font-arcade text-[10px] tracking-wider transition-colors',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
       'disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600 disabled:hover:bg-transparent',
       TONE_STYLES[tone],

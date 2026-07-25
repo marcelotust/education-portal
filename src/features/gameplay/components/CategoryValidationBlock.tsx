@@ -78,7 +78,7 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, true)}
                   className={cn(
-                    'rounded border-2 px-2 py-1 font-arcade text-[9px] transition-colors',
+                    'min-h-11 min-w-11 rounded border-2 px-2 py-1 font-arcade text-[10px] transition-colors',
                     isApproved
                       ? 'border-arcade-green bg-arcade-green/15 text-arcade-green'
                       : 'border-slate-700 text-slate-500',
@@ -95,7 +95,7 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, false)}
                   className={cn(
-                    'rounded border-2 px-2 py-1 font-arcade text-[9px] transition-colors',
+                    'min-h-11 min-w-11 rounded border-2 px-2 py-1 font-arcade text-[10px] transition-colors',
                     isRejected
                       ? 'border-arcade-pink bg-arcade-pink/15 text-arcade-pink'
                       : 'border-slate-700 text-slate-500',

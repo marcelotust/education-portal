@@ -6,7 +6,9 @@
   html,
   body,
   #root {
-    height: 100%;
+    /* dvh follows the visual viewport, so a virtual keyboard shrinks the page
+       instead of hiding part of it behind the keyboard. */
+    min-height: 100dvh;
   }
 
   body {

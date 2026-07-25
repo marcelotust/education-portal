@@ -59,7 +59,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
 
   return (
     <section className="flex flex-col gap-5">
-      <header className="flex flex-col items-center gap-2">
+      <header className="sticky top-0 z-10 -mx-1 flex flex-col items-center gap-2 bg-slate-900/95 px-1 py-2 backdrop-blur">
         <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
           Time
         </span>
