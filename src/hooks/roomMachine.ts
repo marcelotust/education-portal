@@ -184,6 +184,20 @@ const scoreRound = (state: RoomState): RoomState => {
   return { ...state, scores, lastRoundPoints: earned, currentRound: { ...round, isScored: true } };
 };
 
+/**
+ * A new class arrives and the room stays: same PIN, same seats, the points of
+ * whoever played before wiped. Only from the lobby, so a match can never be
+ * reset out from under a round in flight.
+ */
+const resetMatch = (state: RoomState): RoomState => {
+  if (state.status !== 'LOBBY_IDLE') return state;
+
+  const nothingToClear =
+    Object.keys(state.scores).length === 0 && Object.keys(state.lastRoundPoints).length === 0;
+
+  return nothingToClear ? state : { ...state, scores: {}, lastRoundPoints: {} };
+};
+
 const releaseSlot = (state: RoomState, playerId: string): RoomState => {
   const slots = state.slots.map((slot) => (slot?.id === playerId ? null : slot));
   return { ...state, slots };
@@ -260,6 +274,9 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return state.status === 'CALCULATING_SCORES'
         ? { ...state, status: 'LOBBY_IDLE', selectedGameId: null, currentRound: null }
         : state;
+
+    case 'MATCH_RESET':
+      return resetMatch(state);
 
     case 'PLAYER_JOINED':
       return seatPlayer(state, event);

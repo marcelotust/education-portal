@@ -4,16 +4,26 @@ import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { MIN_CATEGORIES } from '@/types';
 import { GameCartridgePicker } from './GameCartridgePicker';
+import { NewMatchControl } from './NewMatchControl';
 
 /** Write-side of the lobby: only ever rendered for the Host. */
 export const HostLobbyControls = () => {
   const { state, dispatch } = useRoom();
 
   if (state.status === 'LOBBY_IDLE') {
+    // Nothing played yet means nothing to zero, so the reset stays hidden.
+    const hasPlayed =
+      Object.keys(state.scores).length > 0 || Object.keys(state.lastRoundPoints).length > 0;
+
     return (
-      <ArcadeButton tone="pink" onClick={() => dispatch({ type: 'OPEN_GAME_CONFIG' })}>
-        SELECT GAME
-      </ArcadeButton>
+      <div className="flex flex-col gap-6">
+        <ArcadeButton tone="pink" onClick={() => dispatch({ type: 'OPEN_GAME_CONFIG' })}>
+          SELECT GAME
+        </ArcadeButton>
+
+        {/* Kept well away from START GAME: a mis-tap here wipes the session. */}
+        {hasPlayed && <NewMatchControl onConfirm={() => dispatch({ type: 'MATCH_RESET' })} />}
+      </div>
     );
   }
 
