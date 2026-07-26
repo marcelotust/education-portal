@@ -38,8 +38,28 @@ Schema, RLS and the hourly `pg_cron` sweep that deletes rooms untouched for 5 ho
 | `npm run typecheck`               | `tsc -b --noEmit`                     |
 
 Run a single test file: `npx vitest run src/features/lobby/LobbyScreen.spec.tsx`
-Inspect the live database: `npx supabase db query --linked "select pin, state->>'status' from public.rooms"`
 Filter by name: `npx vitest run -t "Host clicks Start"`
+
+## Working against the live project
+
+`npx supabase db query --linked "select pin, state->>'status' from public.rooms"` reads and writes the
+remote database **without the database password** — it is the fastest way to inspect or clean up
+state while testing. `npx supabase db push` is different: it connects straight to Postgres and does
+prompt for the password, so applying a migration needs whoever holds it.
+
+Driving the app in a browser leaves real rooms behind. Delete them when finished
+(`delete from public.rooms`) or they sit there until the expiry sweep runs.
+
+Verifying anything involving two participants needs two origins, because two tabs share one
+anonymous identity:
+
+```bash
+npm run dev -- --host 127.0.0.1 --port 5174   # Host on :5173, Client on :5174
+```
+
+Prettier sorts Tailwind classes, so a scripted find-and-replace against a `className` string will
+often silently match nothing. Check that an edit actually landed before believing a measurement of
+it.
 
 ## Architecture
 
