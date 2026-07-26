@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { AdBreakScreen } from '@/features/gameplay/AdBreakScreen';
 import { RoundValidationScreen } from '@/features/gameplay/RoundValidationScreen';
 import { ScoreboardScreen } from '@/features/gameplay/ScoreboardScreen';
@@ -5,15 +7,11 @@ import { QuizRoundScreen } from '@/features/gameplay/quiz/QuizRoundScreen';
 import { StopRoundScreen } from '@/features/gameplay/StopRoundScreen';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { useRoom } from '@/hooks/useRoom';
+import type { RoomState } from '@/types';
+import { HostAwayOverlay } from './HostAwayOverlay';
 
-interface RoomStageProps {
-  playerId: string;
-}
-
-/** Renders whichever screen the FSM state calls for. */
-export const RoomStage = ({ playerId }: RoomStageProps) => {
-  const { state } = useRoom();
-
+/** Maps the FSM state to a screen. Not a component: it holds no state of its own. */
+const screenFor = (state: RoomState, playerId: string): ReactNode => {
   switch (state.status) {
     case 'LOBBY_IDLE':
     case 'CONFIGURING_GAME':
@@ -34,4 +32,20 @@ export const RoomStage = ({ playerId }: RoomStageProps) => {
         <RoundValidationScreen />
       );
   }
+};
+
+interface RoomStageProps {
+  playerId: string;
+}
+
+/** Renders whichever screen the FSM state calls for, plus the Host-away notice. */
+export const RoomStage = ({ playerId }: RoomStageProps) => {
+  const { state } = useRoom();
+
+  return (
+    <>
+      {screenFor(state, playerId)}
+      <HostAwayOverlay />
+    </>
+  );
 };
