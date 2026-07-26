@@ -1,101 +1,70 @@
 import type { QuizAnswer, QuizQuestion, QuizRound, QuizSetup } from '@/types';
+import { QUESTION_PACKS, type QuestionPack } from './questionPacks';
 
 /** Points for a correct answer; the fastest correct answer earns a bonus. */
 export const CORRECT_POINTS = 10;
 export const SPEED_BONUS = 5;
 
-interface QuestionPack {
-  topic: string;
-  questions: readonly QuizQuestion[];
-}
-
-/**
- * A built-in bank for the MVP. Authoring questions is a feature of its own;
- * until then a teacher picks a pack rather than writing one.
- */
-export const QUESTION_PACKS: readonly QuestionPack[] = [
-  {
-    topic: 'GENERAL',
-    questions: [
-      {
-        id: 'g1',
-        prompt: 'Which planet is closest to the Sun?',
-        options: ['Venus', 'Mercury', 'Mars', 'Earth'],
-        correctIndex: 1,
-      },
-      {
-        id: 'g2',
-        prompt: 'How many continents are there?',
-        options: ['5', '6', '7', '8'],
-        correctIndex: 2,
-      },
-      {
-        id: 'g3',
-        prompt: 'What is the largest ocean?',
-        options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'],
-        correctIndex: 3,
-      },
-    ],
-  },
-  {
-    topic: 'SCIENCE',
-    questions: [
-      {
-        id: 's1',
-        prompt: 'What gas do plants absorb from the air?',
-        options: ['Oxygen', 'Carbon dioxide', 'Nitrogen', 'Hydrogen'],
-        correctIndex: 1,
-      },
-      {
-        id: 's2',
-        prompt: 'How many bones does an adult human have?',
-        options: ['206', '186', '226', '246'],
-        correctIndex: 0,
-      },
-      {
-        id: 's3',
-        prompt: 'What is the chemical symbol for gold?',
-        options: ['Go', 'Gd', 'Au', 'Ag'],
-        correctIndex: 2,
-      },
-    ],
-  },
-];
-
-export const QUIZ_TOPICS: readonly string[] = QUESTION_PACKS.map((pack) => pack.topic);
-
-export const DEFAULT_QUIZ_SETUP: QuizSetup = { roundDurationSeconds: 30, topic: 'GENERAL' };
+export const DEFAULT_QUIZ_SETUP: QuizSetup = {
+  roundDurationSeconds: 30,
+  topic: 'GENERAL',
+  questionCount: 5,
+};
 
 const packFor = (topic: string): QuestionPack =>
   QUESTION_PACKS.find((p) => p.topic === topic) ?? QUESTION_PACKS[0]!;
 
-/** Draws one question. Asked ids are excluded so a session does not repeat. */
+const shuffled = <T>(items: readonly T[]): T[] => {
+  const copy = [...items];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[swap]] = [copy[swap]!, copy[index]!];
+  }
+  return copy;
+};
+
+/**
+ * Draws the whole match up front: questions the room has not seen yet first,
+ * topped up with older ones rather than running a shorter match. A topic with
+ * fewer questions than asked for caps the match — never repeats inside one.
+ */
 export const createQuizRound = (
   setup: QuizSetup,
   askedIds: readonly string[] = [],
   now = new Date(),
 ): QuizRound => {
   const pool = packFor(setup.topic).questions;
-  const unasked = pool.filter((question) => !askedIds.includes(question.id));
-  const candidates = unasked.length > 0 ? unasked : pool;
-  const question = candidates[Math.floor(Math.random() * candidates.length)] ?? pool[0]!;
+  const unasked = shuffled(pool.filter((question) => !askedIds.includes(question.id)));
+  const asked = shuffled(pool.filter((question) => askedIds.includes(question.id)));
+  const questions = [...unasked, ...asked].slice(0, Math.min(setup.questionCount, pool.length));
 
   return {
     game: 'QUIZ',
-    question,
+    questions,
+    currentIndex: 0,
     answers: [],
+    questionPoints: {},
+    matchPoints: {},
     endsAt: new Date(now.getTime() + setup.roundDurationSeconds * 1000).toISOString(),
     isScored: false,
   };
 };
+
+/** The question on screen. `undefined` only if a round arrives malformed. */
+export const currentQuestion = (round: QuizRound): QuizQuestion | undefined =>
+  round.questions[round.currentIndex];
+
+export const isLastQuestion = (round: QuizRound): boolean =>
+  round.currentIndex >= round.questions.length - 1;
 
 /**
  * QUIZ needs no Host: a right answer is a right answer. The first correct
  * answer takes a speed bonus, which is what makes it a race rather than a test.
  */
 export const computeQuizScores = (round: QuizRound): Record<string, number> => {
+  const correctIndex = currentQuestion(round)?.correctIndex;
   const correct = round.answers
-    .filter((answer) => answer.choice === round.question.correctIndex)
+    .filter((answer) => answer.choice === correctIndex)
     .sort((a, b) => a.elapsedMs - b.elapsedMs);
 
   const scores: Record<string, number> = {};

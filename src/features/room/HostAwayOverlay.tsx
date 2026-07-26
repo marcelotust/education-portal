@@ -3,7 +3,13 @@ import { useRoom } from '@/hooks/useRoom';
 import type { RoomStatus } from '@/types';
 
 /** Phases that only the Host can move on: without it, they never end. */
-const HOST_DRIVEN: readonly RoomStatus[] = ['PLAYING_AD', 'PLAYING', 'CALCULATING_SCORES'];
+const HOST_DRIVEN: readonly RoomStatus[] = [
+  'PLAYING_AD',
+  'PLAYING',
+  // The reveal waits on the Host by design, so its absence strands it.
+  'SHOWING_ANSWER',
+  'CALCULATING_SCORES',
+];
 
 /**
  * Covers the screen while the Host is disconnected mid-round. The round cannot

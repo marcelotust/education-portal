@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useRoom } from '@/hooks/useRoom';
 import { cn } from '@/utils/cn';
-import { hasAnswered } from './quizRound';
+import { currentQuestion, hasAnswered } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -28,13 +28,17 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
   const { state, isHost, dispatch } = useRoom();
   const round = state.currentRound?.game === 'QUIZ' ? state.currentRound : null;
   const secondsLeft = useCountdown(round?.endsAt ?? null);
-  const [picked, setPicked] = useState<number | null>(null);
-  // Answer speed is measured from the moment this screen mounted.
+  const questionIndex = round?.currentIndex ?? 0;
+  // Which question the pick belongs to, so the next one starts unanswered
+  // without an effect having to clear it.
+  const [pick, setPick] = useState<{ questionIndex: number; choice: number } | null>(null);
+  const picked = pick?.questionIndex === questionIndex ? pick.choice : null;
+  // Answer speed is measured from the moment the question appeared.
   const shownAt = useRef(0);
 
   useEffect(() => {
     shownAt.current = Date.now();
-  }, []);
+  }, [questionIndex]);
 
   useEffect(() => {
     // Only the Host closes the round, so it happens once for everyone.
@@ -44,41 +48,53 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
   const answer = useCallback(
     (choice: number) => {
       if (round === null || picked !== null || hasAnswered(round, playerId)) return;
-      setPicked(choice);
+      setPick({ questionIndex, choice });
       dispatch({
         type: 'QUIZ_ANSWERED',
         answer: { playerId, choice, elapsedMs: Date.now() - shownAt.current },
       });
     },
-    [round, picked, playerId, dispatch],
+    [round, picked, questionIndex, playerId, dispatch],
   );
 
-  if (round === null) return null;
+  const question = round === null ? undefined : currentQuestion(round);
+  if (round === null || question === undefined) return null;
 
   const urgency = urgencyFor(secondsLeft);
 
   return (
     <section className="flex flex-col gap-5">
-      <header className="sticky top-0 z-10 -mx-1 flex flex-col items-center gap-2 bg-slate-900/95 px-1 py-2 backdrop-blur">
-        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
-          Time
-        </span>
-        <span
-          data-testid="round-timer"
-          data-urgency={urgency}
-          className={cn(
-            'font-arcade text-2xl transition-transform duration-300',
-            URGENCY_STYLES[urgency],
-          )}
-        >
-          {secondsLeft}
-        </span>
+      <header className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-slate-900/95 px-1 py-2 backdrop-blur">
+        <div className="flex flex-col items-center">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+            Question
+          </span>
+          <span data-testid="question-progress" className="font-arcade text-sm text-arcade-green">
+            {questionIndex + 1}/{round.questions.length}
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+            Time
+          </span>
+          <span
+            data-testid="round-timer"
+            data-urgency={urgency}
+            className={cn(
+              'font-arcade text-2xl transition-transform duration-300',
+              URGENCY_STYLES[urgency],
+            )}
+          >
+            {secondsLeft}
+          </span>
+        </div>
       </header>
 
-      <h1 className="text-center font-terminal text-2xl text-slate-100">{round.question.prompt}</h1>
+      <h1 className="text-center font-terminal text-2xl text-slate-100">{question.prompt}</h1>
 
       <ul className="flex flex-col gap-2">
-        {round.question.options.map((option, index) => (
+        {question.options.map((option, index) => (
           <li key={option}>
             <button
               type="button"

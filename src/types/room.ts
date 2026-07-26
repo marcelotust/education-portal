@@ -1,9 +1,25 @@
-import type { GameId, GameSetup, QuizAnswer, Round, RoundDuration, StopAnswer } from './game';
+import type {
+  GameId,
+  GameSetup,
+  QuizAnswer,
+  QuizQuestionCount,
+  Round,
+  RoundDuration,
+  StopAnswer,
+} from './game';
 import type { Player, PlayerRole, PlayerSlot } from './player';
 
-/** Finite State Machine states for a persistent room. */
+/**
+ * Finite State Machine states for a persistent room. `SHOWING_ANSWER` is the
+ * pause between two questions of a QUIZ match; STOP never enters it.
+ */
 export type RoomStatus =
-  'LOBBY_IDLE' | 'CONFIGURING_GAME' | 'PLAYING_AD' | 'PLAYING' | 'CALCULATING_SCORES';
+  | 'LOBBY_IDLE'
+  | 'CONFIGURING_GAME'
+  | 'PLAYING_AD'
+  | 'PLAYING'
+  | 'SHOWING_ANSWER'
+  | 'CALCULATING_SCORES';
 
 export interface RoomState {
   /** 4-letter PIN students type to join. */
@@ -44,6 +60,9 @@ export type RoomEvent =
   | { type: 'ROUND_DURATION_SELECTED'; seconds: RoundDuration }
   | { type: 'CATEGORY_TOGGLED'; category: string }
   | { type: 'QUIZ_TOPIC_SELECTED'; topic: string }
+  | { type: 'QUIZ_QUESTION_COUNT_SELECTED'; count: QuizQuestionCount }
+  /** The Host has finished the reveal: on to the next question, or the end. */
+  | { type: 'NEXT_QUESTION'; endsAt: string }
   | { type: 'START_GAME' }
   | { type: 'AD_FINISHED'; round: Round }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }

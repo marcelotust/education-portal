@@ -65,7 +65,7 @@ it.
 
 Room state is a **finite state machine**, the core of the app. Everything hangs off it.
 
-- `src/hooks/roomMachine.ts` — a pure reducer (`roomReducer`). States: `LOBBY_IDLE → CONFIGURING_GAME → PLAYING_AD → PLAYING → CALCULATING_SCORES`. **Invalid transitions return the exact same state object** so React bails out of re-rendering — preserve this when adding cases.
+- `src/hooks/roomMachine.ts` — a pure reducer (`roomReducer`). States: `LOBBY_IDLE → CONFIGURING_GAME → PLAYING_AD → PLAYING → CALCULATING_SCORES`, plus `SHOWING_ANSWER`, the reveal a QUIZ match loops back to `PLAYING` from between questions (STOP never enters it). **Invalid transitions return the exact same state object** so React bails out of re-rendering — preserve this when adding cases.
 - `src/hooks/RoomProvider.tsx` — wraps the reducer in Context and enforces the role model: **control events are Host-only**. `isHostOnlyEvent` (everything except the presence, remote-state and answer events) is dropped when the local `role` is `CLIENT`. Clients are read-only state listeners.
 - `src/types/room.ts` — `RoomState`, the `RoomEvent` union (the FSM's alphabet), and `RoomContextValue`. Adding a feature usually means: add an event to the union, handle it in `roomReducer`, and cover the transition in a spec.
 - `src/app/RoomRoute.tsx` shows the create/join screen until there is a session, then mounts the provider plus two bridges that render nothing: `RoomPresenceBridge` (seats) and `RoomStateBridge` (FSM). `/host` → `HOST`, `/play` → `CLIENT` (see `src/app/App.tsx`).

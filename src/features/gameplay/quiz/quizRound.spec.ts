@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'vitest';
 
-import type { QuizAnswer, QuizRound } from '@/types';
+import { makeQuizRound } from '@/test/factories';
+import type { QuizAnswer, QuizRound, QuizSetup } from '@/types';
+import { QUESTION_PACKS } from './questionPacks';
 import {
   CORRECT_POINTS,
-  QUESTION_PACKS,
   SPEED_BONUS,
   computeQuizScores,
   createQuizRound,
+  currentQuestion,
+  isLastQuestion,
 } from './quizRound';
 
-const roundWith = (answers: readonly QuizAnswer[]): QuizRound => ({
-  game: 'QUIZ',
-  question: {
-    id: 'q1',
-    prompt: 'Which planet is closest to the Sun?',
-    options: ['Venus', 'Mercury', 'Mars', 'Earth'],
-    correctIndex: 1,
-  },
-  answers,
-  endsAt: null,
-  isScored: false,
+const setup = (overrides: Partial<QuizSetup> = {}): QuizSetup => ({
+  roundDurationSeconds: 30,
+  topic: 'GENERAL',
+  questionCount: 3,
+  ...overrides,
 });
+
+/** The factory's first question is the one about the Sun; correct index is 1. */
+const roundWith = (answers: readonly QuizAnswer[]): QuizRound => makeQuizRound({ answers });
 
 const answer = (playerId: string, choice: number, elapsedMs: number): QuizAnswer => ({
   playerId,
@@ -28,36 +28,62 @@ const answer = (playerId: string, choice: number, elapsedMs: number): QuizAnswer
   elapsedMs,
 });
 
-describe('QUIZ round', () => {
-  it('draws a question from the chosen pack', () => {
-    const round = createQuizRound({ roundDurationSeconds: 30, topic: 'SCIENCE' });
+describe('QUIZ match', () => {
+  it('draws the whole match from the chosen pack, on the first question', () => {
+    const round = createQuizRound(setup({ topic: 'SCIENCE', questionCount: 5 }));
 
     const science = QUESTION_PACKS.find((pack) => pack.topic === 'SCIENCE')?.questions ?? [];
-    expect(science.map((question) => question.id)).toContain(round.question.id);
+    const ids = science.map((question) => question.id);
+    expect(round.questions).toHaveLength(5);
+    expect(round.questions.every((question) => ids.includes(question.id))).toBe(true);
+    expect(round.currentIndex).toBe(0);
   });
 
-  it('avoids questions already asked in this session', () => {
-    const asked = ['g1', 'g2'];
+  it('never asks the same question twice inside one match', () => {
+    const round = createQuizRound(setup({ questionCount: 10 }));
 
-    const round = createQuizRound({ roundDurationSeconds: 30, topic: 'GENERAL' }, asked);
-
-    expect(asked).not.toContain(round.question.id);
+    const ids = round.questions.map((question) => question.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('falls back to the whole pack once every question has been asked', () => {
+  it('caps the match at what the topic actually holds', () => {
+    const pool = QUESTION_PACKS[0]!.questions.length;
+
+    const round = createQuizRound(setup({ questionCount: 10 }));
+
+    expect(round.questions.length).toBe(Math.min(10, pool));
+  });
+
+  it('prefers questions the room has not seen yet', () => {
+    const asked = QUESTION_PACKS[0]!.questions.slice(0, 2).map((question) => question.id);
+
+    const round = createQuizRound(setup({ questionCount: 3 }), asked);
+
+    expect(round.questions.map((question) => question.id)).not.toContain(asked[0]);
+  });
+
+  it('reuses old questions rather than running a shorter match', () => {
     const all = QUESTION_PACKS[0]!.questions.map((question) => question.id);
 
-    const round = createQuizRound({ roundDurationSeconds: 30, topic: 'GENERAL' }, all);
+    const round = createQuizRound(setup({ questionCount: 3 }), all);
 
-    expect(all).toContain(round.question.id);
+    expect(round.questions).toHaveLength(3);
   });
 
-  it('sets a deadline from the chosen length', () => {
+  it('sets a deadline for the first question from the chosen length', () => {
     const now = new Date('2026-07-25T10:00:00.000Z');
 
-    const round = createQuizRound({ roundDurationSeconds: 30, topic: 'GENERAL' }, [], now);
+    const round = createQuizRound(setup(), [], now);
 
     expect(round.endsAt).toBe('2026-07-25T10:00:30.000Z');
+  });
+
+  it('knows which question is on and which one is the last', () => {
+    const round = makeQuizRound({ currentIndex: 1 });
+
+    expect(currentQuestion(round)?.id).toBe('q2');
+    expect(isLastQuestion(round)).toBe(false);
+    expect(isLastQuestion({ ...round, currentIndex: 2 })).toBe(true);
   });
 });
 
