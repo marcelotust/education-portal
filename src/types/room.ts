@@ -54,6 +54,7 @@ export type RoomEvent =
   | { type: 'ROUND_SCORED' }
   | { type: 'END_ROUND' }
   | { type: 'RETURN_TO_LOBBY' }
+  | { type: 'MATCH_RESET' }
   | { type: 'PLAYER_JOINED'; player: Player }
   | { type: 'PLAYER_LEFT'; playerId: string }
   | { type: 'PLAYERS_SYNCED'; slots: readonly PlayerSlot[] }

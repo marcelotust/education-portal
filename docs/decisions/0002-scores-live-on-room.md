@@ -27,5 +27,9 @@ The key is the anonymous Supabase user id, which survives a refresh in
   The seat is a live view of who is connected, nothing more.
 - Rows written before the field existed default to `{}` in `rowToRoomState`
   instead of crashing the scoreboard.
-- Scores accumulate for the life of the room and are never reset. A "new game"
-  that zeroes them does not exist yet.
+- Scores accumulate across rounds for the life of the match, not the room.
+  `RETURN_TO_LOBBY` keeps them — that is the point, between rounds of one
+  session — and `MATCH_RESET` zeroes `scores` and `lastRoundPoints` together
+  when a new class arrives. It is guarded to `LOBBY_IDLE`, so a reset can never
+  land on a round in flight, and the Host has to confirm it: the room, the PIN
+  and the seats survive, which is exactly why the action exists.

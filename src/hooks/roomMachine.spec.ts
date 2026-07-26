@@ -35,6 +35,45 @@ describe('room FSM', () => {
     expect(state.currentRound).toBeNull();
   });
 
+  describe('MATCH_RESET', () => {
+    const played = (): RoomState => ({
+      ...withStatus('LOBBY_IDLE'),
+      scores: { 'player-0': 30, 'player-1': 45 },
+      lastRoundPoints: { 'player-0': 10 },
+    });
+
+    it('zeroes the scores and the last round without touching the room', () => {
+      const state = roomReducer(played(), { type: 'MATCH_RESET' });
+
+      expect(state.scores).toEqual({});
+      expect(state.lastRoundPoints).toEqual({});
+      expect(state.pin).toBe('ABCD');
+      expect(state.slots).toEqual(played().slots);
+    });
+
+    it('refuses to wipe a match that is still being played', () => {
+      const playing = { ...played(), status: 'PLAYING' as const };
+
+      expect(roomReducer(playing, { type: 'MATCH_RESET' })).toBe(playing);
+    });
+
+    it('refuses to wipe while the Host is still judging', () => {
+      const judging = { ...played(), status: 'CALCULATING_SCORES' as const };
+
+      expect(roomReducer(judging, { type: 'MATCH_RESET' })).toBe(judging);
+    });
+
+    it('returns the same state when there is nothing to clear', () => {
+      const fresh = withStatus('LOBBY_IDLE');
+
+      expect(roomReducer(fresh, { type: 'MATCH_RESET' })).toBe(fresh);
+    });
+
+    it('is Host-only, like every other control event', () => {
+      expect(isHostOnlyEvent({ type: 'MATCH_RESET' })).toBe(true);
+    });
+  });
+
   describe('STOP typing phase', () => {
     const playing = (): RoomState => {
       const state = roomReducer(

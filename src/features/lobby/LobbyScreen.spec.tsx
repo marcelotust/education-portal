@@ -217,6 +217,68 @@ describe('Lobby feature', () => {
     });
   });
 
+  describe('new match', () => {
+    const playedRoom = (): RoomState => ({
+      ...makeRoom({ playerCount: 2 }),
+      scores: { 'player-0': 30, 'player-1': 45 },
+      lastRoundPoints: { 'player-0': 10, 'player-1': 25 },
+    });
+
+    it('offers a new match to the Host once there is something to clear', () => {
+      renderLobby('HOST', playedRoom());
+
+      expect(screen.getByRole('button', { name: /new match/i })).toBeInTheDocument();
+    });
+
+    it('keeps it out of the way while the room has never scored', () => {
+      renderLobby('HOST', makeRoom({ playerCount: 2 }));
+
+      expect(screen.queryByRole('button', { name: /new match/i })).not.toBeInTheDocument();
+    });
+
+    it('never lets a Client reset the class', () => {
+      renderLobby('CLIENT', playedRoom());
+
+      expect(screen.queryByRole('button', { name: /new match/i })).not.toBeInTheDocument();
+    });
+
+    it('asks before wiping: one tap changes nothing', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST', playedRoom());
+
+      await user.click(screen.getByRole('button', { name: /new match/i }));
+
+      expect(screen.getByTestId('player-slot-0')).toHaveTextContent('30');
+      expect(screen.getByTestId('last-round-standings')).toBeInTheDocument();
+    });
+
+    it('zeroes every score once the Host confirms, and drops the old standings', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST', playedRoom());
+
+      await user.click(screen.getByRole('button', { name: /new match/i }));
+      await user.click(screen.getByRole('button', { name: /zero the scores/i }));
+
+      expect(screen.getByTestId('player-slot-0')).toHaveTextContent('0');
+      expect(screen.getByTestId('player-slot-1')).toHaveTextContent('0');
+      expect(screen.queryByTestId('last-round-standings')).not.toBeInTheDocument();
+      // The room outlives the match: same PIN, same people.
+      expect(screen.getByText('ABCD')).toBeInTheDocument();
+      expect(screen.getByText('ANA')).toBeInTheDocument();
+    });
+
+    it('leaves the scores alone when the Host backs out', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST', playedRoom());
+
+      await user.click(screen.getByRole('button', { name: /new match/i }));
+      await user.click(screen.getByRole('button', { name: /keep them/i }));
+
+      expect(screen.getByTestId('player-slot-0')).toHaveTextContent('30');
+      expect(screen.getByRole('button', { name: /new match/i })).toBeInTheDocument();
+    });
+  });
+
   describe('Client (read-only listener)', () => {
     it('never renders the Host controls', () => {
       renderLobby('CLIENT');
