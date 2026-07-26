@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { AdBreakScreen } from '@/features/gameplay/AdBreakScreen';
 import { RoundValidationScreen } from '@/features/gameplay/RoundValidationScreen';
 import { ScoreboardScreen } from '@/features/gameplay/ScoreboardScreen';
+import { QuizRevealScreen } from '@/features/gameplay/quiz/QuizRevealScreen';
 import { QuizRoundScreen } from '@/features/gameplay/quiz/QuizRoundScreen';
 import { StopRoundScreen } from '@/features/gameplay/StopRoundScreen';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
@@ -24,6 +25,9 @@ const screenFor = (state: RoomState, playerId: string): ReactNode => {
       ) : (
         <StopRoundScreen playerId={playerId} />
       );
+    case 'SHOWING_ANSWER':
+      // Only QUIZ pauses between questions; STOP never reaches this state.
+      return <QuizRevealScreen />;
     case 'CALCULATING_SCORES':
       // The Host judges first; the standings replace the table once confirmed.
       return state.currentRound?.isScored === true ? (

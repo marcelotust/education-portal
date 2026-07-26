@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
-import { makePlayer, makeRoom, makeRound } from '@/test/factories';
+import { makePlayer, makeQuizRound, makeRoom, makeRound } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
 import { MAX_PLAYERS, type RoomState } from '@/types';
 
@@ -331,30 +331,12 @@ describe('room FSM', () => {
   });
 
   describe('QUIZ cartridge', () => {
-    const quizRound = (answers: RoomState['currentRound'] extends null ? never : never[]) =>
-      answers;
-    void quizRound;
-
     const configuringQuiz = (): RoomState =>
       roomReducer(withStatus('CONFIGURING_GAME'), { type: 'SELECT_GAME', gameId: 'QUIZ' });
 
     const playingQuiz = (): RoomState => {
       const started = roomReducer(configuringQuiz(), { type: 'START_GAME' });
-      return roomReducer(started, {
-        type: 'AD_FINISHED',
-        round: {
-          game: 'QUIZ',
-          question: {
-            id: 'q1',
-            prompt: 'Closest planet to the Sun?',
-            options: ['Venus', 'Mercury'],
-            correctIndex: 1,
-          },
-          answers: [],
-          endsAt: new Date(Date.now() + 30_000).toISOString(),
-          isScored: false,
-        },
-      });
+      return roomReducer(started, { type: 'AD_FINISHED', round: makeQuizRound() });
     };
 
     it('swaps the setup panel when the cartridge changes', () => {
@@ -383,19 +365,22 @@ describe('room FSM', () => {
       expect(round?.game === 'QUIZ' && round.answers[0]?.choice).toBe(1);
     });
 
-    it('scores itself when the round ends, with no Host judging anything', () => {
+    it('scores the question itself and stops on the reveal, with no Host judging', () => {
       const answered = roomReducer(playingQuiz(), {
         type: 'QUIZ_ANSWERED',
         answer: { playerId: 'player-0', choice: 1, elapsedMs: 900 },
       });
 
       const ended = roomReducer(answered, { type: 'END_ROUND' });
+      const round = ended.currentRound;
 
-      expect(ended.status).toBe('CALCULATING_SCORES');
-      expect(ended.currentRound?.isScored).toBe(true);
+      expect(ended.status).toBe('SHOWING_ANSWER');
       // Correct and fastest: ten points plus the speed bonus.
       expect(ended.scores['player-0']).toBe(15);
-      expect(ended.lastRoundPoints['player-0']).toBe(15);
+      expect(round?.game === 'QUIZ' && round.questionPoints['player-0']).toBe(15);
+      // The match is not over, so there is nothing to report as a result yet.
+      expect(ended.currentRound?.isScored).toBe(false);
+      expect(ended.lastRoundPoints).toEqual({});
     });
 
     it('gives a wrong answer nothing', () => {
@@ -405,6 +390,98 @@ describe('room FSM', () => {
       });
 
       expect(roomReducer(answered, { type: 'END_ROUND' }).scores['player-0']).toBe(0);
+    });
+
+    describe('a match is a sequence of questions', () => {
+      const NEXT_DEADLINE = '2026-07-25T10:00:30.000Z';
+
+      /** Answers whatever question is on correctly, then closes it. */
+      const revealing = (state: RoomState): RoomState => {
+        const round = state.currentRound;
+        const correct =
+          round?.game === 'QUIZ' ? (round.questions[round.currentIndex]?.correctIndex ?? 0) : 0;
+
+        const answered = roomReducer(state, {
+          type: 'QUIZ_ANSWERED',
+          answer: { playerId: 'player-0', choice: correct, elapsedMs: 900 },
+        });
+        return roomReducer(answered, { type: 'END_ROUND' });
+      };
+
+      it('moves to the next question on a fresh clock, with the answers cleared', () => {
+        const next = roomReducer(revealing(playingQuiz()), {
+          type: 'NEXT_QUESTION',
+          endsAt: NEXT_DEADLINE,
+        });
+        const round = next.currentRound;
+
+        expect(next.status).toBe('PLAYING');
+        expect(round?.game === 'QUIZ' && round.currentIndex).toBe(1);
+        expect(round?.game === 'QUIZ' && round.answers).toEqual([]);
+        expect(round?.game === 'QUIZ' && round.questionPoints).toEqual({});
+        expect(round?.endsAt).toBe(NEXT_DEADLINE);
+      });
+
+      it('keeps the running total across questions', () => {
+        // Two correct answers, one per question: fifteen points each time.
+        const second = roomReducer(revealing(playingQuiz()), {
+          type: 'NEXT_QUESTION',
+          endsAt: NEXT_DEADLINE,
+        });
+
+        expect(revealing(second).scores['player-0']).toBe(30);
+      });
+
+      it('ends the match after the last question and reports what it was worth', () => {
+        let state = playingQuiz();
+        // Three questions in the factory match; the third reveal is the last.
+        for (let question = 0; question < 3; question += 1) {
+          state = revealing(state);
+          state = roomReducer(state, { type: 'NEXT_QUESTION', endsAt: NEXT_DEADLINE });
+        }
+
+        expect(state.status).toBe('CALCULATING_SCORES');
+        expect(state.currentRound?.isScored).toBe(true);
+        expect(state.scores['player-0']).toBe(45);
+        // The scoreboard reports the match, not just the question that closed it.
+        expect(state.lastRoundPoints['player-0']).toBe(45);
+      });
+
+      it('refuses to skip a question that is still being answered', () => {
+        const playing = playingQuiz();
+
+        expect(roomReducer(playing, { type: 'NEXT_QUESTION', endsAt: NEXT_DEADLINE })).toBe(
+          playing,
+        );
+      });
+
+      it('ignores an answer arriving during the reveal', () => {
+        const reveal = revealing(playingQuiz());
+
+        expect(
+          roomReducer(reveal, {
+            type: 'QUIZ_ANSWERED',
+            answer: { playerId: 'player-1', choice: 1, elapsedMs: 100 },
+          }),
+        ).toBe(reveal);
+      });
+
+      it('records how many questions the Host wants', () => {
+        const state = roomReducer(configuringQuiz(), {
+          type: 'QUIZ_QUESTION_COUNT_SELECTED',
+          count: 10,
+        });
+
+        expect(state.gameSetup.game === 'QUIZ' && state.gameSetup.questionCount).toBe(10);
+      });
+
+      it('leaves the count alone once the match is running', () => {
+        const playing = playingQuiz();
+
+        expect(roomReducer(playing, { type: 'QUIZ_QUESTION_COUNT_SELECTED', count: 10 })).toBe(
+          playing,
+        );
+      });
     });
 
     it('ignores the STOP-only events, which have nothing to act on', () => {

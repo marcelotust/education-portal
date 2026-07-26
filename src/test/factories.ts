@@ -1,4 +1,11 @@
-import { MAX_PLAYERS, type AvatarId, type Player, type StopRound } from '@/types';
+import {
+  MAX_PLAYERS,
+  type AvatarId,
+  type Player,
+  type QuizQuestion,
+  type QuizRound,
+  type StopRound,
+} from '@/types';
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import type { RoomState } from '@/types';
 
@@ -24,6 +31,40 @@ export const makeRound = (overrides: Partial<StopRound> = {}): StopRound => ({
   answers: [],
   stoppedBy: null,
   endsAt: '2026-07-24T12:01:00.000Z',
+  isScored: false,
+  ...overrides,
+});
+
+const QUIZ_QUESTIONS: readonly QuizQuestion[] = [
+  {
+    id: 'q1',
+    prompt: 'Which planet is closest to the Sun?',
+    options: ['Venus', 'Mercury', 'Mars', 'Earth'],
+    correctIndex: 1,
+  },
+  {
+    id: 'q2',
+    prompt: 'What is the largest ocean?',
+    options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'],
+    correctIndex: 3,
+  },
+  {
+    id: 'q3',
+    prompt: 'How many continents are there?',
+    options: ['5', '6', '7', '8'],
+    correctIndex: 2,
+  },
+];
+
+/** A three-question QUIZ match sitting on its first question. */
+export const makeQuizRound = (overrides: Partial<QuizRound> = {}): QuizRound => ({
+  game: 'QUIZ',
+  questions: QUIZ_QUESTIONS,
+  currentIndex: 0,
+  answers: [],
+  questionPoints: {},
+  matchPoints: {},
+  endsAt: '2026-07-24T12:00:30.000Z',
   isScored: false,
   ...overrides,
 });

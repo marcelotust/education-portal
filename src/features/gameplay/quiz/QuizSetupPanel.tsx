@@ -1,15 +1,27 @@
-import { ROUND_DURATIONS, type QuizSetup, type RoundDuration } from '@/types';
+import {
+  QUIZ_QUESTION_COUNTS,
+  ROUND_DURATIONS,
+  type QuizQuestionCount,
+  type QuizSetup,
+  type RoundDuration,
+} from '@/types';
 import { cn } from '@/utils/cn';
-import { QUIZ_TOPICS } from './quizRound';
+import { QUIZ_TOPICS } from './questionPacks';
 
 interface QuizSetupPanelProps {
   setup: QuizSetup;
   /** Omitted for Clients: they watch the Host configure the match. */
   onSelectDuration?: ((seconds: RoundDuration) => void) | undefined;
   onSelectTopic?: ((topic: string) => void) | undefined;
+  onSelectQuestionCount?: ((count: QuizQuestionCount) => void) | undefined;
 }
 
-export const QuizSetupPanel = ({ setup, onSelectDuration, onSelectTopic }: QuizSetupPanelProps) => {
+export const QuizSetupPanel = ({
+  setup,
+  onSelectDuration,
+  onSelectTopic,
+  onSelectQuestionCount,
+}: QuizSetupPanelProps) => {
   const isReadOnly = onSelectDuration === undefined;
 
   return (
@@ -36,6 +48,31 @@ export const QuizSetupPanel = ({ setup, onSelectDuration, onSelectTopic }: QuizS
               )}
             >
               {seconds}s
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">Questions</p>
+        <div className="grid grid-cols-3 gap-2">
+          {QUIZ_QUESTION_COUNTS.map((count) => (
+            <button
+              key={count}
+              type="button"
+              aria-label={`${count} questions`}
+              aria-pressed={setup.questionCount === count}
+              disabled={isReadOnly}
+              onClick={() => onSelectQuestionCount?.(count)}
+              className={cn(
+                'min-h-11 rounded border-2 py-2 font-arcade text-[10px] transition-colors',
+                setup.questionCount === count
+                  ? 'border-arcade-pink text-arcade-pink disabled:border-arcade-pink disabled:text-arcade-pink'
+                  : 'border-slate-700 text-slate-500',
+                'disabled:cursor-not-allowed',
+              )}
+            >
+              {count}
             </button>
           ))}
         </div>

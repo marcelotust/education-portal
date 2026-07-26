@@ -49,6 +49,9 @@ export const HostLobbyControls = () => {
           setup={state.gameSetup}
           onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
           onSelectTopic={(topic) => dispatch({ type: 'QUIZ_TOPIC_SELECTED', topic })}
+          onSelectQuestionCount={(count) =>
+            dispatch({ type: 'QUIZ_QUESTION_COUNT_SELECTED', count })
+          }
         />
       )}
 

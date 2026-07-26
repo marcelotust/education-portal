@@ -6,6 +6,7 @@ export type {
   GameSetup,
   QuizAnswer,
   QuizQuestion,
+  QuizQuestionCount,
   QuizRound,
   QuizSetup,
   Round,
@@ -15,7 +16,7 @@ export type {
   StopRound,
   StopSetup,
 } from './game';
-export { MIN_CATEGORIES, ROUND_DURATIONS } from './game';
+export { MIN_CATEGORIES, QUIZ_QUESTION_COUNTS, ROUND_DURATIONS } from './game';
 export type {
   PersistedRoomState,
   RoomContextValue,

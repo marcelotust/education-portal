@@ -56,10 +56,16 @@ export interface QuizQuestion {
   correctIndex: number;
 }
 
+/** How many questions a QUIZ match runs. */
+export const QUIZ_QUESTION_COUNTS = [3, 5, 10] as const;
+export type QuizQuestionCount = (typeof QUIZ_QUESTION_COUNTS)[number];
+
 export interface QuizSetup {
   roundDurationSeconds: RoundDuration;
   /** Which pack of questions to draw from. */
   topic: string;
+  /** Questions in the match; capped by what the topic actually holds. */
+  questionCount: QuizQuestionCount;
 }
 
 export interface QuizAnswer {
@@ -70,10 +76,21 @@ export interface QuizAnswer {
   elapsedMs: number;
 }
 
+/**
+ * A QUIZ round is a whole match: the questions are drawn up front so every
+ * screen agrees on what comes next, and the Host walks the index forward.
+ */
 export interface QuizRound {
   game: 'QUIZ';
-  question: QuizQuestion;
+  questions: readonly QuizQuestion[];
+  /** Index into `questions`; the match ends after the last one is revealed. */
+  currentIndex: number;
+  /** Answers to the current question only, cleared as the match moves on. */
   answers: readonly QuizAnswer[];
+  /** What the question just closed was worth, shown during the reveal. */
+  questionPoints: Readonly<Record<string, number>>;
+  /** What the match is worth so far, which is what the scoreboard reports. */
+  matchPoints: Readonly<Record<string, number>>;
   endsAt: string | null;
   /** QUIZ scores itself, so this flips without a Host judging anything. */
   isScored: boolean;

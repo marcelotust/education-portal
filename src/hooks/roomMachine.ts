@@ -1,5 +1,9 @@
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
-import { DEFAULT_QUIZ_SETUP, computeQuizScores } from '@/features/gameplay/quiz/quizRound';
+import {
+  DEFAULT_QUIZ_SETUP,
+  computeQuizScores,
+  isLastQuestion,
+} from '@/features/gameplay/quiz/quizRound';
 import { computeRoundScores } from '@/features/gameplay/scoring';
 import {
   MAX_PLAYERS,
@@ -76,9 +80,21 @@ const answerQuiz = (state: RoomState, answer: QuizAnswer): RoomState => {
   return { ...state, currentRound: { ...round, answers: [...round.answers, answer] } };
 };
 
+const addPoints = (
+  total: Readonly<Record<string, number>>,
+  earned: Readonly<Record<string, number>>,
+): Record<string, number> => {
+  const sum = { ...total };
+  for (const [playerId, points] of Object.entries(earned)) {
+    sum[playerId] = (sum[playerId] ?? 0) + points;
+  }
+  return sum;
+};
+
 /**
  * STOP hands the round to the Host to judge. QUIZ has nothing to judge, so it
- * scores itself on the spot and everyone lands straight on the scoreboard.
+ * scores the question on the spot and stops on the reveal: the match is only
+ * over once the Host walks past the last question.
  */
 const endRound = (state: RoomState): RoomState => {
   const round = state.currentRound;
@@ -93,17 +109,47 @@ const endRound = (state: RoomState): RoomState => {
   }
 
   const earned = computeQuizScores(round);
-  const scores = { ...state.scores };
-  for (const [playerId, points] of Object.entries(earned)) {
-    scores[playerId] = (scores[playerId] ?? 0) + points;
+
+  return {
+    ...state,
+    status: 'SHOWING_ANSWER',
+    scores: addPoints(state.scores, earned),
+    currentRound: {
+      ...round,
+      questionPoints: earned,
+      matchPoints: addPoints(round.matchPoints, earned),
+    },
+  };
+};
+
+/**
+ * The Host has finished talking about the answer. One more question means a
+ * fresh clock and an empty answer sheet; nothing left means the match is done,
+ * and what it was worth as a whole is what the scoreboard reports.
+ */
+const nextQuestion = (state: RoomState, endsAt: string): RoomState => {
+  const round = state.currentRound;
+  if (state.status !== 'SHOWING_ANSWER' || round?.game !== 'QUIZ') return state;
+
+  if (isLastQuestion(round)) {
+    return {
+      ...state,
+      status: 'CALCULATING_SCORES',
+      lastRoundPoints: round.matchPoints,
+      currentRound: { ...round, isScored: true },
+    };
   }
 
   return {
     ...state,
-    status: 'CALCULATING_SCORES',
-    scores,
-    lastRoundPoints: earned,
-    currentRound: { ...round, isScored: true },
+    status: 'PLAYING',
+    currentRound: {
+      ...round,
+      currentIndex: round.currentIndex + 1,
+      answers: [],
+      questionPoints: {},
+      endsAt,
+    },
   };
 };
 
@@ -238,8 +284,16 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         ? { ...state, gameSetup: { ...state.gameSetup, topic: event.topic } }
         : state;
 
+    case 'QUIZ_QUESTION_COUNT_SELECTED':
+      return state.status === 'CONFIGURING_GAME' && state.gameSetup.game === 'QUIZ'
+        ? { ...state, gameSetup: { ...state.gameSetup, questionCount: event.count } }
+        : state;
+
     case 'QUIZ_ANSWERED':
       return answerQuiz(state, event.answer);
+
+    case 'NEXT_QUESTION':
+      return nextQuestion(state, event.endsAt);
 
     case 'START_GAME':
       // Each cartridge decides what "ready" means, here and not just in the UI.
