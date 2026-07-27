@@ -36,8 +36,10 @@ Then open `/host` to create a room and `/play` to join one.
 ### Testing with two players
 
 Two tabs of the same browser share one `localStorage`, therefore one anonymous identity, therefore
-**one seat**. To have a Host and a Client at the same time, use a private window, another browser,
-or a second origin:
+**one seat**. Joining your own room from `/play` no longer pretends otherwise: the room row says you
+are the Host, so that tab walks back into the Host view instead of seating a second, phantom player.
+To have a Host and a Client at the same time, use a private window, another browser, or a second
+origin:
 
 ```bash
 npm run dev -- --host 127.0.0.1 --port 5174   # a different origin, so a separate identity

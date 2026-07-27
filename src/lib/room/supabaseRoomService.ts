@@ -89,7 +89,25 @@ const joinRoom = async (
   if (data === null) throw new RoomJoinError('ROOM_NOT_FOUND');
 
   const room = rowToRoomState(data);
-  if (countPlayers(room) >= MAX_PLAYERS) throw new RoomJoinError('ROOM_FULL');
+
+  // Same browser, second tab: this identity is already in the room. It is
+  // coming back, not arriving, so it never competes for a seat and is never
+  // turned away — a full board must not lock someone out of their own match.
+  if (playerId === room.hostId) {
+    // The route asked for a Client, but the room row says otherwise, and the
+    // row wins: presence and RLS would both call this identity the Host anyway.
+    const seat = room.slots.find((slot) => slot?.id === playerId);
+    return {
+      room,
+      playerId,
+      role: 'HOST',
+      nickname: seat?.nickname ?? nickname,
+      joinedAt: new Date().toISOString(),
+    };
+  }
+
+  const isSeated = room.slots.some((slot) => slot?.id === playerId);
+  if (!isSeated && countPlayers(room) >= MAX_PLAYERS) throw new RoomJoinError('ROOM_FULL');
 
   return { room, playerId, role: 'CLIENT', nickname, joinedAt: new Date().toISOString() };
 };
