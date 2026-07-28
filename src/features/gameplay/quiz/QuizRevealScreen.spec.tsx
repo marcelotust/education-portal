@@ -41,13 +41,13 @@ const status = () => screen.getByTestId('room-status').textContent;
 
 describe('QUIZ reveal', () => {
   it('finally tells everyone what the right answer was', () => {
-    renderReveal('CLIENT');
+    renderReveal('PLAYER');
 
     expect(screen.getByTestId('correct-option')).toHaveTextContent('Mercury');
   });
 
   it('shows what the question was worth to each player', () => {
-    renderReveal('CLIENT');
+    renderReveal('PLAYER');
 
     const ana = screen.getByTestId('reveal-row-player-0');
     expect(ana).toHaveTextContent('ANA');
@@ -56,7 +56,7 @@ describe('QUIZ reveal', () => {
   });
 
   it('says where the match is up to', () => {
-    renderReveal('CLIENT');
+    renderReveal('PLAYER');
 
     expect(screen.getByTestId('question-progress')).toHaveTextContent('1/3');
   });
@@ -80,8 +80,8 @@ describe('QUIZ reveal', () => {
     expect(status()).toBe('CALCULATING_SCORES');
   });
 
-  it('leaves a Client waiting, with nothing to press', () => {
-    renderReveal('CLIENT');
+  it('leaves a Player waiting, with nothing to press', () => {
+    renderReveal('PLAYER');
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();

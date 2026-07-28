@@ -5,7 +5,7 @@ import { buildSlotsFromPresence, type PresencePayload } from './presence';
 const presence = (id: string, nickname: string, joinedAt: string): PresencePayload => ({
   playerId: id,
   nickname,
-  role: 'CLIENT',
+  role: 'PLAYER',
   joinedAt,
 });
 
@@ -75,7 +75,7 @@ describe('presence to board', () => {
 
     const slots = buildSlotsFromPresence([liar, host], HOST_ID);
 
-    expect(slots.find((slot) => slot?.nickname === 'ANA')?.role).toBe('CLIENT');
+    expect(slots.find((slot) => slot?.nickname === 'ANA')?.role).toBe('PLAYER');
     expect(slots.find((slot) => slot?.nickname === 'TEACHER')?.role).toBe('HOST');
   });
 });

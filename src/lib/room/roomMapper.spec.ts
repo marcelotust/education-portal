@@ -47,6 +47,14 @@ describe('room mapper', () => {
     expect(rowToRoomState(makeRow({ slots: seven })).slots).toHaveLength(6);
   });
 
+  // Rooms live for 5 hours, so a row written before the rename outlives the
+  // deploy that renamed the role. It must not seat a player with no valid role.
+  it('reads a seat stored under the old CLIENT role as a PLAYER', () => {
+    const legacy = { ...makePlayer(1), role: 'CLIENT' as never };
+
+    expect(rowToRoomState(makeRow({ slots: [legacy] })).slots[0]?.role).toBe('PLAYER');
+  });
+
   it('falls back to LOBBY_IDLE when the stored status is not a known state', () => {
     const row = makeRow();
     // Simulates a row written by an older/newer client.

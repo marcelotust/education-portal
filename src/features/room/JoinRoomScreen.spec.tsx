@@ -10,7 +10,7 @@ import { JoinRoomScreen } from './JoinRoomScreen';
 const session = (): RoomSession => ({
   room: makeRoom({ playerCount: 2 }),
   playerId: 'player-1',
-  role: 'CLIENT',
+  role: 'PLAYER',
   nickname: 'ANA',
   joinedAt: '2026-07-24T12:06:00.000Z',
 });
@@ -29,7 +29,7 @@ describe('Join room screen', () => {
     // The PIN is stored uppercase, so typing it in lowercase must still work.
     expect(joinRoom).toHaveBeenCalledWith('KPZT', 'ANA');
     await waitFor(() =>
-      expect(onReady).toHaveBeenCalledWith(expect.objectContaining({ role: 'CLIENT' })),
+      expect(onReady).toHaveBeenCalledWith(expect.objectContaining({ role: 'PLAYER' })),
     );
   });
 

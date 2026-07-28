@@ -3,7 +3,7 @@ import { MAX_PLAYERS, type Player } from '@/types';
 import { countPlayers } from '@/utils/room';
 import { CharacterSelectGrid } from './components/CharacterSelectGrid';
 import { LastRoundStandings } from './components/LastRoundStandings';
-import { ClientLobbyControls } from './components/ClientLobbyControls';
+import { PlayerLobbyControls } from './components/PlayerLobbyControls';
 import { HostLobbyControls } from './components/HostLobbyControls';
 import { RoomPinBanner } from './components/RoomPinBanner';
 
@@ -25,7 +25,7 @@ export const LobbyScreen = () => {
         />
       )}
 
-      {isHost ? <HostLobbyControls /> : <ClientLobbyControls />}
+      {isHost ? <HostLobbyControls /> : <PlayerLobbyControls />}
     </section>
   );
 };

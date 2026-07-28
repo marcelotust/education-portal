@@ -17,7 +17,7 @@ const roundInFlight = (seated: readonly PlayerSlot[]): RoomState => ({
   slots: [...seated, ...Array.from({ length: 6 - seated.length }, () => null)],
 });
 
-const renderOverlay = (room: RoomState, role: PlayerRole = 'CLIENT'): void => {
+const renderOverlay = (room: RoomState, role: PlayerRole = 'PLAYER'): void => {
   render(
     <RoomProvider initialState={room} role={role}>
       <HostAwayOverlay />
@@ -76,7 +76,7 @@ describe('Host away notice', () => {
 
     const seated = roundInFlight([host(), makePlayer(1)]).slots;
     const { rerender } = render(
-      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="CLIENT">
+      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="PLAYER">
         <Seats slots={[]} />
         <HostAwayOverlay />
       </RoomProvider>,
@@ -85,7 +85,7 @@ describe('Host away notice', () => {
     expect(notice()).toBeInTheDocument();
 
     rerender(
-      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="CLIENT">
+      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="PLAYER">
         <Seats slots={seated} />
         <HostAwayOverlay />
       </RoomProvider>,

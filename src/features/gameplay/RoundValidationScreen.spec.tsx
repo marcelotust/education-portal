@@ -146,8 +146,8 @@ describe('STOP validation screen', () => {
     expect(scores()).toEqual({ 'player-0': 20, 'player-1': 0 });
   });
 
-  it('shows the same table to a Client, with no way to judge or confirm', () => {
-    renderValidation('CLIENT');
+  it('shows the same table to a Player, with no way to judge or confirm', () => {
+    renderValidation('PLAYER');
 
     expect(screen.getByRole('heading', { name: 'ANIMAL' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /confirm scores/i })).not.toBeInTheDocument();
@@ -157,8 +157,8 @@ describe('STOP validation screen', () => {
     expect(screen.getAllByRole('button', { name: /reject/i })[0]).toBeDisabled();
   });
 
-  it('tells the Client the Host is still judging', () => {
-    renderValidation('CLIENT');
+  it('tells the Player the Host is still judging', () => {
+    renderValidation('PLAYER');
 
     expect(screen.getByText(/checking the answers/i)).toBeInTheDocument();
   });

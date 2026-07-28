@@ -21,7 +21,7 @@ interface UseRoomStateSyncOptions {
 }
 
 /**
- * The Host writes every FSM change to the room row; the Clients apply what
+ * The Host writes every FSM change to the room row; the Players apply what
  * Realtime pushes back.
  *
  * The Host deliberately does **not** listen to itself. RLS makes it the only

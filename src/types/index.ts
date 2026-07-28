@@ -1,4 +1,4 @@
-export type { AvatarId, Player, PlayerRole, PlayerSlot } from './player';
+export type { AvatarId, Player, PlayerRole, PlayerSlot, StoredPlayerRole } from './player';
 export { MAX_PLAYERS } from './player';
 export type {
   GameCartridge,

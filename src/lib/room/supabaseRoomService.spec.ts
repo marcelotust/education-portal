@@ -45,7 +45,7 @@ describe('joinRoom', () => {
 
     const session = await service.joinRoom('ABCD', 'ANA');
 
-    expect(session.role).toBe('CLIENT');
+    expect(session.role).toBe('PLAYER');
     expect(session.nickname).toBe('ANA');
   });
 
@@ -104,7 +104,7 @@ describe('joinRoom', () => {
 
     const session = await service.joinRoom('ABCD', 'ANA');
 
-    expect(session.role).toBe('CLIENT');
+    expect(session.role).toBe('PLAYER');
     expect(session.playerId).toBe(seated.id);
   });
 

@@ -204,7 +204,7 @@ describe('room FSM', () => {
       expect(stopRoundOf(state)?.phase).toBe('VALIDATION_PHASE');
     });
 
-    it('is a shared event: a Client must be able to send its own answers', () => {
+    it('is a shared event: a Player must be able to send its own answers', () => {
       expect(
         isHostOnlyEvent({ type: 'ANSWERS_SUBMITTED', playerId: 'player-0', answers: [] }),
       ).toBe(false);
@@ -647,7 +647,7 @@ describe('room FSM', () => {
       expect(next.selectedGameId).toBe('STOP');
     });
 
-    it('carries the match setup so Clients watch it being configured', () => {
+    it('carries the match setup so Players watch it being configured', () => {
       const next = roomReducer(makeRoom(), {
         type: 'ROOM_STATE_RECEIVED',
         state: remote({
@@ -686,7 +686,7 @@ describe('room FSM', () => {
       expect(roomReducer(room, { type: 'ROOM_STATE_RECEIVED', state: echo })).toBe(room);
     });
 
-    it('is not a Host-only event: Clients must be able to apply it', () => {
+    it('is not a Host-only event: Players must be able to apply it', () => {
       expect(isHostOnlyEvent({ type: 'ROOM_STATE_RECEIVED', state: remote() })).toBe(false);
     });
   });

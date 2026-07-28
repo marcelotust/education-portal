@@ -5,12 +5,12 @@ const MESSAGES: Partial<Record<RoomStatus, string>> = {
   CONFIGURING_GAME: 'The Host is choosing the game...',
 };
 
-interface ClientLobbyStatusProps {
+interface PlayerLobbyStatusProps {
   status: RoomStatus;
 }
 
-/** Read-only feedback for Clients; mirrors the FSM without exposing controls. */
-export const ClientLobbyStatus = ({ status }: ClientLobbyStatusProps) => {
+/** Read-only feedback for Players; mirrors the FSM without exposing controls. */
+export const PlayerLobbyStatus = ({ status }: PlayerLobbyStatusProps) => {
   const message = MESSAGES[status];
   if (message === undefined) return null;
 

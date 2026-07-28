@@ -34,9 +34,9 @@ describe('RoomProvider write permissions', () => {
     expect(screen.getByRole('button')).toHaveTextContent('CONFIGURING_GAME');
   });
 
-  it('drops flow-control events dispatched by a Client', async () => {
+  it('drops flow-control events dispatched by a Player', async () => {
     const user = userEvent.setup();
-    renderProbe('CLIENT');
+    renderProbe('PLAYER');
 
     await user.click(screen.getByRole('button'));
 

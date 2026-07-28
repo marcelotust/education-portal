@@ -4,7 +4,7 @@ import type { Player } from '@/types';
 import { CategoryValidationBlock } from './components/CategoryValidationBlock';
 import { computeAnswerPoints } from './scoring';
 
-/** The Host judges all six players on a single screen; Clients watch it happen. */
+/** The Host judges all six players on a single screen; Players watch it happen. */
 export const RoundValidationScreen = () => {
   const { state, isHost, dispatch } = useRoom();
   // Only STOP reaches this screen; QUIZ scores itself and skips it.
