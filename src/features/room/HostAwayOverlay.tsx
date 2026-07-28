@@ -30,7 +30,7 @@ export const HostAwayOverlay = () => {
       >
         <p className="animate-blink font-arcade text-sm text-arcade-pink">PAUSED</p>
         <p className="font-arcade text-[10px] leading-relaxed text-arcade-yellow">
-          Waiting for the teacher to come back
+          Waiting for the Host to come back
         </p>
         <p className="font-terminal text-lg leading-tight text-slate-300">
           They dropped out of the room, so the round cannot end. Keep this screen open — nothing you

@@ -84,6 +84,6 @@ describe('QUIZ reveal', () => {
     renderReveal('CLIENT');
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
+    expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
   });
 });

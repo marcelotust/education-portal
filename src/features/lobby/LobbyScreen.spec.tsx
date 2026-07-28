@@ -290,7 +290,7 @@ describe('Lobby feature', () => {
     it('shows a waiting message while the room is idle', () => {
       renderLobby('CLIENT');
 
-      expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
+      expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
     });
 
     it('sees the same cartridge shelf as the Host, but cannot touch it', () => {

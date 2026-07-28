@@ -33,7 +33,7 @@ export const RoundValidationScreen = () => {
       <header className="flex flex-col items-center gap-2">
         <h1 className="text-neon font-arcade text-sm text-arcade-yellow">VALIDATION</h1>
         <p className="font-terminal text-lg text-slate-400">
-          {isHost ? 'Approve or reject every answer.' : 'The teacher is checking the answers...'}
+          {isHost ? 'Approve or reject every answer.' : 'The Host is checking the answers...'}
         </p>
         <p className="font-arcade text-2xl text-arcade-green">{round.letter}</p>
         <p data-testid="judged-progress" className="font-arcade text-[10px] text-slate-500">

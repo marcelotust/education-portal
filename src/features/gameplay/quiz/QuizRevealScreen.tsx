@@ -98,7 +98,7 @@ export const QuizRevealScreen = () => {
         </ArcadeButton>
       ) : (
         <p role="status" className="text-center font-terminal text-lg text-slate-400">
-          Waiting for the teacher to move on...
+          Waiting for the Host to move on...
         </p>
       )}
     </section>

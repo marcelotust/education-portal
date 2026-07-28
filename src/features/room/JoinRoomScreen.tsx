@@ -73,7 +73,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
       <header className="flex flex-col items-center gap-2">
         <h1 className="text-neon font-arcade text-sm text-arcade-cyan">INSERT PIN</h1>
         <p className="text-center font-terminal text-lg text-slate-400">
-          Ask your teacher for the 4-letter PIN.
+          Ask the Host for the 4-letter PIN.
         </p>
       </header>
 

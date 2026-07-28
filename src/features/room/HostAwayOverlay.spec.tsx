@@ -59,12 +59,12 @@ describe('Host away notice', () => {
     expect(notice()).not.toBeInTheDocument();
   });
 
-  it('tells the students the round is on hold once the Host stays gone', () => {
+  it('tells the Players the round is on hold once the Host stays gone', () => {
     renderOverlay(roundInFlight([makePlayer(1)]));
     waitOutTheGrace();
 
     expect(notice()).toBeInTheDocument();
-    expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
+    expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
   });
 
   it('clears itself when the Host comes back', () => {

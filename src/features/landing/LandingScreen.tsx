@@ -27,8 +27,8 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
       <header className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-neon font-arcade text-lg text-arcade-pink">EDUPARTY</h1>
         <p className="font-terminal text-xl text-slate-300">
-          Turn your class into an arcade. The teacher opens a room, everyone joins with a 4-letter
-          PIN, and you play together — no accounts, no downloads.
+          Turn your class into an arcade. The Host opens a room, everyone joins with a 4-letter PIN,
+          and you play together — no accounts, no downloads.
         </p>
         <p className="font-terminal text-lg text-slate-500">
           Up to 6 players per room. First cartridge: STOP.

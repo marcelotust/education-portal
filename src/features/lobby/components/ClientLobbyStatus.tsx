@@ -1,8 +1,8 @@
 import type { RoomStatus } from '@/types';
 
 const MESSAGES: Partial<Record<RoomStatus, string>> = {
-  LOBBY_IDLE: 'Waiting for the teacher to start...',
-  CONFIGURING_GAME: 'The teacher is choosing the game...',
+  LOBBY_IDLE: 'Waiting for the Host to start...',
+  CONFIGURING_GAME: 'The Host is choosing the game...',
 };
 
 interface ClientLobbyStatusProps {
