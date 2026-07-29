@@ -23,7 +23,7 @@ const toPlayer = (payload: PresencePayload, seat: number, hostId: string): Playe
 
 /**
  * Turns the live presence state into the fixed 6-slot board: Host first, then
- * students by join time, one seat per player no matter how many tabs are open.
+ * Players by join time, one seat per player no matter how many tabs are open.
  */
 export const buildSlotsFromPresence = (
   payloads: readonly PresencePayload[],

@@ -10,12 +10,12 @@ const session = (): RoomSession => ({
   room: makeRoom({ playerCount: 1 }),
   playerId: 'player-0',
   role: 'HOST',
-  nickname: 'TEACHER',
+  nickname: 'HOST',
   joinedAt: '2026-07-24T12:00:00.000Z',
 });
 
 describe('Host entry screen', () => {
-  describe('resuming a room the teacher already owns', () => {
+  describe('resuming a room the Host already owns', () => {
     it('offers the open room instead of silently abandoning it', () => {
       const resumable = { ...session(), room: { ...makeRoom({ playerCount: 3 }), pin: 'KPZT' } };
       render(
@@ -31,7 +31,7 @@ describe('Host entry screen', () => {
       expect(screen.getByRole('button', { name: /resume room/i })).toBeInTheDocument();
     });
 
-    it('hands the existing session back when the teacher resumes', async () => {
+    it('hands the existing session back when the Host resumes', async () => {
       const user = userEvent.setup();
       const resumable = session();
       const onResume = vi.fn();
@@ -49,7 +49,7 @@ describe('Host entry screen', () => {
       expect(onResume).toHaveBeenCalledWith(resumable);
     });
 
-    it('still lets the teacher start a fresh room instead', async () => {
+    it('still lets the Host start a fresh room instead', async () => {
       const user = userEvent.setup();
       const createRoom = vi.fn().mockResolvedValue(session());
       render(
@@ -61,10 +61,10 @@ describe('Host entry screen', () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/nickname/i), 'TEACHER');
+      await user.type(screen.getByLabelText(/nickname/i), 'HOST');
       await user.click(screen.getByRole('button', { name: /create room/i }));
 
-      expect(createRoom).toHaveBeenCalledWith('TEACHER');
+      expect(createRoom).toHaveBeenCalledWith('HOST');
     });
 
     it('shows no resume offer when there is no open room', () => {
@@ -74,16 +74,16 @@ describe('Host entry screen', () => {
     });
   });
 
-  it('creates a room with the nickname the teacher typed', async () => {
+  it('creates a room with the nickname the Host typed', async () => {
     const user = userEvent.setup();
     const createRoom = vi.fn().mockResolvedValue(session());
     const onReady = vi.fn();
     render(<HostEntryScreen createRoom={createRoom} onReady={onReady} />);
 
-    await user.type(screen.getByLabelText(/nickname/i), 'TEACHER');
+    await user.type(screen.getByLabelText(/nickname/i), 'HOST');
     await user.click(screen.getByRole('button', { name: /create room/i }));
 
-    expect(createRoom).toHaveBeenCalledWith('TEACHER');
+    expect(createRoom).toHaveBeenCalledWith('HOST');
     await waitFor(() =>
       expect(onReady).toHaveBeenCalledWith(expect.objectContaining({ role: 'HOST' })),
     );
@@ -100,12 +100,12 @@ describe('Host entry screen', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/nickname/i);
   });
 
-  it('surfaces a backend failure instead of leaving the teacher waiting', async () => {
+  it('surfaces a backend failure instead of leaving the Host waiting', async () => {
     const user = userEvent.setup();
     const createRoom = vi.fn().mockRejectedValue(new Error('network down'));
     render(<HostEntryScreen createRoom={createRoom} onReady={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/nickname/i), 'TEACHER');
+    await user.type(screen.getByLabelText(/nickname/i), 'HOST');
     await user.click(screen.getByRole('button', { name: /create room/i }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not create/i);
@@ -116,7 +116,7 @@ describe('Host entry screen', () => {
     const createRoom = vi.fn().mockReturnValue(new Promise(() => undefined));
     render(<HostEntryScreen createRoom={createRoom} onReady={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/nickname/i), 'TEACHER');
+    await user.type(screen.getByLabelText(/nickname/i), 'HOST');
     await user.click(screen.getByRole('button', { name: /create room/i }));
     await user.click(screen.getByRole('button', { name: /creating/i }));
 

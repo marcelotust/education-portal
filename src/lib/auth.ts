@@ -1,7 +1,7 @@
 import type { EduPartyClient } from './supabase';
 
 /**
- * Students never sign up: every participant is an anonymous Supabase user.
+ * Players never sign up: every participant is an anonymous Supabase user.
  * Reuses the persisted session so a refresh does not create a new identity.
  */
 export const ensureAnonymousSession = async (client: EduPartyClient): Promise<string> => {

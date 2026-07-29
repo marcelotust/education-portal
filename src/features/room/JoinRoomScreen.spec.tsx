@@ -16,7 +16,7 @@ const session = (): RoomSession => ({
 });
 
 describe('Join room screen', () => {
-  it('joins with the PIN and nickname the student typed', async () => {
+  it('joins with the PIN and nickname the Player typed', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockResolvedValue(session());
     const onReady = vi.fn();
@@ -46,7 +46,7 @@ describe('Join room screen', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/4 letters/i);
   });
 
-  it('tells the student when the room does not exist', async () => {
+  it('tells the Player when the room does not exist', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);
@@ -58,7 +58,7 @@ describe('Join room screen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/no room with that pin/i);
   });
 
-  it('does not blame the student when a suggested room has ended', async () => {
+  it('does not blame the Player when a suggested room has ended', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} initialPin="KPZT" />);
@@ -69,7 +69,7 @@ describe('Join room screen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/that room has ended/i);
   });
 
-  it('still says the PIN is unknown when the student typed it themselves', async () => {
+  it('still says the PIN is unknown when the Player typed it themselves', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} initialPin="KPZT" />);
@@ -82,7 +82,7 @@ describe('Join room screen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/no room with that pin/i);
   });
 
-  it('tells the student when all 6 seats are taken', async () => {
+  it('tells the Player when all 6 seats are taken', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_FULL'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);

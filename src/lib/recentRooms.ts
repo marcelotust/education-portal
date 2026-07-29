@@ -21,7 +21,7 @@ const isRecentRoom = (value: unknown): value is RecentRoom => {
 };
 
 /**
- * Rooms a student joined leave no trace in the database — presence is
+ * Rooms a Player joined leave no trace in the database — presence is
  * ephemeral and RLS keeps the room Host-writable — so the list lives in this
  * browser. It follows the device, not the person.
  */

@@ -10,7 +10,7 @@ import { HostAwayOverlay } from './HostAwayOverlay';
 
 const HOST_ID = 'host-1';
 
-const host = (): PlayerSlot => makePlayer(0, { id: HOST_ID, nickname: 'TEACHER', role: 'HOST' });
+const host = (): PlayerSlot => makePlayer(0, { id: HOST_ID, nickname: 'HOST', role: 'HOST' });
 
 const roundInFlight = (seated: readonly PlayerSlot[]): RoomState => ({
   ...makeRoom({ playerCount: 0, status: 'PLAYING' }),

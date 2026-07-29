@@ -14,7 +14,7 @@ const HOST_DRIVEN: readonly RoomStatus[] = [
 /**
  * Covers the screen while the Host is disconnected mid-round. The round cannot
  * end without it, so a silent dead timer is the worst possible answer: say so
- * instead, and stop the students typing into a round nobody will close.
+ * instead, and stop the Players typing into a round nobody will close.
  */
 export const HostAwayOverlay = () => {
   const { state } = useRoom();

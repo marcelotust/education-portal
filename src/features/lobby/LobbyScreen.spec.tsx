@@ -110,7 +110,7 @@ describe('Lobby feature', () => {
       expect(screen.queryByTestId('last-round-standings')).not.toBeInTheDocument();
     });
 
-    it('shows the room PIN so students can join', () => {
+    it('shows the room PIN so Players can join', () => {
       renderLobby('HOST');
 
       expect(screen.getByText('ABCD')).toBeInTheDocument();

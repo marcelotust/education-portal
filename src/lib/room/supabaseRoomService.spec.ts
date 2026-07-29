@@ -56,17 +56,17 @@ describe('joinRoom', () => {
     await expect(service.joinRoom('ABCD', 'ANA')).rejects.toMatchObject({ reason: 'ROOM_FULL' });
   });
 
-  it('tells the student when there is no such room', async () => {
+  it('tells the Player when there is no such room', async () => {
     const service = createSupabaseRoomService(fakeClient('newcomer', null));
 
     await expect(service.joinRoom('ZZZZ', 'ANA')).rejects.toBeInstanceOf(RoomJoinError);
   });
 
   // The Host's own browser opening /play is the same identity, not a seventh
-  // player. Turning it away would lock a teacher out of the class it is running.
+  // player. Turning it away would lock a Host out of the room it is running.
   it('walks the Host back into its own room instead of seating a phantom client', async () => {
     const room = makeRoom({ playerCount: 2 });
-    const host = { ...makePlayer(0, { role: 'HOST' }), id: room.hostId, nickname: 'TEACHER' };
+    const host = { ...makePlayer(0, { role: 'HOST' }), id: room.hostId, nickname: 'HOST' };
     const hosted: RoomState = {
       ...room,
       slots: room.slots.map((slot, index) => (index === 0 ? host : slot)),
@@ -78,7 +78,7 @@ describe('joinRoom', () => {
     expect(session.role).toBe('HOST');
     expect(session.playerId).toBe(room.hostId);
     // Its seat already has a name; typing a new one must not rename the Host.
-    expect(session.nickname).toBe('TEACHER');
+    expect(session.nickname).toBe('HOST');
   });
 
   it('lets a Host back in even when the board is full', async () => {
@@ -91,12 +91,12 @@ describe('joinRoom', () => {
     };
     const service = createSupabaseRoomService(fakeClient(room.hostId, toRow(hosted)));
 
-    await expect(service.joinRoom('ABCD', 'TEACHER')).resolves.toMatchObject({ role: 'HOST' });
+    await expect(service.joinRoom('ABCD', 'HOST')).resolves.toMatchObject({ role: 'HOST' });
   });
 
-  // Slots are persisted, so a seated student counts against MAX_PLAYERS. A
+  // Slots are persisted, so a seated Player counts against MAX_PLAYERS. A
   // refresh must reclaim that seat rather than bounce off a room it is in.
-  it('lets a seated student back into a full room', async () => {
+  it('lets a seated Player back into a full room', async () => {
     const room = makeRoom({ playerCount: MAX_PLAYERS });
     const seated = room.slots[3];
     if (seated === null || seated === undefined) throw new Error('expected a seated player');
@@ -108,7 +108,7 @@ describe('joinRoom', () => {
     expect(session.playerId).toBe(seated.id);
   });
 
-  it('keeps the name a returning student types', async () => {
+  it('keeps the name a returning Player types', async () => {
     const room = makeRoom({ playerCount: 3 });
     const seated = room.slots[1];
     if (seated === null || seated === undefined) throw new Error('expected a seated player');

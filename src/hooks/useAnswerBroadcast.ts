@@ -25,7 +25,7 @@ export interface AnswerChannel {
 
 /**
  * Answers travel over Broadcast, never through the table: RLS keeps the room
- * Host-writable, and six students typing at once should not fight over one row.
+ * Host-writable, and six Players typing at once should not fight over one row.
  * The Host consolidates what arrives and persists the result.
  */
 export const useAnswerBroadcast = ({

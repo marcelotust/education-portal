@@ -9,7 +9,7 @@ const LETTERS = ['A', 'B', 'C', 'D'];
 /**
  * The pause between two questions. Until now a QUIZ never told anyone what the
  * right answer was — the round simply ended. This is that moment, and it waits
- * for the Host so a teacher can explain before the next question starts.
+ * for the Host so they can explain before the next question starts.
  */
 export const QuizRevealScreen = () => {
   const { state, isHost, dispatch } = useRoom();

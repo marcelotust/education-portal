@@ -1,8 +1,8 @@
 # EduParty
 
-A gamified, arcade-themed portal for online classes. The teacher (Host) creates a persistent room
-and students (Clients) join with a 4-letter PIN. The Host loads game "cartridges" without ever
-dropping the room.
+A gamified, arcade-themed portal for online classes. The **Host** creates a persistent room and
+**Players** join with a 4-letter PIN. The Host loads game "cartridges" without ever dropping the
+room.
 
 Status: **MVP complete** — a round of STOP plays end to end against a live Supabase project:
 create or join by PIN, lobby, ad break, timed typing, Host validation and scoreboard. Open work is
@@ -38,7 +38,7 @@ Then open `/host` to create a room and `/play` to join one.
 Two tabs of the same browser share one `localStorage`, therefore one anonymous identity, therefore
 **one seat**. Joining your own room from `/play` no longer pretends otherwise: the room row says you
 are the Host, so that tab walks back into the Host view instead of seating a second, phantom player.
-To have a Host and a Client at the same time, use a private window, another browser, or a second
+To have a Host and a Player at the same time, use a private window, another browser, or a second
 origin:
 
 ```bash
@@ -72,8 +72,8 @@ npx supabase gen types typescript --linked --schema public > src/types/supabase.
 
 ## Routes
 
-- `/host` — teacher view (flow controls)
-- `/play` — student view (read-only)
+- `/host` — Host view (flow controls)
+- `/play` — Player view (read-only)
 
 ## Architecture
 
@@ -91,11 +91,11 @@ src/
 
 Room state is a finite state machine (`LOBBY_IDLE → CONFIGURING_GAME → PLAYING_AD → PLAYING →
 CALCULATING_SCORES`) living in `src/hooks/roomMachine.ts`. Flow-control events are Host-only: the
-`RoomProvider` drops them whenever the local participant is a Client, and RLS refuses the write
+`RoomProvider` drops them whenever the local participant is a Player, and RLS refuses the write
 regardless of what the client sends.
 
 Seats come from Realtime Presence, the FSM from the `rooms` row, and answers from Broadcast. Note
-that two tabs of the same browser share one anonymous identity, so testing Host and Client together
+that two tabs of the same browser share one anonymous identity, so testing Host and Player together
 needs a second origin or a private window.
 
 ## Decisions

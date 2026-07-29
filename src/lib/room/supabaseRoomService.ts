@@ -114,7 +114,7 @@ const joinRoom = async (
 
 /**
  * The room outlives the tab that created it, so a returning Host should walk
- * back in instead of minting a new room and stranding the students.
+ * back in instead of minting a new room and stranding the Players.
  * Never signs in: no session means there is nothing to resume.
  */
 const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | null> => {

@@ -5,9 +5,9 @@
 ## Context
 
 RLS makes `public.rooms` writable only by the Host (`host_id = auth.uid()`),
-which is the database-side twin of the role model: Clients are read-only state
+which is the database-side twin of the role model: Players are read-only state
 listeners. That single rule forces a decision for every piece of shared state,
-because a student cannot write to the room row at all — not even to take a seat.
+because a Player cannot write to the room row at all — not even to take a seat.
 
 ## Decision
 
@@ -17,7 +17,7 @@ Three different transports, each matching what the data actually is:
 | ------------------------------ | --------------------------- | -------------------------------------------------------------- |
 | Seats (who is connected)       | Realtime **Presence**       | Ephemeral by nature; a disconnect must free the seat by itself |
 | FSM (status, cartridge, round) | `rooms.state` **JSONB row** | Must survive a refresh; single writer, so no contention        |
-| Answers during a round         | Realtime **Broadcast**      | Six students writing at once; the Host consolidates            |
+| Answers during a round         | Realtime **Broadcast**      | Six Players writing at once; the Host consolidates             |
 
 The Host mirrors the presence-derived board back into the row, so the seat count
 is accurate for the `ROOM_FULL` check and for a late joiner.
@@ -28,7 +28,7 @@ is accurate for the `ROOM_FULL` check and for a late joiner.
   slot, plus cleanup for players who vanish without leaving. Presence gives both
   for free.
 - **Answers in an `answers` table.** Needs an insert policy per player and six
-  concurrent writers per round. The blueprint says Clients "only broadcast
+  concurrent writers per round. The blueprint says Players "only broadcast
   answers"; RLS already pushes the same way.
 - **Everything over Broadcast.** Nothing would survive a refresh.
 
@@ -42,7 +42,7 @@ second later. Measured in the browser — the cartridge selection turned on at
 
 RLS makes the Host the only writer, so the row can tell it nothing it does not
 already know. `useRoomStateSync` now subscribes only when the local participant
-is a Client. The rule generalises: **a single writer must not treat its own
+is a Player. The rule generalises: **a single writer must not treat its own
 broadcast as input**.
 
 Known limit: two Host tabs sharing one identity (see #4) would both write and
@@ -55,5 +55,5 @@ neither would hear the other. Out of scope while a Host is one tab.
 - The Host is a single point of failure during a round: if it drops, nobody
   consolidates the answers.
 - Two tabs of the same browser share one anonymous identity and therefore one
-  seat. Testing Host and Client together needs a second origin or a private
+  seat. Testing Host and Player together needs a second origin or a private
   window.

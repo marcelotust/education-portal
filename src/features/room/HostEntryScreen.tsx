@@ -9,7 +9,7 @@ import { ResumeRoomBanner } from './ResumeRoomBanner';
 interface HostEntryScreenProps {
   createRoom: CreateRoom;
   onReady: (session: RoomSession) => void;
-  /** An open room this teacher already owns, if any. */
+  /** An open room this Host already owns, if any. */
   resumableRoom?: RoomSession | null | undefined;
   onResume?: ((session: RoomSession) => void) | undefined;
 }

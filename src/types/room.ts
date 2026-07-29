@@ -22,7 +22,7 @@ export type RoomStatus =
   | 'CALCULATING_SCORES';
 
 export interface RoomState {
-  /** 4-letter PIN students type to join. */
+  /** 4-letter PIN Players type to join. */
   pin: string;
   hostId: string;
   status: RoomStatus;

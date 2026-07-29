@@ -19,7 +19,7 @@ error, looking like a bug in the scoring rules rather than in the data model.
 id, persisted in the room row and accumulated across rounds.
 
 The key is the anonymous Supabase user id, which survives a refresh in
-`localStorage`, so a student who reloads keeps their points.
+`localStorage`, so a Player who reloads keeps their points.
 
 ## Consequences
 

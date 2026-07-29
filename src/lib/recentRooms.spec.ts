@@ -9,7 +9,7 @@ describe('recently joined rooms', () => {
 
   const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
 
-  it('remembers a room the student joined', () => {
+  it('remembers a room the Player joined', () => {
     const joinedAt = minutesAgo(1);
     rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt });
 
