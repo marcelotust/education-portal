@@ -34,7 +34,7 @@ describe('Lobby feature', () => {
     });
 
     it('shows the nickname of connected players and marks the open slots as free', () => {
-      renderLobby('CLIENT', makeRoom({ playerCount: 2 }));
+      renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
 
       expect(screen.getByText('ANA')).toBeInTheDocument();
       expect(screen.getByText('BRUNO')).toBeInTheDocument();
@@ -49,28 +49,28 @@ describe('Lobby feature', () => {
 
     it('carries the score of each player into the next round', () => {
       const room = { ...makeRoom({ playerCount: 2 }), scores: { 'player-0': 30, 'player-1': 20 } };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       expect(screen.getByTestId('player-slot-0')).toHaveTextContent('30');
       expect(screen.getByTestId('player-slot-1')).toHaveTextContent('20');
     });
 
     it('shows zero for a player who has not scored yet', () => {
-      renderLobby('CLIENT', makeRoom({ playerCount: 2 }));
+      renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
 
       expect(screen.getByTestId('player-slot-0')).toHaveTextContent('0');
     });
 
     it('marks the player leading the session', () => {
       const room = { ...makeRoom({ playerCount: 3 }), scores: { 'player-0': 10, 'player-1': 40 } };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       expect(screen.getByTestId('player-slot-1')).toHaveAttribute('data-leader', 'true');
       expect(screen.getByTestId('player-slot-0')).toHaveAttribute('data-leader', 'false');
     });
 
     it('crowns nobody while everyone is still on zero', () => {
-      renderLobby('CLIENT', makeRoom({ playerCount: 3 }));
+      renderLobby('PLAYER', makeRoom({ playerCount: 3 }));
 
       expect(screen.getByTestId('player-slot-0')).toHaveAttribute('data-leader', 'false');
     });
@@ -81,7 +81,7 @@ describe('Lobby feature', () => {
         scores: { 'player-0': 30, 'player-1': 45 },
         lastRoundPoints: { 'player-0': 10, 'player-1': 25 },
       };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       const standings = screen.getByTestId('last-round-standings');
       expect(standings).toHaveTextContent('BRUNO');
@@ -95,7 +95,7 @@ describe('Lobby feature', () => {
         scores: { 'player-0': 30, 'player-1': 45 },
         lastRoundPoints: { 'player-0': 10, 'player-1': 25 },
       };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       const names = within(screen.getByTestId('last-round-standings'))
         .getAllByRole('listitem')
@@ -105,12 +105,12 @@ describe('Lobby feature', () => {
     });
 
     it('shows no standings before the first round has been scored', () => {
-      renderLobby('CLIENT', makeRoom({ playerCount: 2 }));
+      renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
 
       expect(screen.queryByTestId('last-round-standings')).not.toBeInTheDocument();
     });
 
-    it('shows the room PIN so students can join', () => {
+    it('shows the room PIN so Players can join', () => {
       renderLobby('HOST');
 
       expect(screen.getByText('ABCD')).toBeInTheDocument();
@@ -236,8 +236,8 @@ describe('Lobby feature', () => {
       expect(screen.queryByRole('button', { name: /new match/i })).not.toBeInTheDocument();
     });
 
-    it('never lets a Client reset the class', () => {
-      renderLobby('CLIENT', playedRoom());
+    it('never lets a Player reset the class', () => {
+      renderLobby('PLAYER', playedRoom());
 
       expect(screen.queryByRole('button', { name: /new match/i })).not.toBeInTheDocument();
     });
@@ -279,22 +279,22 @@ describe('Lobby feature', () => {
     });
   });
 
-  describe('Client (read-only listener)', () => {
+  describe('Player (read-only listener)', () => {
     it('never renders the Host controls', () => {
-      renderLobby('CLIENT');
+      renderLobby('PLAYER');
 
       expect(screen.queryByRole('button', { name: /select game/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
     });
 
     it('shows a waiting message while the room is idle', () => {
-      renderLobby('CLIENT');
+      renderLobby('PLAYER');
 
-      expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
+      expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
     });
 
     it('sees the same cartridge shelf as the Host, but cannot touch it', () => {
-      renderLobby('CLIENT', makeRoom({ status: 'CONFIGURING_GAME' }));
+      renderLobby('PLAYER', makeRoom({ status: 'CONFIGURING_GAME' }));
 
       expect(status()).toBe('CONFIGURING_GAME');
       expect(screen.getByText(/choosing the game/i)).toBeInTheDocument();
@@ -303,7 +303,7 @@ describe('Lobby feature', () => {
 
     it('shows which cartridge the Host has picked', () => {
       const room = { ...makeRoom({ status: 'CONFIGURING_GAME' }), selectedGameId: 'STOP' as const };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       expect(screen.getByRole('button', { name: /^stop$/i })).toHaveAttribute(
         'aria-pressed',
@@ -322,7 +322,7 @@ describe('Lobby feature', () => {
           categories: ['NAME', 'ANIMAL', 'FOOD'],
         },
       };
-      renderLobby('CLIENT', room);
+      renderLobby('PLAYER', room);
 
       expect(screen.getByRole('button', { name: /90 seconds/i })).toHaveAttribute(
         'aria-pressed',
@@ -339,9 +339,9 @@ describe('Lobby feature', () => {
       );
     });
 
-    it('keeps the room untouched when a Client clicks the disabled cartridge', async () => {
+    it('keeps the room untouched when a Player clicks the disabled cartridge', async () => {
       const user = userEvent.setup();
-      renderLobby('CLIENT', makeRoom({ status: 'CONFIGURING_GAME' }));
+      renderLobby('PLAYER', makeRoom({ status: 'CONFIGURING_GAME' }));
 
       await user.click(screen.getByRole('button', { name: /^stop$/i }));
 

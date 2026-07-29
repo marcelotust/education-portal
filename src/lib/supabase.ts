@@ -24,7 +24,7 @@ export const getSupabaseClient = (): EduPartyClient => {
     readEnv('VITE_SUPABASE_ANON_KEY'),
     {
       auth: {
-        // Students join anonymously; the session must survive a page refresh.
+        // Players join anonymously; the session must survive a page refresh.
         persistSession: true,
         autoRefreshToken: true,
       },

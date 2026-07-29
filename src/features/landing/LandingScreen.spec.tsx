@@ -44,7 +44,7 @@ describe('Landing screen', () => {
     expect(navigate).toHaveBeenCalledWith('/play');
   });
 
-  it('offers to walk back into a room this teacher still hosts', async () => {
+  it('offers to walk back into a room this Host still owns', async () => {
     const user = userEvent.setup();
     renderLanding({ pin: 'KPZT' });
 
@@ -73,7 +73,7 @@ describe('Landing screen', () => {
     expect(recent[1]).toHaveAccessibleName(/AAAA/);
   });
 
-  it('takes the student straight back with the PIN already filled', async () => {
+  it('takes the Player straight back with the PIN already filled', async () => {
     const user = userEvent.setup();
     rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: new Date().toISOString() });
     renderLanding();

@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRoom } from './useRoom';
 
 /**
- * How long the Host seat may stay empty before the students are told. Presence
- * drops on any network hiccup, and a teacher switching tabs on a phone comes
+ * How long the Host seat may stay empty before the Players are told. Presence
+ * drops on any network hiccup, and a Host switching tabs on a phone comes
  * back in a second or two — announcing that would be noise, not information.
  */
 const HOST_AWAY_GRACE_MS = 6000;

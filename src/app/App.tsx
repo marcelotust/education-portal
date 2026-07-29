@@ -10,7 +10,7 @@ export const App = () => (
     <Routes>
       <Route path="/" element={<LandingRoute />} />
       <Route path="/host" element={<RoomRoute role="HOST" />} />
-      <Route path="/play" element={<RoomRoute role="CLIENT" />} />
+      <Route path="/play" element={<RoomRoute role="PLAYER" />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
 

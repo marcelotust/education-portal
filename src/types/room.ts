@@ -22,7 +22,7 @@ export type RoomStatus =
   | 'CALCULATING_SCORES';
 
 export interface RoomState {
-  /** 4-letter PIN students type to join. */
+  /** 4-letter PIN Players type to join. */
   pin: string;
   hostId: string;
   status: RoomStatus;
@@ -51,7 +51,7 @@ export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId'>;
 
 /**
  * Events the FSM understands. Control events (everything except the
- * `PLAYER_*` presence events) are Host-only and are dropped for Clients.
+ * `PLAYER_*` presence events) are Host-only and are dropped for Players.
  */
 export type RoomEvent =
   | { type: 'OPEN_GAME_CONFIG' }
@@ -86,6 +86,6 @@ export interface RoomContextValue {
   /** Role of the local participant; drives write permissions. */
   role: PlayerRole;
   isHost: boolean;
-  /** Host-only events dispatched by a Client are ignored. */
+  /** Host-only events dispatched by a Player are ignored. */
   dispatch: (event: RoomEvent) => void;
 }

@@ -6,7 +6,7 @@ import { isHostOnlyEvent, roomReducer } from './roomMachine';
 
 interface RoomProviderProps {
   initialState: RoomState;
-  /** Role of the local participant. Clients are read-only listeners. */
+  /** Role of the local participant. Players are read-only listeners. */
   role: PlayerRole;
   children: ReactNode;
 }

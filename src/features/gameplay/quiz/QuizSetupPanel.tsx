@@ -10,7 +10,7 @@ import { QUIZ_TOPICS } from './questionPacks';
 
 interface QuizSetupPanelProps {
   setup: QuizSetup;
-  /** Omitted for Clients: they watch the Host configure the match. */
+  /** Omitted for Players: they watch the Host configure the match. */
   onSelectDuration?: ((seconds: RoundDuration) => void) | undefined;
   onSelectTopic?: ((topic: string) => void) | undefined;
   onSelectQuestionCount?: ((count: QuizQuestionCount) => void) | undefined;

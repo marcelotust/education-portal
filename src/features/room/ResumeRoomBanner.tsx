@@ -8,7 +8,7 @@ interface ResumeRoomBannerProps {
 }
 
 /**
- * A refresh used to abandon the room and strand the students in it. The room
+ * A refresh used to abandon the room and strand the Players in it. The room
  * lives in the database, so the Host can simply walk back in.
  */
 export const ResumeRoomBanner = ({ session, onResume }: ResumeRoomBannerProps) => (

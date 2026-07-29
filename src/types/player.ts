@@ -1,5 +1,8 @@
 /** Who is allowed to write to the room state. */
-export type PlayerRole = 'HOST' | 'CLIENT';
+export type PlayerRole = 'HOST' | 'PLAYER';
+
+/** Rooms written before the role was renamed still say `CLIENT`. */
+export type StoredPlayerRole = PlayerRole | 'CLIENT';
 
 /** Arcade avatars are picked from a fixed sprite sheet, one per lobby slot. */
 export type AvatarId = 'RED' | 'BLUE' | 'GREEN' | 'PINK' | 'CYAN' | 'YELLOW';

@@ -18,7 +18,7 @@ const makePlayer = (id: string, nickname: string, seat: number, isHost: boolean)
   id,
   nickname,
   avatarId: AVATARS[seat % AVATARS.length] ?? 'GREEN',
-  role: isHost ? 'HOST' : 'CLIENT',
+  role: isHost ? 'HOST' : 'PLAYER',
   isReady: isHost,
   joinedAt: new Date().toISOString(),
 });
@@ -94,7 +94,7 @@ const joinRoom = async (
   // coming back, not arriving, so it never competes for a seat and is never
   // turned away — a full board must not lock someone out of their own match.
   if (playerId === room.hostId) {
-    // The route asked for a Client, but the room row says otherwise, and the
+    // The route asked for a Player, but the room row says otherwise, and the
     // row wins: presence and RLS would both call this identity the Host anyway.
     const seat = room.slots.find((slot) => slot?.id === playerId);
     return {
@@ -109,12 +109,12 @@ const joinRoom = async (
   const isSeated = room.slots.some((slot) => slot?.id === playerId);
   if (!isSeated && countPlayers(room) >= MAX_PLAYERS) throw new RoomJoinError('ROOM_FULL');
 
-  return { room, playerId, role: 'CLIENT', nickname, joinedAt: new Date().toISOString() };
+  return { room, playerId, role: 'PLAYER', nickname, joinedAt: new Date().toISOString() };
 };
 
 /**
  * The room outlives the tab that created it, so a returning Host should walk
- * back in instead of minting a new room and stranding the students.
+ * back in instead of minting a new room and stranding the Players.
  * Never signs in: no session means there is nothing to resume.
  */
 const findResumableRoom = async (client: EduPartyClient): Promise<RoomSession | null> => {

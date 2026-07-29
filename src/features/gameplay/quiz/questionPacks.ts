@@ -7,7 +7,7 @@ export interface QuestionPack {
 
 /**
  * The built-in question bank, one pack per topic. Authoring questions is not a
- * feature: a teacher picks a topic, and these are ours to write.
+ * feature: the Host picks a topic, and these are ours to write.
  *
  * It lives in code, which ships every pack — including `correctIndex` — to
  * every player. Fine for trivia, wrong for anything graded; see issue #14 for

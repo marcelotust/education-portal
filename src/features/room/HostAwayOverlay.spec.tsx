@@ -10,14 +10,14 @@ import { HostAwayOverlay } from './HostAwayOverlay';
 
 const HOST_ID = 'host-1';
 
-const host = (): PlayerSlot => makePlayer(0, { id: HOST_ID, nickname: 'TEACHER', role: 'HOST' });
+const host = (): PlayerSlot => makePlayer(0, { id: HOST_ID, nickname: 'HOST', role: 'HOST' });
 
 const roundInFlight = (seated: readonly PlayerSlot[]): RoomState => ({
   ...makeRoom({ playerCount: 0, status: 'PLAYING' }),
   slots: [...seated, ...Array.from({ length: 6 - seated.length }, () => null)],
 });
 
-const renderOverlay = (room: RoomState, role: PlayerRole = 'CLIENT'): void => {
+const renderOverlay = (room: RoomState, role: PlayerRole = 'PLAYER'): void => {
   render(
     <RoomProvider initialState={room} role={role}>
       <HostAwayOverlay />
@@ -59,12 +59,12 @@ describe('Host away notice', () => {
     expect(notice()).not.toBeInTheDocument();
   });
 
-  it('tells the students the round is on hold once the Host stays gone', () => {
+  it('tells the Players the round is on hold once the Host stays gone', () => {
     renderOverlay(roundInFlight([makePlayer(1)]));
     waitOutTheGrace();
 
     expect(notice()).toBeInTheDocument();
-    expect(screen.getByText(/waiting for the teacher/i)).toBeInTheDocument();
+    expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
   });
 
   it('clears itself when the Host comes back', () => {
@@ -76,7 +76,7 @@ describe('Host away notice', () => {
 
     const seated = roundInFlight([host(), makePlayer(1)]).slots;
     const { rerender } = render(
-      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="CLIENT">
+      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="PLAYER">
         <Seats slots={[]} />
         <HostAwayOverlay />
       </RoomProvider>,
@@ -85,7 +85,7 @@ describe('Host away notice', () => {
     expect(notice()).toBeInTheDocument();
 
     rerender(
-      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="CLIENT">
+      <RoomProvider initialState={roundInFlight([makePlayer(1)])} role="PLAYER">
         <Seats slots={seated} />
         <HostAwayOverlay />
       </RoomProvider>,

@@ -13,7 +13,7 @@ const FAILURE_MESSAGES: Record<string, string> = {
 
 /**
  * Arriving with the PIN already filled means the app suggested this room. If it
- * is gone, that is not the student mistyping.
+ * is gone, that is not the Player mistyping.
  */
 const SUGGESTED_ROOM_GONE = 'That room has ended. Ask for a new PIN.';
 
@@ -26,7 +26,7 @@ interface JoinRoomScreenProps {
   initialPin?: string | undefined;
 }
 
-/** First screen of /play: the student types the PIN the Host is showing. */
+/** First screen of /play: the Player types the PIN the Host is showing. */
 export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreenProps) => {
   const [pin, setPin] = useState(initialPin ?? '');
   const [nickname, setNickname] = useState('');
@@ -73,7 +73,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
       <header className="flex flex-col items-center gap-2">
         <h1 className="text-neon font-arcade text-sm text-arcade-cyan">INSERT PIN</h1>
         <p className="text-center font-terminal text-lg text-slate-400">
-          Ask your teacher for the 4-letter PIN.
+          Ask the Host for the 4-letter PIN.
         </p>
       </header>
 

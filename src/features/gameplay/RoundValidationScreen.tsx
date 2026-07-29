@@ -4,7 +4,7 @@ import type { Player } from '@/types';
 import { CategoryValidationBlock } from './components/CategoryValidationBlock';
 import { computeAnswerPoints } from './scoring';
 
-/** The Host judges all six players on a single screen; Clients watch it happen. */
+/** The Host judges all six players on a single screen; Players watch it happen. */
 export const RoundValidationScreen = () => {
   const { state, isHost, dispatch } = useRoom();
   // Only STOP reaches this screen; QUIZ scores itself and skips it.
@@ -33,7 +33,7 @@ export const RoundValidationScreen = () => {
       <header className="flex flex-col items-center gap-2">
         <h1 className="text-neon font-arcade text-sm text-arcade-yellow">VALIDATION</h1>
         <p className="font-terminal text-lg text-slate-400">
-          {isHost ? 'Approve or reject every answer.' : 'The teacher is checking the answers...'}
+          {isHost ? 'Approve or reject every answer.' : 'The Host is checking the answers...'}
         </p>
         <p className="font-arcade text-2xl text-arcade-green">{round.letter}</p>
         <p data-testid="judged-progress" className="font-arcade text-[10px] text-slate-500">

@@ -1,16 +1,16 @@
 import type { RoomStatus } from '@/types';
 
 const MESSAGES: Partial<Record<RoomStatus, string>> = {
-  LOBBY_IDLE: 'Waiting for the teacher to start...',
-  CONFIGURING_GAME: 'The teacher is choosing the game...',
+  LOBBY_IDLE: 'Waiting for the Host to start...',
+  CONFIGURING_GAME: 'The Host is choosing the game...',
 };
 
-interface ClientLobbyStatusProps {
+interface PlayerLobbyStatusProps {
   status: RoomStatus;
 }
 
-/** Read-only feedback for Clients; mirrors the FSM without exposing controls. */
-export const ClientLobbyStatus = ({ status }: ClientLobbyStatusProps) => {
+/** Read-only feedback for Players; mirrors the FSM without exposing controls. */
+export const PlayerLobbyStatus = ({ status }: PlayerLobbyStatusProps) => {
   const message = MESSAGES[status];
   if (message === undefined) return null;
 

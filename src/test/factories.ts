@@ -17,7 +17,7 @@ export const makePlayer = (index: number, overrides: Partial<Player> = {}): Play
   id: `player-${index}`,
   nickname: NICKNAMES[index % NICKNAMES.length] ?? `P${index}`,
   avatarId: AVATARS[index % AVATARS.length] ?? 'RED',
-  role: 'CLIENT',
+  role: 'PLAYER',
   isReady: true,
   joinedAt: new Date(2026, 0, 1, 10, index).toISOString(),
   ...overrides,

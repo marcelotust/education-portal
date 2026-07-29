@@ -4,7 +4,7 @@ import { STOP_CATEGORY_CATALOG } from './stopRound';
 
 interface StopSetupPanelProps {
   setup: StopSetup;
-  /** Omitted for Clients: they watch the Host configure the match. */
+  /** Omitted for Players: they watch the Host configure the match. */
   onSelectDuration?: ((seconds: RoundDuration) => void) | undefined;
   onToggleCategory?: ((category: string) => void) | undefined;
 }

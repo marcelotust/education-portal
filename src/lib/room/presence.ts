@@ -16,14 +16,14 @@ const toPlayer = (payload: PresencePayload, seat: number, hostId: string): Playe
   nickname: payload.nickname,
   avatarId: AVATARS[seat % AVATARS.length] ?? 'GREEN',
   // The room row decides who hosts; a client cannot promote itself by lying.
-  role: payload.playerId === hostId ? 'HOST' : 'CLIENT',
+  role: payload.playerId === hostId ? 'HOST' : 'PLAYER',
   isReady: true,
   joinedAt: payload.joinedAt,
 });
 
 /**
  * Turns the live presence state into the fixed 6-slot board: Host first, then
- * students by join time, one seat per player no matter how many tabs are open.
+ * Players by join time, one seat per player no matter how many tabs are open.
  */
 export const buildSlotsFromPresence = (
   payloads: readonly PresencePayload[],

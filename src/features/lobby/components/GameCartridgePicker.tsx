@@ -5,7 +5,7 @@ import { GAME_CARTRIDGES } from '../cartridges';
 
 interface GameCartridgePickerProps {
   selectedGameId: GameId | null;
-  /** Omitted for Clients: they see the same shelf, read-only. */
+  /** Omitted for Players: they see the same shelf, read-only. */
   onSelect?: ((gameId: GameId) => void) | undefined;
 }
 
@@ -32,7 +32,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
             className={cn(
               'flex flex-col items-start gap-1 text-left',
               isSelected && 'bg-arcade-yellow/20',
-              // The Host's pick must stay legible on the Client's disabled shelf.
+              // The Host's pick must stay legible on the Player's disabled shelf.
               isSelected && 'disabled:border-arcade-yellow disabled:text-arcade-yellow',
             )}
           >

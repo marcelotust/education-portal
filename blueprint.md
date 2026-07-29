@@ -4,12 +4,12 @@ You are a Senior Front-end Engineer and Architect. Your task is to initialize th
 
 Project Name: EduParty
 
-Description: A gamified, arcade-themed portal for online classes. The teacher (Host) creates a persistent room, and students (Clients) join via a 4-letter PIN. The host selects "game cartridges" to play without the room dropping.
+Description: A gamified, arcade-themed portal for online classes. The Host creates a persistent room, and Players join via a 4-letter PIN. The host selects "game cartridges" to play without the room dropping.
 
 Core Features for MVP:
 
 1. **Persistent Room & Presence:** Room created by Host. Max 6 players per room. Uses a 6-slot Grid "Character Select" UI for the lobby.
-2. **Role-Based State Machine:** Host (Teacher) has write permissions (controls the game flow, clicks next, approves/rejects answers). Clients (Students) are read-only state listeners who only broadcast answers.
+2. **Role-Based State Machine:** Host has write permissions (controls the game flow, clicks next, approves/rejects answers). Players are read-only state listeners who only broadcast answers.
 3. **First Game (STOP):** Categories game with a timed `TYPING_PHASE` and a subsequent `VALIDATION_PHASE` where the Host judges the 6 players' answers on a single screen.
 
 # [2. MANDATORY TECH STACK & INFRASTRUCTURE]

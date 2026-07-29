@@ -1,5 +1,12 @@
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
-import { MAX_PLAYERS, type PlayerSlot, type RoomState, type RoomStatus } from '@/types';
+import {
+  MAX_PLAYERS,
+  type PlayerRole,
+  type PlayerSlot,
+  type RoomState,
+  type RoomStatus,
+  type StoredPlayerRole,
+} from '@/types';
 import type { PersistedRoomState, RoomRow } from '@/types/database';
 
 const ROOM_STATUSES: readonly RoomStatus[] = [
@@ -13,9 +20,18 @@ const ROOM_STATUSES: readonly RoomStatus[] = [
 const toStatus = (value: RoomStatus): RoomStatus =>
   ROOM_STATUSES.includes(value) ? value : 'LOBBY_IDLE';
 
+/**
+ * A room outlives the deploy that renamed the role, so a stored seat can still
+ * say `CLIENT`. Read it as what it always meant.
+ */
+const toRole = (role: StoredPlayerRole): PlayerRole => (role === 'CLIENT' ? 'PLAYER' : role);
+
 /** The board is a contract, not a suggestion: always exactly MAX_PLAYERS seats. */
 const toSlots = (slots: readonly PlayerSlot[]): PlayerSlot[] =>
-  Array.from({ length: MAX_PLAYERS }, (_, index) => slots[index] ?? null);
+  Array.from({ length: MAX_PLAYERS }, (_, index) => {
+    const slot = slots[index] ?? null;
+    return slot === null ? null : { ...slot, role: toRole(slot.role) };
+  });
 
 /**
  * JSONB is untyped at rest, so a row can always be stale or malformed.
