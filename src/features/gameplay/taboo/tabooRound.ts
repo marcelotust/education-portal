@@ -1,71 +1,22 @@
-import type { TabooCard, TabooGuess, TabooRound, TabooSetup, TabooTurn } from '@/types';
+import type { TabooGuess, TabooRound, TabooSetup, TabooTurn } from '@/types';
+import { TABOO_DECK } from './tabooCards';
 
 /** Flat points for a correct guess; nobody is judged, so there is no bonus to argue about. */
 export const TABOO_CORRECT_POINTS = 10;
 
-export const TABOO_CATEGORY_CATALOG: readonly string[] = ['ANIMALS', 'MOVIES'];
-
-/**
- * The built-in deck, same trade-off as QUIZ's question bank: it ships in the
- * client bundle, so the word is technically readable before it is revealed.
- * Fine for a classroom game; see issue #27 for the real deck and the bundle
- * question this reopens.
- */
-const TABOO_DECK: readonly TabooCard[] = [
-  {
-    id: 'a1',
-    word: 'ELEPHANT',
-    forbidden: ['TRUNK', 'AFRICA', 'TUSK', 'GRAY', 'ZOO'],
-    category: 'ANIMALS',
-  },
-  {
-    id: 'a2',
-    word: 'PENGUIN',
-    forbidden: ['BIRD', 'ICE', 'BLACK', 'WHITE', 'SWIM'],
-    category: 'ANIMALS',
-  },
-  {
-    id: 'a3',
-    word: 'GIRAFFE',
-    forbidden: ['NECK', 'TALL', 'SPOTS', 'AFRICA', 'ZOO'],
-    category: 'ANIMALS',
-  },
-  {
-    id: 'a4',
-    word: 'KANGAROO',
-    forbidden: ['POUCH', 'AUSTRALIA', 'JUMP', 'HOP', 'BOXING'],
-    category: 'ANIMALS',
-  },
-  {
-    id: 'm1',
-    word: 'TITANIC',
-    forbidden: ['SHIP', 'ICEBERG', 'SINK', 'OCEAN', 'LEONARDO'],
-    category: 'MOVIES',
-  },
-  {
-    id: 'm2',
-    word: 'JAWS',
-    forbidden: ['SHARK', 'OCEAN', 'BEACH', 'ATTACK', 'FIN'],
-    category: 'MOVIES',
-  },
-  {
-    id: 'm3',
-    word: 'FROZEN',
-    forbidden: ['SNOW', 'ICE', 'ELSA', 'QUEEN', 'COLD'],
-    category: 'MOVIES',
-  },
-  {
-    id: 'm4',
-    word: 'MATRIX',
-    forbidden: ['PILL', 'COMPUTER', 'NEO', 'REALITY', 'SIMULATION'],
-    category: 'MOVIES',
-  },
+export const TABOO_CATEGORY_CATALOG: readonly string[] = [
+  'ANIMALS',
+  'MOVIES',
+  'SPORTS',
+  'FOOD',
+  'JOBS',
+  'COUNTRIES',
 ];
 
 /** A fresh room is playable without touching the setup. */
 export const DEFAULT_TABOO_SETUP: TabooSetup = {
   roundDurationSeconds: 120,
-  categories: ['ANIMALS', 'MOVIES'],
+  categories: ['ANIMALS', 'MOVIES', 'FOOD'],
 };
 
 const shuffled = <T>(items: readonly T[]): T[] => {
