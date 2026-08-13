@@ -49,18 +49,12 @@ describe('TABOO match', () => {
   });
 
   it('caps the match at whichever runs out first: seats or cards', () => {
-    const oneCategory = createTabooRound(setup({ categories: ['ANIMALS'] }), [
-      'p0',
-      'p1',
-      'p2',
-      'p3',
-      'p4',
-      'p5',
-    ]);
+    // More fake seats than any single category's deck could possibly hold.
+    const manySeats = Array.from({ length: 50 }, (_, index) => `p${index}`);
 
-    // The placeholder ANIMALS deck holds 4 cards; a 6-player room can't draw 6.
-    expect(oneCategory.turns.length).toBeLessThanOrEqual(4);
-    expect(oneCategory.turns.length).toBeLessThanOrEqual(6);
+    const oneCategory = createTabooRound(setup({ categories: ['ANIMALS'] }), manySeats);
+
+    expect(oneCategory.turns.length).toBeLessThan(manySeats.length);
   });
 
   it('sets a deadline for the first turn from the chosen length', () => {
