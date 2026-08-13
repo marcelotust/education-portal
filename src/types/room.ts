@@ -6,12 +6,13 @@ import type {
   Round,
   RoundDuration,
   StopAnswer,
+  TabooGuess,
 } from './game';
 import type { Player, PlayerRole, PlayerSlot } from './player';
 
 /**
  * Finite State Machine states for a persistent room. `SHOWING_ANSWER` is the
- * pause between two questions of a QUIZ match; STOP never enters it.
+ * pause between two turns of a QUIZ or TABOO match; STOP never enters it.
  */
 export type RoomStatus =
   | 'LOBBY_IDLE'
@@ -69,6 +70,11 @@ export type RoomEvent =
   | { type: 'QUIZ_ANSWERED'; answer: QuizAnswer }
   /** Every seated player has picked; pull the deadline in instead of waiting out the clock. */
   | { type: 'QUIZ_ALL_ANSWERED'; endsAt: string }
+  | { type: 'TABOO_GUESSED'; guess: TabooGuess }
+  /** Every guesser has answered; pull the deadline in instead of waiting out the clock. */
+  | { type: 'TABOO_ALL_GUESSED'; endsAt: string }
+  /** The Host has finished the reveal: on to the next clue-giver, or the end. */
+  | { type: 'NEXT_TABOO_TURN'; endsAt: string }
   | { type: 'STOP_CALLED'; playerId: string; endsAt: string }
   | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
   | { type: 'REMAINING_ANSWERS_APPROVED' }

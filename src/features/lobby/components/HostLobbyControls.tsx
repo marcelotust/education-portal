@@ -1,6 +1,7 @@
 import { ArcadeButton } from '@/components/ui/ArcadeButton';
 import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
+import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { MIN_CATEGORIES } from '@/types';
 import { GameCartridgePicker } from './GameCartridgePicker';
@@ -55,11 +56,20 @@ export const HostLobbyControls = () => {
         />
       )}
 
+      {state.gameSetup.game === 'TABOO' && state.selectedGameId !== null && (
+        <TabooSetupPanel
+          setup={state.gameSetup}
+          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+          onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
+        />
+      )}
+
       <ArcadeButton
         tone="green"
         disabled={
           state.selectedGameId === null ||
-          (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES)
+          (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES) ||
+          (state.gameSetup.game === 'TABOO' && state.gameSetup.categories.length < 1)
         }
         onClick={() => dispatch({ type: 'START_GAME' })}
       >

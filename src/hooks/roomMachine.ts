@@ -1,21 +1,19 @@
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
-import {
-  DEFAULT_QUIZ_SETUP,
-  computeQuizScores,
-  isLastQuestion,
-} from '@/features/gameplay/quiz/quizRound';
+import { DEFAULT_QUIZ_SETUP, computeQuizScores } from '@/features/gameplay/quiz/quizRound';
 import { computeRoundScores } from '@/features/gameplay/scoring';
+import { DEFAULT_TABOO_SETUP, computeTabooScores } from '@/features/gameplay/taboo/tabooRound';
 import {
   MAX_PLAYERS,
   MIN_CATEGORIES,
   type GameId,
   type GameSetup,
-  type QuizAnswer,
   type RoomEvent,
   type RoomEventType,
   type RoomState,
 } from '@/types';
 import { releaseSlot, sameBoard, seatPlayer } from '@/utils/room';
+import { allAnswered, answerQuiz, nextQuestion } from './quizMachine';
+import { allTabooGuessed, guessTaboo, nextTabooTurn } from './tabooMachine';
 
 /** Presence events are broadcast by the infrastructure, not by the Host. */
 const PRESENCE_EVENTS: readonly RoomEventType[] = [
@@ -27,6 +25,7 @@ const PRESENCE_EVENTS: readonly RoomEventType[] = [
   // Every player broadcasts its own answers; the Host consolidates them.
   'ANSWERS_SUBMITTED',
   'QUIZ_ANSWERED',
+  'TABOO_GUESSED',
 ];
 
 export const isHostOnlyEvent = (event: RoomEvent): boolean => !PRESENCE_EVENTS.includes(event.type);
@@ -46,24 +45,22 @@ const submitAnswers = (
   return { ...state, currentRound: { ...round, answers: [...others, ...event.answers] } };
 };
 
-const defaultSetupFor = (gameId: GameId): GameSetup =>
-  gameId === 'QUIZ' ? { game: 'QUIZ', ...DEFAULT_QUIZ_SETUP } : DEFAULT_STOP_GAME_SETUP;
-
-/** STOP needs four categories; QUIZ ships with its packs and is always ready. */
-const isSetupPlayable = (state: RoomState): boolean => {
-  if (state.selectedGameId === null) return false;
-  return state.gameSetup.game === 'STOP'
-    ? state.gameSetup.categories.length >= MIN_CATEGORIES
-    : true;
+const defaultSetupFor = (gameId: GameId): GameSetup => {
+  if (gameId === 'QUIZ') return { game: 'QUIZ', ...DEFAULT_QUIZ_SETUP };
+  if (gameId === 'TABOO') return { game: 'TABOO', ...DEFAULT_TABOO_SETUP };
+  return DEFAULT_STOP_GAME_SETUP;
 };
 
-const answerQuiz = (state: RoomState, answer: QuizAnswer): RoomState => {
-  const round = state.currentRound;
-  if (state.status !== 'PLAYING' || round?.game !== 'QUIZ') return state;
-  // First answer stands: nobody changes their mind after seeing a reaction.
-  if (round.answers.some((entry) => entry.playerId === answer.playerId)) return state;
-
-  return { ...state, currentRound: { ...round, answers: [...round.answers, answer] } };
+/**
+ * STOP needs four categories; TABOO's real constraint is card supply rather
+ * than a category count, so one is enough to start; QUIZ ships with its packs
+ * and is always ready.
+ */
+const isSetupPlayable = (state: RoomState): boolean => {
+  if (state.selectedGameId === null) return false;
+  if (state.gameSetup.game === 'STOP') return state.gameSetup.categories.length >= MIN_CATEGORIES;
+  if (state.gameSetup.game === 'TABOO') return state.gameSetup.categories.length >= 1;
+  return true;
 };
 
 const addPoints = (
@@ -78,9 +75,9 @@ const addPoints = (
 };
 
 /**
- * STOP hands the round to the Host to judge. QUIZ has nothing to judge, so it
- * scores the question on the spot and stops on the reveal: the match is only
- * over once the Host walks past the last question.
+ * STOP hands the round to the Host to judge. QUIZ and TABOO have nothing to
+ * judge, so each scores itself on the spot and stops on the reveal: the match
+ * is only over once the Host walks past the last question or clue-giver.
  */
 const endRound = (state: RoomState): RoomState => {
   const round = state.currentRound;
@@ -94,68 +91,36 @@ const endRound = (state: RoomState): RoomState => {
     };
   }
 
-  const earned = computeQuizScores(round);
+  if (round.game === 'QUIZ') {
+    const earned = computeQuizScores(round);
+    return {
+      ...state,
+      status: 'SHOWING_ANSWER',
+      scores: addPoints(state.scores, earned),
+      currentRound: {
+        ...round,
+        questionPoints: earned,
+        matchPoints: addPoints(round.matchPoints, earned),
+      },
+    };
+  }
 
+  const earned = computeTabooScores(round);
   return {
     ...state,
     status: 'SHOWING_ANSWER',
     scores: addPoints(state.scores, earned),
     currentRound: {
       ...round,
-      questionPoints: earned,
+      turnPoints: earned,
       matchPoints: addPoints(round.matchPoints, earned),
     },
   };
 };
 
-/**
- * The Host has finished talking about the answer. One more question means a
- * fresh clock and an empty answer sheet; nothing left means the match is done,
- * and what it was worth as a whole is what the scoreboard reports.
- */
-const nextQuestion = (state: RoomState, endsAt: string): RoomState => {
-  const round = state.currentRound;
-  if (state.status !== 'SHOWING_ANSWER' || round?.game !== 'QUIZ') return state;
-
-  if (isLastQuestion(round)) {
-    return {
-      ...state,
-      status: 'CALCULATING_SCORES',
-      lastRoundPoints: round.matchPoints,
-      currentRound: { ...round, isScored: true },
-    };
-  }
-
-  return {
-    ...state,
-    status: 'PLAYING',
-    currentRound: {
-      ...round,
-      currentIndex: round.currentIndex + 1,
-      answers: [],
-      questionPoints: {},
-      endsAt,
-    },
-  };
-};
-
-/**
- * Every seated player has picked, so waiting out the full clock only leaves
- * them staring at a countdown with nothing left to do. Pulling the deadline
- * in lets the existing clock-driven END_ROUND close the round, the same way
- * STOP's early end works: this only ever shortens it, never pushes it out.
- */
-const allAnswered = (state: RoomState, endsAt: string): RoomState => {
-  const round = state.currentRound;
-  if (state.status !== 'PLAYING' || round?.game !== 'QUIZ') return state;
-  if (round.endsAt !== null && round.endsAt <= endsAt) return state;
-
-  return { ...state, currentRound: { ...round, endsAt } };
-};
-
 /** Order matters: categories appear in the round exactly as the Host picked them. */
 const toggleCategory = (state: RoomState, category: string): RoomState => {
-  if (state.gameSetup.game !== 'STOP') return state;
+  if (state.gameSetup.game !== 'STOP' && state.gameSetup.game !== 'TABOO') return state;
   const { categories } = state.gameSetup;
   const next = categories.includes(category)
     ? categories.filter((entry) => entry !== category)
@@ -270,7 +235,8 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
         : state;
 
     case 'CATEGORY_TOGGLED':
-      return state.status === 'CONFIGURING_GAME' && state.gameSetup.game === 'STOP'
+      return state.status === 'CONFIGURING_GAME' &&
+        (state.gameSetup.game === 'STOP' || state.gameSetup.game === 'TABOO')
         ? toggleCategory(state, event.category)
         : state;
 
@@ -292,6 +258,15 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'QUIZ_ALL_ANSWERED':
       return allAnswered(state, event.endsAt);
+
+    case 'TABOO_GUESSED':
+      return guessTaboo(state, event.guess);
+
+    case 'TABOO_ALL_GUESSED':
+      return allTabooGuessed(state, event.endsAt);
+
+    case 'NEXT_TABOO_TURN':
+      return nextTabooTurn(state, event.endsAt);
 
     case 'START_GAME':
       // Each cartridge decides what "ready" means, here and not just in the UI.

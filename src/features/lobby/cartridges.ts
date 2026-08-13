@@ -1,6 +1,6 @@
 import type { GameCartridge } from '@/types';
 
-/** Cartridge catalog available to the Host. Only STOP ships in the MVP. */
+/** Cartridge catalog available to the Host. */
 export const GAME_CARTRIDGES: readonly GameCartridge[] = [
   {
     id: 'STOP',
@@ -13,5 +13,11 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     title: 'QUIZ',
     tagline: 'Multiple choice, fastest wins',
     roundDurationSeconds: 30,
+  },
+  {
+    id: 'TABOO',
+    title: 'TABOO',
+    tagline: 'Say anything but the word',
+    roundDurationSeconds: 120,
   },
 ];

@@ -1,5 +1,5 @@
 /** Game "cartridges" the Host can load without dropping the room. */
-export type GameId = 'STOP' | 'QUIZ';
+export type GameId = 'STOP' | 'QUIZ' | 'TABOO';
 
 export interface GameCartridge {
   id: GameId;
@@ -9,9 +9,10 @@ export interface GameCartridge {
   roundDurationSeconds: number;
 }
 
-/** Round lengths the Host can pick, in seconds. */
+/** Round lengths STOP and QUIZ offer, in seconds. */
 export const ROUND_DURATIONS = [30, 60, 90, 120] as const;
-export type RoundDuration = (typeof ROUND_DURATIONS)[number];
+/** Every duration any cartridge's setup can store, so the field type is shared. */
+export type RoundDuration = 30 | 60 | 90 | 120 | 180;
 
 /** A match needs enough categories to be worth playing. */
 export const MIN_CATEGORIES = 4;
@@ -96,8 +97,57 @@ export interface QuizRound {
   isScored: boolean;
 }
 
+/** TABOO wants longer turns than STOP or QUIZ; kept as its own offered set. */
+export const TABOO_ROUND_DURATIONS = [60, 120, 180] as const;
+
+export interface TabooSetup {
+  roundDurationSeconds: RoundDuration;
+  categories: readonly string[];
+}
+
+/** A word to make the room guess, and the words that can't be said to clue it. */
+export interface TabooCard {
+  id: string;
+  word: string;
+  forbidden: readonly string[];
+  category: string;
+}
+
+export interface TabooTurn {
+  card: TabooCard;
+  clueGiverId: string;
+}
+
+export interface TabooGuess {
+  playerId: string;
+  value: string;
+}
+
+/**
+ * A TABOO round is a whole match: one turn per seated player, drawn up front
+ * like QUIZ's questions, cycling the clue-giver instead of a question index.
+ */
+export interface TabooRound {
+  game: 'TABOO';
+  turns: readonly TabooTurn[];
+  /** Index into `turns`; the match ends after the last clue-giver's reveal. */
+  currentIndex: number;
+  /** Guesses for the current turn only, cleared as the match moves on. */
+  guesses: readonly TabooGuess[];
+  /** What the turn just closed was worth, shown during the reveal. */
+  turnPoints: Readonly<Record<string, number>>;
+  /** What the match is worth so far, which is what the scoreboard reports. */
+  matchPoints: Readonly<Record<string, number>>;
+  endsAt: string | null;
+  /** TABOO scores itself, so this flips without a Host judging anything. */
+  isScored: boolean;
+}
+
 /** Whatever cartridge is loaded, the room holds exactly one round shape. */
-export type Round = StopRound | QuizRound;
+export type Round = StopRound | QuizRound | TabooRound;
 
 /** Per-cartridge setup, so switching games swaps the whole panel. */
-export type GameSetup = ({ game: 'STOP' } & StopSetup) | ({ game: 'QUIZ' } & QuizSetup);
+export type GameSetup =
+  | ({ game: 'STOP' } & StopSetup)
+  | ({ game: 'QUIZ' } & QuizSetup)
+  | ({ game: 'TABOO' } & TabooSetup);

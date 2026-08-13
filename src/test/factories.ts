@@ -5,6 +5,8 @@ import {
   type QuizQuestion,
   type QuizRound,
   type StopRound,
+  type TabooRound,
+  type TabooTurn,
 } from '@/types';
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import type { RoomState } from '@/types';
@@ -65,6 +67,49 @@ export const makeQuizRound = (overrides: Partial<QuizRound> = {}): QuizRound => 
   questionPoints: {},
   matchPoints: {},
   endsAt: '2026-07-24T12:00:30.000Z',
+  isScored: false,
+  ...overrides,
+});
+
+const TABOO_TURNS: readonly TabooTurn[] = [
+  {
+    clueGiverId: 'player-0',
+    card: {
+      id: 't1',
+      word: 'ELEPHANT',
+      forbidden: ['TRUNK', 'AFRICA', 'TUSK', 'GRAY'],
+      category: 'ANIMALS',
+    },
+  },
+  {
+    clueGiverId: 'player-1',
+    card: {
+      id: 't2',
+      word: 'TITANIC',
+      forbidden: ['SHIP', 'ICEBERG', 'SINK', 'OCEAN'],
+      category: 'MOVIES',
+    },
+  },
+  {
+    clueGiverId: 'player-2',
+    card: {
+      id: 't3',
+      word: 'PENGUIN',
+      forbidden: ['BIRD', 'ICE', 'BLACK', 'WHITE'],
+      category: 'ANIMALS',
+    },
+  },
+];
+
+/** A three-turn TABOO match sitting on its first clue-giver. */
+export const makeTabooRound = (overrides: Partial<TabooRound> = {}): TabooRound => ({
+  game: 'TABOO',
+  turns: TABOO_TURNS,
+  currentIndex: 0,
+  guesses: [],
+  turnPoints: {},
+  matchPoints: {},
+  endsAt: '2026-07-24T12:02:00.000Z',
   isScored: false,
   ...overrides,
 });
