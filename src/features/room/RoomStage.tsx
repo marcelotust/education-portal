@@ -6,6 +6,8 @@ import { ScoreboardScreen } from '@/features/gameplay/ScoreboardScreen';
 import { QuizRevealScreen } from '@/features/gameplay/quiz/QuizRevealScreen';
 import { QuizRoundScreen } from '@/features/gameplay/quiz/QuizRoundScreen';
 import { StopRoundScreen } from '@/features/gameplay/StopRoundScreen';
+import { TabooRevealScreen } from '@/features/gameplay/taboo/TabooRevealScreen';
+import { TabooRoundScreen } from '@/features/gameplay/taboo/TabooRoundScreen';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { useRoom } from '@/hooks/useRoom';
 import type { RoomState } from '@/types';
@@ -20,14 +22,12 @@ const screenFor = (state: RoomState, playerId: string): ReactNode => {
     case 'PLAYING_AD':
       return <AdBreakScreen />;
     case 'PLAYING':
-      return state.currentRound?.game === 'QUIZ' ? (
-        <QuizRoundScreen playerId={playerId} />
-      ) : (
-        <StopRoundScreen playerId={playerId} />
-      );
+      if (state.currentRound?.game === 'QUIZ') return <QuizRoundScreen playerId={playerId} />;
+      if (state.currentRound?.game === 'TABOO') return <TabooRoundScreen playerId={playerId} />;
+      return <StopRoundScreen playerId={playerId} />;
     case 'SHOWING_ANSWER':
-      // Only QUIZ pauses between questions; STOP never reaches this state.
-      return <QuizRevealScreen />;
+      // Only QUIZ and TABOO pause for a reveal; STOP never reaches this state.
+      return state.currentRound?.game === 'TABOO' ? <TabooRevealScreen /> : <QuizRevealScreen />;
     case 'CALCULATING_SCORES':
       // The Host judges first; the standings replace the table once confirmed.
       return state.currentRound?.isScored === true ? (

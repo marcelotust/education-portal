@@ -1,5 +1,6 @@
 import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
+import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { PlayerLobbyStatus } from './PlayerLobbyStatus';
 import { GameCartridgePicker } from './GameCartridgePicker';
@@ -23,6 +24,9 @@ export const PlayerLobbyControls = () => {
           )}
           {state.selectedGameId !== null && state.gameSetup.game === 'QUIZ' && (
             <QuizSetupPanel setup={state.gameSetup} />
+          )}
+          {state.selectedGameId !== null && state.gameSetup.game === 'TABOO' && (
+            <TabooSetupPanel setup={state.gameSetup} />
           )}
         </>
       )}

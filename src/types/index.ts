@@ -15,8 +15,18 @@ export type {
   StopPhase,
   StopRound,
   StopSetup,
+  TabooCard,
+  TabooGuess,
+  TabooRound,
+  TabooSetup,
+  TabooTurn,
 } from './game';
-export { MIN_CATEGORIES, QUIZ_QUESTION_COUNTS, ROUND_DURATIONS } from './game';
+export {
+  MIN_CATEGORIES,
+  QUIZ_QUESTION_COUNTS,
+  ROUND_DURATIONS,
+  TABOO_ROUND_DURATIONS,
+} from './game';
 export type {
   PersistedRoomState,
   RoomContextValue,

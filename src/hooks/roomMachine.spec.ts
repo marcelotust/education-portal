@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { TABOO_CORRECT_POINTS } from '@/features/gameplay/taboo/tabooRound';
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
-import { makePlayer, makeQuizRound, makeRoom, makeRound } from '@/test/factories';
+import { makePlayer, makeQuizRound, makeRoom, makeRound, makeTabooRound } from '@/test/factories';
 import { isHostOnlyEvent, roomReducer } from './roomMachine';
 import { MAX_PLAYERS, type RoomState } from '@/types';
 
@@ -407,7 +408,10 @@ describe('room FSM', () => {
         const state = playingQuiz();
         const round = state.currentRound;
         return round?.game === 'QUIZ'
-          ? { ...state, currentRound: { ...round, endsAt: new Date(Date.now() + 60_000).toISOString() } }
+          ? {
+              ...state,
+              currentRound: { ...round, endsAt: new Date(Date.now() + 60_000).toISOString() },
+            }
           : state;
       };
 
@@ -542,6 +546,176 @@ describe('room FSM', () => {
       expect(
         roomReducer(playing, { type: 'ANSWERS_SUBMITTED', playerId: 'player-0', answers: [] }),
       ).toBe(playing);
+    });
+  });
+
+  describe('TABOO cartridge', () => {
+    const configuringTaboo = (): RoomState =>
+      roomReducer(withStatus('CONFIGURING_GAME'), { type: 'SELECT_GAME', gameId: 'TABOO' });
+
+    /** 3 seated players; the factory match hands each of them exactly one turn as clue-giver. */
+    const playingTaboo = (): RoomState => {
+      const started = roomReducer(configuringTaboo(), { type: 'START_GAME' });
+      return roomReducer(started, { type: 'AD_FINISHED', round: makeTabooRound() });
+    };
+
+    it('swaps the setup panel when the cartridge changes', () => {
+      expect(configuringTaboo().gameSetup.game).toBe('TABOO');
+    });
+
+    it('needs at least one category to start', () => {
+      const noCategories: RoomState = {
+        ...configuringTaboo(),
+        gameSetup: { game: 'TABOO', roundDurationSeconds: 120, categories: [] },
+      };
+
+      expect(roomReducer(noCategories, { type: 'START_GAME' }).status).toBe('CONFIGURING_GAME');
+      expect(roomReducer(configuringTaboo(), { type: 'START_GAME' }).status).toBe('PLAYING_AD');
+    });
+
+    it('records a guess once, and refuses a change of mind', () => {
+      // Turn 0's clue-giver is player-0; player-1 is free to guess.
+      const guessed = roomReducer(playingTaboo(), {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-1', value: 'wrong' },
+      });
+      const again = roomReducer(guessed, {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-1', value: 'elephant' },
+      });
+
+      const round = again.currentRound;
+      expect(round?.game === 'TABOO' && round.guesses).toHaveLength(1);
+      expect(round?.game === 'TABOO' && round.guesses[0]?.value).toBe('wrong');
+    });
+
+    it("refuses a guess from the current turn's own clue-giver", () => {
+      const playing = playingTaboo();
+
+      const guessed = roomReducer(playing, {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-0', value: 'elephant' },
+      });
+
+      expect(guessed).toBe(playing);
+    });
+
+    it('scores the turn itself and stops on the reveal, with no Host judging', () => {
+      const guessed = roomReducer(playingTaboo(), {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-1', value: 'elephant' },
+      });
+
+      const ended = roomReducer(guessed, { type: 'END_ROUND' });
+      const round = ended.currentRound;
+
+      expect(ended.status).toBe('SHOWING_ANSWER');
+      expect(ended.scores['player-1']).toBe(TABOO_CORRECT_POINTS);
+      expect(round?.game === 'TABOO' && round.turnPoints['player-1']).toBe(TABOO_CORRECT_POINTS);
+      expect(ended.currentRound?.isScored).toBe(false);
+    });
+
+    it('gives a wrong guess nothing', () => {
+      const guessed = roomReducer(playingTaboo(), {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-1', value: 'giraffe' },
+      });
+
+      expect(roomReducer(guessed, { type: 'END_ROUND' }).scores['player-1']).toBe(0);
+    });
+
+    it('is a shared event: a Player must be able to send its own guess', () => {
+      expect(
+        isHostOnlyEvent({ type: 'TABOO_GUESSED', guess: { playerId: 'player-0', value: 'x' } }),
+      ).toBe(false);
+    });
+
+    describe('a match is a sequence of turns', () => {
+      const NEXT_DEADLINE = '2026-07-25T10:02:00.000Z';
+
+      /** Whoever is seated and is not the clue-giver guesses the word right, then closes it. */
+      const revealing = (state: RoomState): RoomState => {
+        const round = state.currentRound;
+        if (round?.game !== 'TABOO') return state;
+        const turn = round.turns[round.currentIndex];
+        const guesser = ['player-0', 'player-1', 'player-2'].find((id) => id !== turn?.clueGiverId);
+
+        const guessed = roomReducer(state, {
+          type: 'TABOO_GUESSED',
+          guess: { playerId: guesser ?? 'player-0', value: turn?.card.word ?? '' },
+        });
+        return roomReducer(guessed, { type: 'END_ROUND' });
+      };
+
+      it('moves to the next turn on a fresh clock, with the guesses cleared', () => {
+        const next = roomReducer(revealing(playingTaboo()), {
+          type: 'NEXT_TABOO_TURN',
+          endsAt: NEXT_DEADLINE,
+        });
+        const round = next.currentRound;
+
+        expect(next.status).toBe('PLAYING');
+        expect(round?.game === 'TABOO' && round.currentIndex).toBe(1);
+        expect(round?.game === 'TABOO' && round.guesses).toEqual([]);
+        expect(round?.endsAt).toBe(NEXT_DEADLINE);
+      });
+
+      it('ends the match after the last turn and reports what it was worth', () => {
+        let state = playingTaboo();
+        // Three turns in the factory match; the third reveal is the last.
+        for (let turn = 0; turn < 3; turn += 1) {
+          state = revealing(state);
+          state = roomReducer(state, { type: 'NEXT_TABOO_TURN', endsAt: NEXT_DEADLINE });
+        }
+
+        expect(state.status).toBe('CALCULATING_SCORES');
+        expect(state.currentRound?.isScored).toBe(true);
+        const total = Object.values(state.lastRoundPoints).reduce((sum, points) => sum + points, 0);
+        expect(total).toBe(TABOO_CORRECT_POINTS * 3);
+      });
+
+      it('refuses to skip a turn that is still being guessed', () => {
+        const playing = playingTaboo();
+
+        expect(roomReducer(playing, { type: 'NEXT_TABOO_TURN', endsAt: NEXT_DEADLINE })).toBe(
+          playing,
+        );
+      });
+    });
+
+    describe('ending the turn once everyone has guessed', () => {
+      /** A turn with a full minute left, so TABOO_ALL_GUESSED has something to cut. */
+      const running = (): RoomState => {
+        const state = playingTaboo();
+        const round = state.currentRound;
+        return round?.game === 'TABOO'
+          ? {
+              ...state,
+              currentRound: { ...round, endsAt: new Date(Date.now() + 60_000).toISOString() },
+            }
+          : state;
+      };
+
+      it('pulls the deadline in', () => {
+        const soon = new Date(Date.now() + 5000).toISOString();
+
+        const state = roomReducer(running(), { type: 'TABOO_ALL_GUESSED', endsAt: soon });
+
+        expect(state.currentRound?.endsAt).toBe(soon);
+      });
+
+      it('never lets it push the deadline further away', () => {
+        const started = running();
+        const later = new Date(Date.now() + 999_000).toISOString();
+
+        expect(roomReducer(started, { type: 'TABOO_ALL_GUESSED', endsAt: later })).toBe(started);
+      });
+
+      it('is Host-only: the trigger is derived locally, but only the Host may act on it', () => {
+        expect(
+          isHostOnlyEvent({ type: 'TABOO_ALL_GUESSED', endsAt: new Date().toISOString() }),
+        ).toBe(true);
+      });
     });
   });
 

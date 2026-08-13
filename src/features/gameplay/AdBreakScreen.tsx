@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { useRoom } from '@/hooks/useRoom';
+import type { Player } from '@/types';
 import { createQuizRound } from './quiz/quizRound';
 import { createStopRound } from './stopRound';
+import { createTabooRound } from './taboo/tabooRound';
 
 const BREAK_SECONDS = 5;
 
@@ -26,15 +28,18 @@ export const AdBreakScreen = () => {
   useEffect(() => {
     if (!isHost || secondsLeft > 0) return;
 
-    // Only the Host draws the letter, so everyone plays the same round.
-    dispatch({
-      type: 'AD_FINISHED',
-      round:
-        state.gameSetup.game === 'QUIZ'
-          ? createQuizRound(state.gameSetup)
-          : createStopRound(state.gameSetup),
-    });
-  }, [isHost, secondsLeft, state.gameSetup, dispatch]);
+    // Only the Host draws the round, so everyone plays the same one.
+    if (state.gameSetup.game === 'QUIZ') {
+      dispatch({ type: 'AD_FINISHED', round: createQuizRound(state.gameSetup) });
+    } else if (state.gameSetup.game === 'TABOO') {
+      const seated = state.slots
+        .filter((slot): slot is Player => slot !== null)
+        .map((player) => player.id);
+      dispatch({ type: 'AD_FINISHED', round: createTabooRound(state.gameSetup, seated) });
+    } else {
+      dispatch({ type: 'AD_FINISHED', round: createStopRound(state.gameSetup) });
+    }
+  }, [isHost, secondsLeft, state.gameSetup, state.slots, dispatch]);
 
   return (
     <section className="flex flex-col items-center gap-6 py-10 text-center">
