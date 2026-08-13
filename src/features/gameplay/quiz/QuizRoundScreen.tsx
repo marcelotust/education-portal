@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useCountdown } from '@/hooks/useCountdown';
+import { useQuizAnswerBroadcast } from '@/hooks/useQuizAnswerBroadcast';
 import { useRoom } from '@/hooks/useRoom';
+import type { QuizAnswer } from '@/types';
 import { cn } from '@/utils/cn';
-import { currentQuestion, hasAnswered } from './quizRound';
+import { countPlayers } from '@/utils/room';
+import { currentQuestion, hasAnswered, hasEveryoneAnswered } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
+
+/** Long enough to read, short enough to feel earned; matches STOP's grace period. */
+const QUIZ_GRACE_MS = 5000;
 
 const urgencyFor = (secondsLeft: number): 'calm' | 'warning' | 'critical' => {
   if (secondsLeft <= 5) return 'critical';
@@ -35,9 +41,12 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
   const picked = pick?.questionIndex === questionIndex ? pick.choice : null;
   // Answer speed is measured from the moment the question appeared.
   const shownAt = useRef(0);
+  // Which question QUIZ_ALL_ANSWERED already fired for, so it triggers once.
+  const allAnsweredFor = useRef(-1);
 
   useEffect(() => {
     shownAt.current = Date.now();
+    allAnsweredFor.current = -1;
   }, [questionIndex]);
 
   useEffect(() => {
@@ -45,22 +54,40 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     if (isHost && secondsLeft <= 0 && round !== null) dispatch({ type: 'END_ROUND' });
   }, [isHost, secondsLeft, round, dispatch]);
 
+  const onAnswer = useCallback(
+    (received: QuizAnswer) => dispatch({ type: 'QUIZ_ANSWERED', answer: received }),
+    [dispatch],
+  );
+  const channel = useQuizAnswerBroadcast({ pin: state.pin, onAnswer });
+
+  useEffect(() => {
+    // Only the Host pulls the deadline in, so it happens once for everyone.
+    if (!isHost || round === null || allAnsweredFor.current === questionIndex) return;
+    if (!hasEveryoneAnswered(round, countPlayers(state))) return;
+
+    allAnsweredFor.current = questionIndex;
+    dispatch({
+      type: 'QUIZ_ALL_ANSWERED',
+      endsAt: new Date(Date.now() + QUIZ_GRACE_MS).toISOString(),
+    });
+  }, [isHost, round, questionIndex, state, dispatch]);
+
   const answer = useCallback(
     (choice: number) => {
       if (round === null || picked !== null || hasAnswered(round, playerId)) return;
       setPick({ questionIndex, choice });
-      dispatch({
-        type: 'QUIZ_ANSWERED',
-        answer: { playerId, choice, elapsedMs: Date.now() - shownAt.current },
-      });
+      const submitted: QuizAnswer = { playerId, choice, elapsedMs: Date.now() - shownAt.current };
+      dispatch({ type: 'QUIZ_ANSWERED', answer: submitted });
+      channel.sendAnswer(submitted);
     },
-    [round, picked, questionIndex, playerId, dispatch],
+    [round, picked, questionIndex, playerId, dispatch, channel],
   );
 
   const question = round === null ? undefined : currentQuestion(round);
   if (round === null || question === undefined) return null;
 
   const urgency = urgencyFor(secondsLeft);
+  const everyoneAnswered = hasEveryoneAnswered(round, countPlayers(state));
 
   return (
     <section className="flex flex-col gap-5">
@@ -92,6 +119,15 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
       </header>
 
       <h1 className="text-center font-terminal text-2xl text-slate-100">{question.prompt}</h1>
+
+      {everyoneAnswered && (
+        <p
+          role="alert"
+          className="animate-blink rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+        >
+          EVERYONE HAS ANSWERED! ENDING ROUND
+        </p>
+      )}
 
       <ul className="flex flex-col gap-2">
         {question.options.map((option, index) => (

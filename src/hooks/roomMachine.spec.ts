@@ -392,6 +392,55 @@ describe('room FSM', () => {
       expect(roomReducer(answered, { type: 'END_ROUND' }).scores['player-0']).toBe(0);
     });
 
+    it('is a shared event: a Player must be able to send its own pick', () => {
+      expect(
+        isHostOnlyEvent({
+          type: 'QUIZ_ANSWERED',
+          answer: { playerId: 'player-0', choice: 0, elapsedMs: 0 },
+        }),
+      ).toBe(false);
+    });
+
+    describe('ending the round once everyone has answered', () => {
+      /** A round with a full minute left, so QUIZ_ALL_ANSWERED has something to cut. */
+      const running = (): RoomState => {
+        const state = playingQuiz();
+        const round = state.currentRound;
+        return round?.game === 'QUIZ'
+          ? { ...state, currentRound: { ...round, endsAt: new Date(Date.now() + 60_000).toISOString() } }
+          : state;
+      };
+
+      it('pulls the deadline in once every seated player has answered', () => {
+        const soon = new Date(Date.now() + 5000).toISOString();
+
+        const state = roomReducer(running(), { type: 'QUIZ_ALL_ANSWERED', endsAt: soon });
+
+        expect(state.currentRound?.endsAt).toBe(soon);
+      });
+
+      it('never lets it push the deadline further away', () => {
+        const started = running();
+        const later = new Date(Date.now() + 999_000).toISOString();
+
+        expect(roomReducer(started, { type: 'QUIZ_ALL_ANSWERED', endsAt: later })).toBe(started);
+      });
+
+      it('ignores it once the round is no longer running', () => {
+        const idle = withStatus('LOBBY_IDLE');
+
+        expect(
+          roomReducer(idle, { type: 'QUIZ_ALL_ANSWERED', endsAt: new Date().toISOString() }),
+        ).toBe(idle);
+      });
+
+      it('is Host-only: the trigger is derived locally, but only the Host may act on it', () => {
+        expect(
+          isHostOnlyEvent({ type: 'QUIZ_ALL_ANSWERED', endsAt: new Date().toISOString() }),
+        ).toBe(true);
+      });
+    });
+
     describe('a match is a sequence of questions', () => {
       const NEXT_DEADLINE = '2026-07-25T10:00:30.000Z';
 

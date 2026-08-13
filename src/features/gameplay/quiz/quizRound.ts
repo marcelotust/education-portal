@@ -79,3 +79,7 @@ export const computeQuizScores = (round: QuizRound): Record<string, number> => {
 
 export const hasAnswered = (round: QuizRound, playerId: string): boolean =>
   round.answers.some((answer: QuizAnswer) => answer.playerId === playerId);
+
+/** True once nobody is left to answer, so the round can end without waiting on the clock. */
+export const hasEveryoneAnswered = (round: QuizRound, seatedCount: number): boolean =>
+  round.answers.length >= seatedCount;
