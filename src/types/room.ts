@@ -67,6 +67,8 @@ export type RoomEvent =
   | { type: 'AD_FINISHED'; round: Round }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }
   | { type: 'QUIZ_ANSWERED'; answer: QuizAnswer }
+  /** Every seated player has picked; pull the deadline in instead of waiting out the clock. */
+  | { type: 'QUIZ_ALL_ANSWERED'; endsAt: string }
   | { type: 'STOP_CALLED'; playerId: string; endsAt: string }
   | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
   | { type: 'REMAINING_ANSWERS_APPROVED' }

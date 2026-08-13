@@ -11,11 +11,11 @@ import {
   type GameId,
   type GameSetup,
   type QuizAnswer,
-  type PlayerSlot,
   type RoomEvent,
   type RoomEventType,
   type RoomState,
 } from '@/types';
+import { releaseSlot, sameBoard, seatPlayer } from '@/utils/room';
 
 /** Presence events are broadcast by the infrastructure, not by the Host. */
 const PRESENCE_EVENTS: readonly RoomEventType[] = [
@@ -26,24 +26,10 @@ const PRESENCE_EVENTS: readonly RoomEventType[] = [
   'ROOM_STATE_RECEIVED',
   // Every player broadcasts its own answers; the Host consolidates them.
   'ANSWERS_SUBMITTED',
+  'QUIZ_ANSWERED',
 ];
 
-const sameBoard = (a: readonly PlayerSlot[], b: readonly PlayerSlot[]): boolean =>
-  a.length === b.length &&
-  a.every((slot, index) => {
-    const other = b[index];
-    return slot === other || (slot?.id === other?.id && slot?.nickname === other?.nickname);
-  });
-
 export const isHostOnlyEvent = (event: RoomEvent): boolean => !PRESENCE_EVENTS.includes(event.type);
-
-const seatPlayer = (state: RoomState, event: Extract<RoomEvent, { type: 'PLAYER_JOINED' }>) => {
-  const openSlot = state.slots.findIndex((slot) => slot === null);
-  if (openSlot === -1 || state.slots.length > MAX_PLAYERS) return state;
-
-  const slots = state.slots.map((slot, index) => (index === openSlot ? event.player : slot));
-  return { ...state, slots };
-};
 
 /**
  * Answers arrive over Broadcast, so the same player can send twice (retry,
@@ -153,6 +139,20 @@ const nextQuestion = (state: RoomState, endsAt: string): RoomState => {
   };
 };
 
+/**
+ * Every seated player has picked, so waiting out the full clock only leaves
+ * them staring at a countdown with nothing left to do. Pulling the deadline
+ * in lets the existing clock-driven END_ROUND close the round, the same way
+ * STOP's early end works: this only ever shortens it, never pushes it out.
+ */
+const allAnswered = (state: RoomState, endsAt: string): RoomState => {
+  const round = state.currentRound;
+  if (state.status !== 'PLAYING' || round?.game !== 'QUIZ') return state;
+  if (round.endsAt !== null && round.endsAt <= endsAt) return state;
+
+  return { ...state, currentRound: { ...round, endsAt } };
+};
+
 /** Order matters: categories appear in the round exactly as the Host picked them. */
 const toggleCategory = (state: RoomState, category: string): RoomState => {
   if (state.gameSetup.game !== 'STOP') return state;
@@ -244,11 +244,6 @@ const resetMatch = (state: RoomState): RoomState => {
   return nothingToClear ? state : { ...state, scores: {}, lastRoundPoints: {} };
 };
 
-const releaseSlot = (state: RoomState, playerId: string): RoomState => {
-  const slots = state.slots.map((slot) => (slot?.id === playerId ? null : slot));
-  return { ...state, slots };
-};
-
 /**
  * Pure Finite State Machine for a persistent room.
  * Invalid transitions return the exact same object so React can bail out.
@@ -294,6 +289,9 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'NEXT_QUESTION':
       return nextQuestion(state, event.endsAt);
+
+    case 'QUIZ_ALL_ANSWERED':
+      return allAnswered(state, event.endsAt);
 
     case 'START_GAME':
       // Each cartridge decides what "ready" means, here and not just in the UI.

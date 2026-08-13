@@ -1,4 +1,4 @@
-import { MAX_PLAYERS, type PlayerSlot, type RoomState } from '@/types';
+import { MAX_PLAYERS, type PlayerSlot, type RoomEvent, type RoomState } from '@/types';
 
 const PIN_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
@@ -30,3 +30,27 @@ export const countPlayers = (state: RoomState): number =>
   state.slots.filter((slot) => slot !== null).length;
 
 export const isRoomFull = (state: RoomState): boolean => countPlayers(state) >= MAX_PLAYERS;
+
+/** Presence resyncs the whole board on every tick; this is how the FSM skips a no-op update. */
+export const sameBoard = (a: readonly PlayerSlot[], b: readonly PlayerSlot[]): boolean =>
+  a.length === b.length &&
+  a.every((slot, index) => {
+    const other = b[index];
+    return slot === other || (slot?.id === other?.id && slot?.nickname === other?.nickname);
+  });
+
+export const seatPlayer = (
+  state: RoomState,
+  event: Extract<RoomEvent, { type: 'PLAYER_JOINED' }>,
+): RoomState => {
+  const openSlot = state.slots.findIndex((slot) => slot === null);
+  if (openSlot === -1 || state.slots.length > MAX_PLAYERS) return state;
+
+  const slots = state.slots.map((slot, index) => (index === openSlot ? event.player : slot));
+  return { ...state, slots };
+};
+
+export const releaseSlot = (state: RoomState, playerId: string): RoomState => {
+  const slots = state.slots.map((slot) => (slot?.id === playerId ? null : slot));
+  return { ...state, slots };
+};
