@@ -1,4 +1,3 @@
-import { SectionLabel } from '@/components/ui/SectionLabel';
 import { MIN_CATEGORIES, ROUND_DURATIONS, type RoundDuration, type StopSetup } from '@/types';
 import { cn } from '@/utils/cn';
 import { STOP_CATEGORY_CATALOG } from './stopRound';
@@ -22,7 +21,9 @@ export const StopSetupPanel = ({
   return (
     <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
       <div className="flex flex-col gap-2">
-        <SectionLabel>Round length</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+          Round length
+        </p>
         <div className="grid grid-cols-4 gap-2">
           {ROUND_DURATIONS.map((seconds) => (
             <button
@@ -49,7 +50,9 @@ export const StopSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <SectionLabel>Categories ({chosen})</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+          Categories ({chosen})
+        </p>
 
         <div className="flex flex-wrap gap-2">
           {STOP_CATEGORY_CATALOG.map((category) => {

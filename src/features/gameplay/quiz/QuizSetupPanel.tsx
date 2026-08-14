@@ -1,4 +1,3 @@
-import { SectionLabel } from '@/components/ui/SectionLabel';
 import {
   QUIZ_QUESTION_COUNTS,
   ROUND_DURATIONS,
@@ -28,7 +27,9 @@ export const QuizSetupPanel = ({
   return (
     <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
       <div className="flex flex-col gap-2">
-        <SectionLabel>Time to answer</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+          Time to answer
+        </p>
         <div className="grid grid-cols-4 gap-2">
           {ROUND_DURATIONS.map((seconds) => (
             <button
@@ -55,7 +56,7 @@ export const QuizSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <SectionLabel>Questions</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Questions</p>
         <div className="grid grid-cols-3 gap-2">
           {QUIZ_QUESTION_COUNTS.map((count) => (
             <button
@@ -82,7 +83,7 @@ export const QuizSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <SectionLabel>Topic</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Topic</p>
         <div className="flex flex-wrap gap-2">
           {QUIZ_TOPICS.map((topic) => (
             <button
