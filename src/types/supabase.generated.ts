@@ -12,6 +12,30 @@ export type Database = {
   };
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          category: string;
+          created_at: string;
+          id: string;
+          message: string;
+          submitted_by: string | null;
+        };
+        Insert: {
+          category: string;
+          created_at?: string;
+          id?: string;
+          message: string;
+          submitted_by?: string | null;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          id?: string;
+          message?: string;
+          submitted_by?: string | null;
+        };
+        Relationships: [];
+      };
       quiz_questions: {
         Row: {
           correct_index: number;

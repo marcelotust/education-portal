@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /legal
+Disallow: /contact
 
 Sitemap: https://education-portal-swart.vercel.app/sitemap.xml
