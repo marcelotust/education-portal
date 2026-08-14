@@ -2,11 +2,17 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LandingScreen } from '@/features/landing/LandingScreen';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { listRecentRooms } from '@/lib/recentRooms';
 import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 
 /** Front door of the app: presentation plus the ways back into a room. */
 export const LandingRoute = () => {
+  useDocumentMeta({
+    title: 'EduParty — Free Party Games for Online English Classes',
+    description:
+      'EduParty is a free, no-signup game portal built to support online English classes. Host a room, share a 4-letter PIN, and play together — everyone is welcome.',
+  });
   const service = useMemo(() => createSupabaseRoomService(), []);
   const [resumableRoom, setResumableRoom] = useState<{ pin: string } | null>(null);
   const [livePins, setLivePins] = useState<readonly string[] | null>(null);

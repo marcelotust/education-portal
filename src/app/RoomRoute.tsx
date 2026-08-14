@@ -8,6 +8,7 @@ import { RoomPresenceBridge } from '@/features/room/RoomPresenceBridge';
 import { RoomStateBridge } from '@/features/room/RoomStateBridge';
 import { RoomStage } from '@/features/room/RoomStage';
 import { RoomProvider } from '@/hooks/RoomProvider';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 import type { PlayerRole } from '@/types';
 import type { RoomSession } from '@/types/roomService';
@@ -16,11 +17,23 @@ interface RoomRouteProps {
   role: PlayerRole;
 }
 
+const ROOM_ROUTE_META: Record<PlayerRole, { title: string; description: string }> = {
+  HOST: {
+    title: 'EduParty — Host a Room',
+    description: 'Open a free game room for your online English class and share the 4-letter PIN.',
+  },
+  PLAYER: {
+    title: 'EduParty — Join a Room',
+    description: 'Enter the 4-letter PIN your Host shared to join the game.',
+  },
+};
+
 /**
  * Entry point of a room: shows the create/join screen until there is a
  * session, then mounts the FSM for the resulting role.
  */
 export const RoomRoute = ({ role }: RoomRouteProps) => {
+  useDocumentMeta(ROOM_ROUTE_META[role]);
   const service = useMemo(() => createSupabaseRoomService(), []);
   const [session, setSession] = useState<RoomSession | null>(null);
   const [resumableRoom, setResumableRoom] = useState<RoomSession | null>(null);

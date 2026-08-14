@@ -28,12 +28,17 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
     <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-3 text-center">
         <h1 className="font-arcade text-lg text-rose-500">EDUPARTY</h1>
+        <p className="font-arcade text-[10px] uppercase tracking-widest text-green-600">
+          100% Free
+        </p>
         <p className="font-terminal text-xl text-gray-700">
-          Turn your class into an arcade. The Host opens a room, everyone joins with a 4-letter PIN,
-          and you play together — no accounts, no downloads.
+          Built to support online English classes — the Host opens a room, everyone joins with a
+          4-letter PIN, and you play together as a warm-up, wrap-up, or reward. No accounts, no
+          downloads.
         </p>
         <p className="font-terminal text-lg text-gray-500">
-          Up to 6 players per room. First cartridge: STOP.
+          Not in an English class? Everyone&apos;s invited — grab a PIN and play. Up to 6 players
+          per room.
         </p>
       </header>
 
