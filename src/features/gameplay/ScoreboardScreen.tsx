@@ -1,3 +1,4 @@
+import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
@@ -44,6 +45,8 @@ export const ScoreboardScreen = () => {
           </li>
         ))}
       </ol>
+
+      <InlineAdSlot label="AD SPACE" />
 
       {isHost && (
         <RetroButton tone="cyan" onClick={() => dispatch({ type: 'RETURN_TO_LOBBY' })}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
@@ -7,7 +8,9 @@ import { createQuizRound } from './quiz/quizRound';
 import { createStopRound } from './stopRound';
 import { createTabooRound } from './taboo/tabooRound';
 
-const BREAK_SECONDS = 5;
+// Nobody is playing yet, so this is the one screen an ad costs nothing (#18).
+// Long enough for a slot to render before GO! — 5s wasn't.
+const BREAK_SECONDS = 8;
 
 /** The ad interstitial between the lobby and the round. */
 export const AdBreakScreen = () => {
@@ -69,6 +72,8 @@ export const AdBreakScreen = () => {
       <p className="font-terminal text-lg text-gray-600">
         Loading cartridge {state.selectedGameId ?? ''}...
       </p>
+
+      <InlineAdSlot label="AD SPACE" />
     </RetroContainer>
   );
 };
