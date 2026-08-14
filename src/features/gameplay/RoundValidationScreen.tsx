@@ -1,4 +1,5 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { CategoryValidationBlock } from './components/CategoryValidationBlock';
@@ -29,14 +30,14 @@ export const RoundValidationScreen = () => {
     );
 
   return (
-    <section className="flex flex-col gap-5">
+    <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-2">
-        <h1 className="text-neon font-arcade text-sm text-arcade-yellow">VALIDATION</h1>
-        <p className="font-terminal text-lg text-slate-400">
+        <h1 className="font-arcade text-sm text-yellow-500">VALIDATION</h1>
+        <p className="font-terminal text-lg text-gray-600">
           {isHost ? 'Approve or reject every answer.' : 'The Host is checking the answers...'}
         </p>
-        <p className="font-arcade text-2xl text-arcade-green">{round.letter}</p>
-        <p data-testid="judged-progress" className="font-arcade text-[10px] text-slate-500">
+        <p className="font-arcade text-2xl text-green-600">{round.letter}</p>
+        <p data-testid="judged-progress" className="font-arcade text-[10px] text-gray-500">
           {judged.length}/{judgeable.length} judged
         </p>
       </header>
@@ -59,23 +60,23 @@ export const RoundValidationScreen = () => {
       {isHost && (
         <div className="flex flex-col gap-2">
           {!isComplete && !isScored && (
-            <ArcadeButton
+            <RetroButton
               tone="cyan"
               onClick={() => dispatch({ type: 'REMAINING_ANSWERS_APPROVED' })}
             >
               APPROVE ALL REMAINING
-            </ArcadeButton>
+            </RetroButton>
           )}
 
-          <ArcadeButton
+          <RetroButton
             tone="green"
             disabled={isScored || !isComplete}
             onClick={() => dispatch({ type: 'ROUND_SCORED' })}
           >
             {isScored ? 'SCORES CONFIRMED' : 'CONFIRM SCORES'}
-          </ArcadeButton>
+          </RetroButton>
         </div>
       )}
-    </section>
+    </RetroContainer>
   );
 };

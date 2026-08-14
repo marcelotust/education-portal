@@ -25,9 +25,9 @@ export const QuizSetupPanel = ({
   const isReadOnly = onSelectDuration === undefined;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border-2 border-slate-800 p-3">
+    <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
       <div className="flex flex-col gap-2">
-        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
           Time to answer
         </p>
         <div className="grid grid-cols-4 gap-2">
@@ -40,11 +40,13 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 rounded border-2 py-2 font-arcade text-[10px] transition-colors',
+                'min-h-11 border-4 border-black py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.roundDurationSeconds === seconds
-                  ? 'border-arcade-cyan text-arcade-cyan disabled:border-arcade-cyan disabled:text-arcade-cyan'
-                  : 'border-slate-700 text-slate-500',
-                'disabled:cursor-not-allowed',
+                  ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
+                  : cn(
+                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                    ),
               )}
             >
               {seconds}s
@@ -54,7 +56,7 @@ export const QuizSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">Questions</p>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Questions</p>
         <div className="grid grid-cols-3 gap-2">
           {QUIZ_QUESTION_COUNTS.map((count) => (
             <button
@@ -65,11 +67,13 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectQuestionCount?.(count)}
               className={cn(
-                'min-h-11 rounded border-2 py-2 font-arcade text-[10px] transition-colors',
+                'min-h-11 border-4 border-black py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.questionCount === count
-                  ? 'border-arcade-pink text-arcade-pink disabled:border-arcade-pink disabled:text-arcade-pink'
-                  : 'border-slate-700 text-slate-500',
-                'disabled:cursor-not-allowed',
+                  ? 'translate-x-[2px] translate-y-[2px] bg-rose-500 text-white shadow-none'
+                  : cn(
+                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                    ),
               )}
             >
               {count}
@@ -79,7 +83,7 @@ export const QuizSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">Topic</p>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Topic</p>
         <div className="flex flex-wrap gap-2">
           {QUIZ_TOPICS.map((topic) => (
             <button
@@ -90,11 +94,13 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectTopic?.(topic)}
               className={cn(
-                'min-h-11 rounded border-2 px-3 py-2 font-arcade text-[9px] transition-colors',
+                'min-h-11 border-4 border-black px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
                 setup.topic === topic
-                  ? 'border-arcade-green text-arcade-green disabled:border-arcade-green disabled:text-arcade-green'
-                  : 'border-slate-800 text-slate-600',
-                'disabled:cursor-not-allowed',
+                  ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
+                  : cn(
+                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                    ),
               )}
             >
               {topic}

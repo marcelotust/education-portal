@@ -10,14 +10,14 @@ interface RoomPinBannerProps {
 /** Header of the lobby: the PIN Players type plus the seat counter. */
 export const RoomPinBanner = ({ pin, playerCount, maxPlayers, isHost }: RoomPinBannerProps) => (
   <header className="mb-5 flex flex-col items-center gap-2">
-    <h1 className="text-neon font-arcade text-sm text-arcade-pink">LOBBY</h1>
+    <h1 className="font-arcade text-xs text-rose-500">LOBBY</h1>
 
-    <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">Room PIN</p>
-    <p className="text-neon font-arcade text-3xl tracking-[0.4em] text-arcade-green">{pin}</p>
+    <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Room PIN</p>
+    <p className="text-solid-shadow font-arcade text-3xl tracking-[0.3em] text-yellow-400">{pin}</p>
 
     {isHost && <InviteLinkButton pin={pin} />}
 
-    <p className="font-arcade text-[10px] text-arcade-cyan">
+    <p className="border-4 border-black bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
       {playerCount}/{maxPlayers} PLAYERS
     </p>
   </header>

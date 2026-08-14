@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useQuizAnswerBroadcast } from '@/hooks/useQuizAnswerBroadcast';
 import { useRoom } from '@/hooks/useRoom';
@@ -20,9 +21,9 @@ const urgencyFor = (secondsLeft: number): 'calm' | 'warning' | 'critical' => {
 };
 
 const URGENCY_STYLES = {
-  calm: 'text-arcade-cyan',
-  warning: 'text-arcade-yellow scale-110',
-  critical: 'animate-blink text-arcade-pink scale-125',
+  calm: 'text-sky-600',
+  warning: 'text-yellow-500 scale-110',
+  critical: 'animate-blink text-rose-500 scale-125',
 } as const;
 
 interface QuizRoundScreenProps {
@@ -90,19 +91,19 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
   const everyoneAnswered = hasEveryoneAnswered(round, countPlayers(state));
 
   return (
-    <section className="flex flex-col gap-5">
-      <header className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-slate-900/95 px-1 py-2 backdrop-blur">
+    <RetroContainer className="flex flex-col gap-5 p-6">
+      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Question
           </span>
-          <span data-testid="question-progress" className="font-arcade text-sm text-arcade-green">
+          <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
             {questionIndex + 1}/{round.questions.length}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Time
           </span>
           <span
@@ -118,12 +119,12 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
         </div>
       </header>
 
-      <h1 className="text-center font-terminal text-2xl text-slate-100">{question.prompt}</h1>
+      <h1 className="text-center font-terminal text-2xl text-black">{question.prompt}</h1>
 
       {everyoneAnswered && (
         <p
           role="alert"
-          className="animate-blink rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           EVERYONE HAS ANSWERED! ENDING ROUND
         </p>
@@ -138,14 +139,24 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               aria-pressed={picked === index}
               onClick={() => answer(index)}
               className={cn(
-                'flex w-full items-center gap-3 rounded border-2 px-3 py-3 text-left font-terminal text-xl transition-colors',
+                'flex w-full items-center gap-3 border-4 border-black px-3 py-3 text-left font-terminal text-xl transition-transform',
                 picked === index
-                  ? 'border-arcade-cyan bg-arcade-cyan/15 text-arcade-cyan disabled:border-arcade-cyan disabled:text-arcade-cyan'
-                  : 'border-slate-700 text-slate-200',
-                'disabled:cursor-not-allowed disabled:opacity-60',
+                  ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
+                  : cn(
+                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'disabled:opacity-60',
+                    ),
+                'disabled:cursor-not-allowed',
               )}
             >
-              <span className="font-arcade text-[10px] text-slate-500">{LETTERS[index]}</span>
+              <span
+                className={cn(
+                  'font-arcade text-[10px]',
+                  picked === index ? 'text-white/70' : 'text-gray-500',
+                )}
+              >
+                {LETTERS[index]}
+              </span>
               {option}
             </button>
           </li>
@@ -153,13 +164,10 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
       </ul>
 
       {picked !== null && (
-        <p
-          role="status"
-          className="animate-blink text-center font-terminal text-lg text-arcade-green"
-        >
+        <p role="status" className="animate-blink text-center font-terminal text-lg text-green-600">
           Answer locked. Waiting for the others...
         </p>
       )}
-    </section>
+    </RetroContainer>
   );
 };

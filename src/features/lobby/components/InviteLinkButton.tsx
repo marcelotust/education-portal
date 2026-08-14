@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
 
 interface InviteLinkButtonProps {
   pin: string;
@@ -37,8 +37,8 @@ export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   };
 
   return (
-    <ArcadeButton tone="pink" onClick={() => void handleClick()}>
+    <RetroButton tone="pink" onClick={() => void handleClick()}>
       {copied ? 'COPIED!' : 'INVITE'}
-    </ArcadeButton>
+    </RetroButton>
   );
 };

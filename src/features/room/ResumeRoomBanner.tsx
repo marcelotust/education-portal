@@ -1,4 +1,5 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import type { RoomSession } from '@/types/roomService';
 import { countPlayers } from '@/utils/room';
 
@@ -12,19 +13,19 @@ interface ResumeRoomBannerProps {
  * lives in the database, so the Host can simply walk back in.
  */
 export const ResumeRoomBanner = ({ session, onResume }: ResumeRoomBannerProps) => (
-  <div className="flex flex-col gap-3 rounded-lg border-2 border-arcade-yellow/60 bg-slate-900/60 p-4 text-center">
-    <p className="font-terminal text-lg text-slate-300">You still have a room open</p>
+  <RetroContainer className="flex flex-col gap-3 bg-orange-50 p-4 text-center">
+    <p className="font-terminal text-lg text-gray-700">You still have a room open</p>
 
-    <p className="text-neon font-arcade text-2xl tracking-[0.4em] text-arcade-yellow">
+    <p className="text-solid-shadow font-arcade text-2xl tracking-[0.3em] text-yellow-400">
       {session.room.pin}
     </p>
 
-    <p className="font-terminal text-sm text-slate-500">
+    <p className="font-terminal text-sm text-gray-500">
       {countPlayers(session.room)} player(s) were seated
     </p>
 
-    <ArcadeButton tone="yellow" onClick={() => onResume(session)}>
+    <RetroButton tone="yellow" onClick={() => onResume(session)}>
       RESUME ROOM
-    </ArcadeButton>
-  </div>
+    </RetroButton>
+  </RetroContainer>
 );

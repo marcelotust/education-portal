@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
-import { ArcadeInput } from '@/components/ui/ArcadeInput';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
+import { RetroInput } from '@/components/ui/RetroInput';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useRoom } from '@/hooks/useRoom';
 import { useTabooGuessBroadcast } from '@/hooks/useTabooGuessBroadcast';
@@ -20,9 +21,9 @@ const urgencyFor = (secondsLeft: number): 'calm' | 'warning' | 'critical' => {
 };
 
 const URGENCY_STYLES = {
-  calm: 'text-arcade-cyan',
-  warning: 'text-arcade-yellow scale-110',
-  critical: 'animate-blink text-arcade-pink scale-125',
+  calm: 'text-sky-600',
+  warning: 'text-yellow-500 scale-110',
+  critical: 'animate-blink text-rose-500 scale-125',
 } as const;
 
 interface TabooRoundScreenProps {
@@ -90,19 +91,19 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
     state.slots.find((slot) => slot?.id === turn.clueGiverId)?.nickname ?? 'SOMEBODY';
 
   return (
-    <section className="flex flex-col gap-5">
-      <header className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-slate-900/95 px-1 py-2 backdrop-blur">
+    <RetroContainer className="flex flex-col gap-5 p-6">
+      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Turn
           </span>
-          <span data-testid="turn-progress" className="font-arcade text-sm text-arcade-green">
+          <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">
             {turnIndex + 1}/{round.turns.length}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Time
           </span>
           <span
@@ -121,7 +122,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
       {everyoneGuessed && (
         <p
           role="alert"
-          className="animate-blink rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           EVERYONE HAS GUESSED! ENDING ROUND
         </p>
@@ -129,19 +130,19 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
 
       {isClueGiver ? (
         <div className="flex flex-col items-center gap-4">
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Make them say
           </p>
-          <p className="text-neon font-arcade text-2xl text-arcade-green">{turn.card.word}</p>
+          <p className="text-solid-shadow font-arcade text-2xl text-green-600">{turn.card.word}</p>
 
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Without saying
           </p>
           <ul className="flex flex-col gap-2">
             {turn.card.forbidden.map((word) => (
               <li
                 key={word}
-                className="rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+                className="border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
               >
                 {word}
               </li>
@@ -150,11 +151,11 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <h1 className="text-center font-terminal text-2xl text-slate-100">
+          <h1 className="text-center font-terminal text-2xl text-black">
             {clueGiverNickname} is explaining a word
           </h1>
 
-          <ArcadeInput
+          <RetroInput
             label="Your guess"
             value={guessValue}
             disabled={hasSubmitted}
@@ -163,24 +164,24 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
             onChange={(event) => setDraft({ turnIndex, value: event.target.value })}
           />
 
-          <ArcadeButton
+          <RetroButton
             tone="green"
             disabled={hasSubmitted || guessValue.trim() === ''}
             onClick={submitGuess}
           >
             {hasSubmitted ? 'GUESS SENT' : 'CONFIRM'}
-          </ArcadeButton>
+          </RetroButton>
 
           {hasSubmitted && (
             <p
               role="status"
-              className="animate-blink text-center font-terminal text-lg text-arcade-green"
+              className="animate-blink text-center font-terminal text-lg text-green-600"
             >
               Answer locked. Waiting for the others...
             </p>
           )}
         </div>
       )}
-    </section>
+    </RetroContainer>
   );
 };

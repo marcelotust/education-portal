@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
-import { ArcadeInput } from '@/components/ui/ArcadeInput';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
+import { RetroInput } from '@/components/ui/RetroInput';
 import { rememberRoom } from '@/lib/recentRooms';
 import { RoomJoinError, type JoinRoom, type RoomSession } from '@/types/roomService';
 import { MAX_NICKNAME_LENGTH, PIN_LENGTH, isValidPin } from '@/utils/room';
@@ -70,40 +71,42 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
 
   return (
     <form className="flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>
-      <header className="flex flex-col items-center gap-2">
-        <h1 className="text-neon font-arcade text-sm text-arcade-cyan">INSERT PIN</h1>
-        <p className="text-center font-terminal text-lg text-slate-400">
-          Ask the Host for the 4-letter PIN.
-        </p>
-      </header>
+      <RetroContainer className="flex flex-col gap-5 p-6">
+        <header className="flex flex-col items-center gap-2">
+          <h1 className="font-arcade text-sm text-sky-500">INSERT PIN</h1>
+          <p className="text-center font-terminal text-lg text-gray-600">
+            Ask the Host for the 4-letter PIN.
+          </p>
+        </header>
 
-      <ArcadeInput
-        label="Room PIN"
-        value={pin}
-        maxLength={PIN_LENGTH}
-        autoComplete="off"
-        autoCapitalize="characters"
-        className="text-center uppercase tracking-[0.5em]"
-        onChange={(event) => setPin(event.target.value)}
-      />
+        <RetroInput
+          label="Room PIN"
+          value={pin}
+          maxLength={PIN_LENGTH}
+          autoComplete="off"
+          autoCapitalize="characters"
+          className="text-center uppercase tracking-[0.5em]"
+          onChange={(event) => setPin(event.target.value)}
+        />
 
-      <ArcadeInput
-        label="Nickname"
-        value={nickname}
-        maxLength={MAX_NICKNAME_LENGTH}
-        autoComplete="off"
-        onChange={(event) => setNickname(event.target.value)}
-      />
+        <RetroInput
+          label="Nickname"
+          value={nickname}
+          maxLength={MAX_NICKNAME_LENGTH}
+          autoComplete="off"
+          onChange={(event) => setNickname(event.target.value)}
+        />
 
-      {error !== null && (
-        <p role="alert" className="font-terminal text-lg text-arcade-pink">
-          {error}
-        </p>
-      )}
+        {error !== null && (
+          <p role="alert" className="font-terminal text-lg text-rose-500">
+            {error}
+          </p>
+        )}
 
-      <ArcadeButton type="submit" tone="cyan" disabled={isJoining}>
-        {isJoining ? 'JOINING...' : 'JOIN'}
-      </ArcadeButton>
+        <RetroButton type="submit" tone="cyan" disabled={isJoining}>
+          {isJoining ? 'JOINING...' : 'JOIN'}
+        </RetroButton>
+      </RetroContainer>
     </form>
   );
 };

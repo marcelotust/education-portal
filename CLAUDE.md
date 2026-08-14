@@ -86,4 +86,4 @@ Directory layout: `src/app` (routing/composition), `src/components` (layout + sh
 
 ## Styling
 
-Tailwind with an arcade theme (`tailwind.config.js`): fonts `font-arcade` (Press Start 2P, for headings/buttons) and `font-terminal` (VT323, for inputs/text); `arcade.{black,green,pink,cyan,yellow}` colors; `shadow-neon` and `animate-blink`. Deployed on Vercel (`vercel.json` rewrites all routes to `index.html` for the SPA).
+Tailwind with a Retro Platformer 16-bit theme (`tailwind.config.js`): fonts `font-arcade` (Press Start 2P, for headings/buttons, kept small — pixel fonts run wide) and `font-terminal` (VT323, for inputs/long-form text). Light backgrounds (`bg-sky-400` page, white/`orange-50` panels), thick black borders (`border-4 border-black`), solid offset shadows (`shadow-retro`, no blur/glow) and `.text-solid-shadow` for large display text, plus `animate-blink`. Shared primitives live in `src/components/ui/`: `RetroContainer` (bordered panel), `RetroButton` (tone + `pressed` for persistent selection), `RetroInput`. Deployed on Vercel (`vercel.json` rewrites all routes to `index.html` for the SPA).

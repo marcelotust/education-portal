@@ -18,9 +18,9 @@ export const TabooSetupPanel = ({
   const chosen = setup.categories.length;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border-2 border-slate-800 p-3">
+    <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
       <div className="flex flex-col gap-2">
-        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
           Turn length
         </p>
         <div className="grid grid-cols-3 gap-2">
@@ -33,11 +33,13 @@ export const TabooSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 rounded border-2 py-2 font-arcade text-[10px] transition-colors',
+                'min-h-11 border-4 border-black py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.roundDurationSeconds === seconds
-                  ? 'border-arcade-cyan text-arcade-cyan disabled:border-arcade-cyan disabled:text-arcade-cyan'
-                  : 'border-slate-700 text-slate-500',
-                'disabled:cursor-not-allowed',
+                  ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
+                  : cn(
+                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                    ),
               )}
             >
               {seconds}s
@@ -47,7 +49,7 @@ export const TabooSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
           Categories ({chosen})
         </p>
 
@@ -64,11 +66,13 @@ export const TabooSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 rounded border-2 px-3 py-2 font-arcade text-[9px] transition-colors',
+                  'min-h-11 border-4 border-black px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
                   isChosen
-                    ? 'border-arcade-green text-arcade-green disabled:border-arcade-green disabled:text-arcade-green'
-                    : 'border-slate-800 text-slate-600',
-                  'disabled:cursor-not-allowed',
+                    ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
+                    : cn(
+                        'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                        'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                      ),
                 )}
               >
                 {category}
@@ -78,7 +82,7 @@ export const TabooSetupPanel = ({
         </div>
 
         {chosen === 0 && (
-          <p role="status" className="font-terminal text-sm text-arcade-pink">
+          <p role="status" className="font-terminal text-sm text-rose-500">
             Pick at least 1 to start.
           </p>
         )}

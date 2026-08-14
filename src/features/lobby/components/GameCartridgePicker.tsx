@@ -1,6 +1,5 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
 import type { GameId } from '@/types';
-import { cn } from '@/utils/cn';
 import { GAME_CARTRIDGES } from '../cartridges';
 
 interface GameCartridgePickerProps {
@@ -14,7 +13,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+      <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
         {isReadOnly ? 'Cartridge shelf' : 'Choose a cartridge'}
       </p>
 
@@ -22,25 +21,21 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
         const isSelected = selectedGameId === cartridge.id;
 
         return (
-          <ArcadeButton
+          <RetroButton
             key={cartridge.id}
             tone="yellow"
+            pressed={isSelected}
             aria-label={cartridge.title}
             aria-pressed={isSelected}
             disabled={isReadOnly}
             onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
-            className={cn(
-              'flex flex-col items-start gap-1 text-left',
-              isSelected && 'bg-arcade-yellow/20',
-              // The Host's pick must stay legible on the Player's disabled shelf.
-              isSelected && 'disabled:border-arcade-yellow disabled:text-arcade-yellow',
-            )}
+            className="flex flex-col items-start gap-1 text-left"
           >
             <span>{cartridge.title}</span>
             <span className="font-terminal text-sm normal-case opacity-80">
               {cartridge.tagline}
             </span>
-          </ArcadeButton>
+          </RetroButton>
         );
       })}
     </div>
