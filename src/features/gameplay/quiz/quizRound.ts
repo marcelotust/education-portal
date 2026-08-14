@@ -17,7 +17,13 @@ export const DEFAULT_QUIZ_SETUP: QuizSetup = {
  * in code so the setup panel never waits on a fetch (#34). Adding a topic to
  * `quiz_questions` also means adding its name here.
  */
-export const QUIZ_TOPICS: readonly string[] = ['GENERAL', 'SCIENCE'];
+export const QUIZ_TOPICS: readonly string[] = [
+  'GENERAL',
+  'SCIENCE',
+  'HISTORY',
+  'GEOGRAPHY',
+  'MATH',
+];
 
 const shuffled = <T>(items: readonly T[]): T[] => {
   const copy = [...items];
