@@ -26,7 +26,7 @@ export const LastRoundStandings = ({
 
   return (
     <div className="flex flex-col gap-2" data-testid="last-round-standings">
-      <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+      <p className="font-terminal text-sm uppercase tracking-[0.3em] text-gray-500">
         Standings · last round
       </p>
 
