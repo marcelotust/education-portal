@@ -1,5 +1,6 @@
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
@@ -40,7 +41,7 @@ export const TabooRevealScreen = () => {
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-1">
-        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Turn</span>
+        <SectionLabel>Turn</SectionLabel>
         <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">
           {round.currentIndex + 1}/{round.turns.length}
         </span>

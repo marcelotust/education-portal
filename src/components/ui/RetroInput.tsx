@@ -18,7 +18,7 @@ export const RetroInput = ({ label, className, ...inputProps }: RetroInputProps)
     <div className="flex flex-col gap-1">
       <label
         htmlFor={id}
-        className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-600"
+        className="font-terminal text-sm uppercase tracking-[0.3em] text-gray-500"
       >
         {label}
       </label>
