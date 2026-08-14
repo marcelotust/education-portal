@@ -14,7 +14,5 @@ export const PlayerLobbyStatus = ({ status }: PlayerLobbyStatusProps) => {
   const message = MESSAGES[status];
   if (message === undefined) return null;
 
-  return (
-    <p className="animate-blink text-center font-terminal text-xl text-arcade-cyan">{message}</p>
-  );
+  return <p className="animate-blink text-center font-terminal text-xl text-black">{message}</p>;
 };

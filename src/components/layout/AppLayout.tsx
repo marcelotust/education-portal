@@ -7,16 +7,15 @@ interface AppLayoutProps {
 }
 
 /**
- * Arcade cabinet frame: a centered mobile-first column with lateral ad spaces
- * that only appear once there is desktop room for them.
+ * Retro Platformer cabinet frame: a centered mobile-first column with lateral
+ * ad spaces that only appear once there is desktop room for them. Each screen
+ * supplies its own bordered panel (see RetroContainer), so this stays plain.
  */
 export const AppLayout = ({ children }: AppLayoutProps) => (
-  <div className="flex min-h-full w-full justify-center gap-6 bg-arcade-black p-4 lg:p-8">
+  <div className="flex min-h-full w-full justify-center gap-6 bg-sky-400 p-4 lg:p-8">
     <AdSlot label="AD SPACE" />
 
-    <main className="flex w-full max-w-md flex-col rounded-xl border-2 border-arcade-cyan/40 bg-slate-900/80 p-5 shadow-[0_0_30px_rgba(0,255,255,0.15)]">
-      {children}
-    </main>
+    <main className="flex w-full max-w-md flex-col">{children}</main>
 
     <AdSlot label="AD SPACE" />
   </div>

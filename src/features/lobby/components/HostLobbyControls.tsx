@@ -1,4 +1,4 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
 import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
@@ -18,9 +18,9 @@ export const HostLobbyControls = () => {
 
     return (
       <div className="flex flex-col gap-6">
-        <ArcadeButton tone="pink" onClick={() => dispatch({ type: 'OPEN_GAME_CONFIG' })}>
+        <RetroButton tone="yellow" onClick={() => dispatch({ type: 'OPEN_GAME_CONFIG' })}>
           SELECT GAME
-        </ArcadeButton>
+        </RetroButton>
 
         {/* Kept well away from START GAME: a mis-tap here wipes the session. */}
         {hasPlayed && <NewMatchControl onConfirm={() => dispatch({ type: 'MATCH_RESET' })} />}
@@ -64,7 +64,7 @@ export const HostLobbyControls = () => {
         />
       )}
 
-      <ArcadeButton
+      <RetroButton
         tone="green"
         disabled={
           state.selectedGameId === null ||
@@ -74,11 +74,11 @@ export const HostLobbyControls = () => {
         onClick={() => dispatch({ type: 'START_GAME' })}
       >
         START GAME
-      </ArcadeButton>
+      </RetroButton>
 
-      <ArcadeButton tone="cyan" onClick={() => dispatch({ type: 'CANCEL_GAME_CONFIG' })}>
+      <RetroButton tone="cyan" onClick={() => dispatch({ type: 'CANCEL_GAME_CONFIG' })}>
         BACK
-      </ArcadeButton>
+      </RetroButton>
     </div>
   );
 };

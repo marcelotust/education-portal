@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { listRecentRooms } from '@/lib/recentRooms';
 
 interface LandingScreenProps {
@@ -23,30 +24,30 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
     livePins == null ? remembered : remembered.filter((room) => livePins.includes(room.pin));
 
   return (
-    <section className="flex flex-col gap-6">
+    <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-neon font-arcade text-lg text-arcade-pink">EDUPARTY</h1>
-        <p className="font-terminal text-xl text-slate-300">
+        <h1 className="font-arcade text-lg text-rose-500">EDUPARTY</h1>
+        <p className="font-terminal text-xl text-gray-700">
           Turn your class into an arcade. The Host opens a room, everyone joins with a 4-letter PIN,
           and you play together — no accounts, no downloads.
         </p>
-        <p className="font-terminal text-lg text-slate-500">
+        <p className="font-terminal text-lg text-gray-500">
           Up to 6 players per room. First cartridge: STOP.
         </p>
       </header>
 
       <div className="flex flex-col gap-3">
-        <ArcadeButton tone="green" onClick={() => void navigate('/host')}>
+        <RetroButton tone="green" onClick={() => void navigate('/host')}>
           CREATE A ROOM
-        </ArcadeButton>
-        <ArcadeButton tone="cyan" onClick={() => void navigate('/play')}>
+        </RetroButton>
+        <RetroButton tone="cyan" onClick={() => void navigate('/play')}>
           JOIN A ROOM
-        </ArcadeButton>
+        </RetroButton>
       </div>
 
       {recentRooms.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Rooms you joined
           </p>
 
@@ -56,14 +57,14 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
               type="button"
               aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
               onClick={() => void navigate(`/play?pin=${room.pin}`)}
-              className="flex min-h-11 items-center justify-between gap-3 rounded border-2 border-slate-800 px-3 py-3 font-arcade text-[10px] text-slate-300 transition-colors hover:border-arcade-cyan"
+              className="flex min-h-11 items-center justify-between gap-3 border-4 border-black bg-white px-3 py-3 font-arcade text-[10px] text-black transition-colors hover:bg-gray-50"
             >
-              <span className="tracking-[0.3em] text-arcade-cyan">{room.pin}</span>
-              <span className="text-slate-500">{room.nickname}</span>
+              <span className="tracking-[0.3em] text-sky-500">{room.pin}</span>
+              <span className="text-gray-500">{room.nickname}</span>
             </button>
           ))}
 
-          <p className="font-terminal text-sm text-slate-600">
+          <p className="font-terminal text-sm text-gray-500">
             Saved on this device only — the room itself may already be over.
           </p>
         </div>
@@ -71,15 +72,15 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
 
       {resumableRoom !== null && (
         <div className="flex flex-col gap-2">
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Load your last room
           </p>
 
-          <ArcadeButton tone="yellow" onClick={() => void navigate('/host')}>
+          <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
             RESUME {resumableRoom.pin}
-          </ArcadeButton>
+          </RetroButton>
         </div>
       )}
-    </section>
+    </RetroContainer>
   );
 };

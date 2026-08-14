@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { createQuizRound } from './quiz/quizRound';
@@ -42,16 +43,19 @@ export const AdBreakScreen = () => {
   }, [isHost, secondsLeft, state.gameSetup, state.slots, dispatch]);
 
   return (
-    <section className="flex flex-col items-center gap-6 py-10 text-center">
-      <h1 className="text-neon font-arcade text-sm text-arcade-pink">GET READY</h1>
+    <RetroContainer className="flex flex-col items-center gap-6 p-6 py-10 text-center">
+      <h1 className="font-arcade text-sm text-rose-500">GET READY</h1>
 
-      <p className="font-arcade text-6xl text-arcade-yellow" data-testid="ad-countdown">
+      <p
+        className="text-solid-shadow font-arcade text-6xl text-yellow-400"
+        data-testid="ad-countdown"
+      >
         {secondsLeft > 0 ? secondsLeft : 'GO!'}
       </p>
 
-      <p className="font-terminal text-lg text-slate-400">
+      <p className="font-terminal text-lg text-gray-600">
         Loading cartridge {state.selectedGameId ?? ''}...
       </p>
-    </section>
+    </RetroContainer>
   );
 };

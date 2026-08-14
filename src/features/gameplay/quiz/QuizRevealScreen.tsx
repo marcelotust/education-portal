@@ -1,4 +1,5 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
@@ -36,17 +37,17 @@ export const QuizRevealScreen = () => {
     });
 
   return (
-    <section className="flex flex-col gap-5">
+    <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-1">
-        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
           Question
         </span>
-        <span data-testid="question-progress" className="font-arcade text-sm text-arcade-green">
+        <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
           {round.currentIndex + 1}/{round.questions.length}
         </span>
       </header>
 
-      <h1 className="text-center font-terminal text-2xl text-slate-100">{question.prompt}</h1>
+      <h1 className="text-center font-terminal text-2xl text-black">{question.prompt}</h1>
 
       <ul className="flex flex-col gap-2">
         {question.options.map((option, index) => {
@@ -56,13 +57,13 @@ export const QuizRevealScreen = () => {
               <div
                 {...(isCorrect ? { 'data-testid': 'correct-option' } : {})}
                 className={cn(
-                  'flex items-center gap-3 rounded border-2 px-3 py-3 font-terminal text-xl',
+                  'flex items-center gap-3 border-4 px-3 py-3 font-terminal text-xl',
                   isCorrect
-                    ? 'border-arcade-green bg-arcade-green/15 text-arcade-green'
-                    : 'border-slate-800 text-slate-500',
+                    ? 'border-black bg-green-100 text-green-700'
+                    : 'border-black bg-white text-gray-500',
                 )}
               >
-                <span className="font-arcade text-[10px] text-slate-500">{LETTERS[index]}</span>
+                <span className="font-arcade text-[10px] text-gray-500">{LETTERS[index]}</span>
                 {option}
                 {isCorrect && <span className="ml-auto font-arcade text-[9px]">CORRECT</span>}
               </div>
@@ -77,15 +78,15 @@ export const QuizRevealScreen = () => {
             key={player.id}
             data-testid={`reveal-row-${player.id}`}
             className={cn(
-              'flex items-center gap-2 rounded border px-2 py-1',
-              gained > 0 ? 'border-arcade-green/60' : 'border-slate-800',
+              'flex items-center gap-2 border-2 border-black px-2 py-1',
+              gained > 0 ? 'bg-green-100' : 'bg-white',
             )}
           >
-            <span className="flex-1 font-arcade text-[9px] text-slate-200">{player.nickname}</span>
-            <span className="font-arcade text-[9px] text-arcade-cyan">
+            <span className="flex-1 font-arcade text-[9px] text-black">{player.nickname}</span>
+            <span className="font-arcade text-[9px] text-sky-600">
               {gained > 0 ? `+${gained}` : '—'}
             </span>
-            <span className="w-8 shrink-0 text-right font-arcade text-[10px] text-arcade-green">
+            <span className="w-8 shrink-0 text-right font-arcade text-[10px] text-green-600">
               {total}
             </span>
           </li>
@@ -93,14 +94,14 @@ export const QuizRevealScreen = () => {
       </ol>
 
       {isHost ? (
-        <ArcadeButton tone={isLast ? 'yellow' : 'green'} onClick={advance}>
+        <RetroButton tone={isLast ? 'yellow' : 'green'} onClick={advance}>
           {isLast ? 'SEE THE SCOREBOARD' : 'NEXT QUESTION'}
-        </ArcadeButton>
+        </RetroButton>
       ) : (
-        <p role="status" className="text-center font-terminal text-lg text-slate-400">
+        <p role="status" className="text-center font-terminal text-lg text-gray-600">
           Waiting for the Host to move on...
         </p>
       )}
-    </section>
+    </RetroContainer>
   );
 };

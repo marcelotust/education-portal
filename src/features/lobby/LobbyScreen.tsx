@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import { MAX_PLAYERS, type Player } from '@/types';
 import { countPlayers } from '@/utils/room';
@@ -37,7 +38,7 @@ export const LobbyScreen = () => {
   const controls = isHost ? <HostLobbyControls /> : <PlayerLobbyControls />;
 
   return (
-    <section className="flex flex-col gap-5">
+    <RetroContainer className="flex flex-col gap-5 p-6">
       <RoomPinBanner
         pin={state.pin}
         playerCount={countPlayers(state)}
@@ -57,9 +58,9 @@ export const LobbyScreen = () => {
         </>
       )}
 
-      <ArcadeButton tone="cyan" onClick={() => void navigate('/')}>
+      <RetroButton tone="cyan" onClick={() => void navigate('/')}>
         BACK TO START
-      </ArcadeButton>
-    </section>
+      </RetroButton>
+    </RetroContainer>
   );
 };

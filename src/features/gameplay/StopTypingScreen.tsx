@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
-import { ArcadeInput } from '@/components/ui/ArcadeInput';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
+import { RetroInput } from '@/components/ui/RetroInput';
 import type { StopRound } from '@/types';
 import { cn } from '@/utils/cn';
 
@@ -19,9 +20,9 @@ const urgencyFor = (secondsLeft: number): 'calm' | 'warning' | 'critical' => {
 };
 
 const URGENCY_STYLES = {
-  calm: 'text-arcade-cyan',
-  warning: 'text-arcade-yellow scale-110',
-  critical: 'animate-blink text-arcade-pink scale-125',
+  calm: 'text-sky-600',
+  warning: 'text-yellow-500 scale-110',
+  critical: 'animate-blink text-rose-500 scale-125',
 } as const;
 
 interface StopTypingScreenProps {
@@ -69,24 +70,24 @@ export const StopTypingScreen = ({
   ).length;
 
   return (
-    <section className="flex flex-col gap-4">
+    <RetroContainer className="flex flex-col gap-4 p-6">
       {/* Sticky: with eight categories the fields scroll, and losing sight of
           the clock in a timed game is losing the game. */}
-      <header className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-slate-900/95 px-1 py-2 backdrop-blur">
+      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Letter
           </span>
           <span
             data-testid="round-letter"
-            className="text-neon font-arcade text-4xl text-arcade-yellow"
+            className="text-solid-shadow font-arcade text-4xl text-yellow-400"
           >
             {round.letter}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
             Time
           </span>
           <span
@@ -105,7 +106,7 @@ export const StopTypingScreen = ({
       {round.stoppedBy !== null && (
         <p
           role="alert"
-          className="animate-blink rounded border-2 border-arcade-pink px-3 py-2 text-center font-arcade text-[10px] text-arcade-pink"
+          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           {stoppedByNickname ?? 'SOMEBODY'} CALLED STOP! LAST SECONDS
         </p>
@@ -113,7 +114,7 @@ export const StopTypingScreen = ({
 
       <div className="flex flex-col gap-3">
         {round.categories.map((category) => (
-          <ArcadeInput
+          <RetroInput
             key={category}
             label={category}
             value={values[category] ?? ''}
@@ -128,14 +129,14 @@ export const StopTypingScreen = ({
       </div>
 
       {missing > 0 && !hasSubmitted && (
-        <p role="status" className="text-center font-terminal text-lg text-slate-500">
+        <p role="status" className="text-center font-terminal text-lg text-gray-500">
           {missing} to go before you can call STOP
         </p>
       )}
 
-      <ArcadeButton tone="pink" disabled={hasSubmitted || missing > 0} onClick={() => submit(true)}>
+      <RetroButton tone="pink" disabled={hasSubmitted || missing > 0} onClick={() => submit(true)}>
         {hasSubmitted ? 'ANSWERS SENT' : 'STOP!'}
-      </ArcadeButton>
-    </section>
+      </RetroButton>
+    </RetroContainer>
   );
 };

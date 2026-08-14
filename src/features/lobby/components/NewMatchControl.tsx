@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
 
 interface NewMatchControlProps {
   onConfirm: () => void;
@@ -15,24 +15,20 @@ export const NewMatchControl = ({ onConfirm }: NewMatchControlProps) => {
 
   if (!isConfirming) {
     return (
-      <ArcadeButton
-        tone="yellow"
-        className="border-slate-700 text-slate-400 hover:bg-slate-800"
-        onClick={() => setIsConfirming(true)}
-      >
+      <RetroButton tone="white" onClick={() => setIsConfirming(true)}>
         NEW MATCH
-      </ArcadeButton>
+      </RetroButton>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-md border-2 border-arcade-pink/60 p-3">
-      <p className="font-terminal text-lg leading-tight text-slate-300">
+    <div className="flex flex-col gap-2 border-4 border-black bg-orange-50 p-3">
+      <p className="font-terminal text-lg leading-tight text-black">
         Start a new match? Every score goes back to zero. The room, the PIN and everyone seated stay
         exactly as they are.
       </p>
 
-      <ArcadeButton
+      <RetroButton
         tone="pink"
         onClick={() => {
           onConfirm();
@@ -40,11 +36,11 @@ export const NewMatchControl = ({ onConfirm }: NewMatchControlProps) => {
         }}
       >
         ZERO THE SCORES
-      </ArcadeButton>
+      </RetroButton>
 
-      <ArcadeButton tone="cyan" onClick={() => setIsConfirming(false)}>
+      <RetroButton tone="cyan" onClick={() => setIsConfirming(false)}>
         KEEP THEM
-      </ArcadeButton>
+      </RetroButton>
     </div>
   );
 };

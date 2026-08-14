@@ -23,16 +23,16 @@ export const HostAwayOverlay = () => {
   if (!isHostAway || !HOST_DRIVEN.includes(state.status)) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6">
       <div
         role="alert"
-        className="flex max-w-sm flex-col items-center gap-4 rounded-lg border-2 border-arcade-pink bg-slate-900 px-6 py-8 text-center shadow-neon"
+        className="flex max-w-sm flex-col items-center gap-4 border-4 border-black bg-white px-6 py-8 text-center shadow-retro"
       >
-        <p className="animate-blink font-arcade text-sm text-arcade-pink">PAUSED</p>
-        <p className="font-arcade text-[10px] leading-relaxed text-arcade-yellow">
+        <p className="animate-blink font-arcade text-sm text-rose-500">PAUSED</p>
+        <p className="font-arcade text-[10px] leading-relaxed text-yellow-500">
           Waiting for the Host to come back
         </p>
-        <p className="font-terminal text-lg leading-tight text-slate-300">
+        <p className="font-terminal text-lg leading-tight text-gray-700">
           They dropped out of the room, so the round cannot end. Keep this screen open — nothing you
           typed is lost.
         </p>

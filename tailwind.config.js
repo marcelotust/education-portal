@@ -9,17 +9,9 @@ export default {
         // Inputs and long-form text: readable at small sizes.
         terminal: ['"VT323"', 'monospace'],
       },
-      colors: {
-        arcade: {
-          black: '#111111',
-          green: '#39FF14',
-          pink: '#FF00FF',
-          cyan: '#00FFFF',
-          yellow: '#FFFF00',
-        },
-      },
       boxShadow: {
-        neon: '0 0 8px currentColor, 0 0 24px currentColor',
+        // Retro Platformer: solid offset shadow, no blur.
+        retro: '4px 4px 0px 0px rgba(0,0,0,1)',
       },
       keyframes: {
         blink: {

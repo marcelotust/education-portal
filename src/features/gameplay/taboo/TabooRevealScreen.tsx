@@ -1,4 +1,5 @@
-import { ArcadeButton } from '@/components/ui/ArcadeButton';
+import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
@@ -37,22 +38,20 @@ export const TabooRevealScreen = () => {
     });
 
   return (
-    <section className="flex flex-col gap-5">
+    <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-1">
-        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
-          Turn
-        </span>
-        <span data-testid="turn-progress" className="font-arcade text-sm text-arcade-green">
+        <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Turn</span>
+        <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">
           {round.currentIndex + 1}/{round.turns.length}
         </span>
       </header>
 
-      <p className="text-center font-terminal text-lg text-slate-400">
+      <p className="text-center font-terminal text-lg text-gray-600">
         {clueGiverNickname} was explaining
       </p>
       <p
         data-testid="revealed-word"
-        className="text-neon text-center font-arcade text-2xl text-arcade-green"
+        className="text-solid-shadow text-center font-arcade text-2xl text-green-600"
       >
         {turn.card.word}
       </p>
@@ -63,15 +62,15 @@ export const TabooRevealScreen = () => {
             key={player.id}
             data-testid={`reveal-row-${player.id}`}
             className={cn(
-              'flex items-center gap-2 rounded border px-2 py-1',
-              gained > 0 ? 'border-arcade-green/60' : 'border-slate-800',
+              'flex items-center gap-2 border-2 border-black px-2 py-1',
+              gained > 0 ? 'bg-green-100' : 'bg-white',
             )}
           >
-            <span className="flex-1 font-arcade text-[9px] text-slate-200">{player.nickname}</span>
-            <span className="font-arcade text-[9px] text-arcade-cyan">
+            <span className="flex-1 font-arcade text-[9px] text-black">{player.nickname}</span>
+            <span className="font-arcade text-[9px] text-sky-600">
               {gained > 0 ? `+${gained}` : '—'}
             </span>
-            <span className="w-8 shrink-0 text-right font-arcade text-[10px] text-arcade-green">
+            <span className="w-8 shrink-0 text-right font-arcade text-[10px] text-green-600">
               {total}
             </span>
           </li>
@@ -79,14 +78,14 @@ export const TabooRevealScreen = () => {
       </ol>
 
       {isHost ? (
-        <ArcadeButton tone={isLast ? 'yellow' : 'green'} onClick={advance}>
+        <RetroButton tone={isLast ? 'yellow' : 'green'} onClick={advance}>
           {isLast ? 'SEE THE SCOREBOARD' : 'NEXT CLUE-GIVER'}
-        </ArcadeButton>
+        </RetroButton>
       ) : (
-        <p role="status" className="text-center font-terminal text-lg text-slate-400">
+        <p role="status" className="text-center font-terminal text-lg text-gray-600">
           Waiting for the Host to move on...
         </p>
       )}
-    </section>
+    </RetroContainer>
   );
 };
