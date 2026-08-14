@@ -53,6 +53,21 @@ describe('Landing screen', () => {
     expect(navigate).toHaveBeenCalledWith('/host');
   });
 
+  it('titles the resume section and keeps it below the two ways in', () => {
+    renderLanding({ pin: 'KPZT' });
+
+    const create = screen.getByRole('button', { name: /create a room/i });
+    const join = screen.getByRole('button', { name: /join a room/i });
+    const title = screen.getByText(/load your last room/i);
+    const resumeButton = screen.getByRole('button', { name: /resume KPZT/i });
+
+    expect(create.compareDocumentPosition(join) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(join.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      title.compareDocumentPosition(resumeButton) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('says nothing about resuming when there is no open room', () => {
     renderLanding();
 

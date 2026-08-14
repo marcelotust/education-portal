@@ -1,3 +1,6 @@
+import { useNavigate } from 'react-router-dom';
+
+import { ArcadeButton } from '@/components/ui/ArcadeButton';
 import { useRoom } from '@/hooks/useRoom';
 import { MAX_PLAYERS, type Player } from '@/types';
 import { countPlayers } from '@/utils/room';
@@ -10,6 +13,7 @@ import { RoomPinBanner } from './components/RoomPinBanner';
 /** Lobby screen: the 6-slot board plus the role-aware action area. */
 export const LobbyScreen = () => {
   const { state, isHost } = useRoom();
+  const navigate = useNavigate();
 
   return (
     <section className="flex flex-col gap-5">
@@ -26,6 +30,10 @@ export const LobbyScreen = () => {
       )}
 
       {isHost ? <HostLobbyControls /> : <PlayerLobbyControls />}
+
+      <ArcadeButton tone="cyan" onClick={() => void navigate('/')}>
+        BACK TO START
+      </ArcadeButton>
     </section>
   );
 };
