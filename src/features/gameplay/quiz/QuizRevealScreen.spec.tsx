@@ -46,6 +46,24 @@ describe('QUIZ reveal', () => {
     expect(screen.getByTestId('correct-option')).toHaveTextContent('Mercury');
   });
 
+  it('shows who picked each option, right or wrong', () => {
+    renderReveal('PLAYER');
+
+    expect(screen.getByTestId('option-voters-1')).toHaveTextContent('ANA');
+    expect(screen.getByTestId('option-voters-0')).toHaveTextContent('BRUNO');
+    expect(screen.queryByTestId('option-voters-2')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('option-voters-3')).not.toBeInTheDocument();
+  });
+
+  it('calls out a player who never answered instead of hiding them', () => {
+    renderReveal(
+      'PLAYER',
+      revealing({ answers: [{ playerId: 'player-0', choice: 1, elapsedMs: 900 }] }),
+    );
+
+    expect(screen.getByTestId('no-answer-players')).toHaveTextContent('BRUNO');
+  });
+
   it('shows what the question was worth to each player', () => {
     renderReveal('PLAYER');
 

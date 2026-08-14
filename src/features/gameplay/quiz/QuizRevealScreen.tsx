@@ -19,8 +19,21 @@ export const QuizRevealScreen = () => {
   const question = round === null ? undefined : currentQuestion(round);
   if (round === null || question === undefined) return null;
 
-  const scored = state.slots
-    .filter((slot): slot is Player => slot !== null)
+  const seatedPlayers = state.slots.filter((slot): slot is Player => slot !== null);
+  const playersById = new Map(seatedPlayers.map((player) => [player.id, player]));
+
+  const votersByOption: Player[][] = question.options.map((_, index) =>
+    round.answers
+      .filter((answer) => answer.choice === index)
+      .map((answer) => playersById.get(answer.playerId))
+      .filter((player): player is Player => player !== undefined),
+  );
+
+  const noAnswerPlayers = seatedPlayers.filter(
+    (player) => !round.answers.some((answer) => answer.playerId === player.id),
+  );
+
+  const scored = seatedPlayers
     .map((player) => ({
       player,
       gained: round.questionPoints[player.id] ?? 0,
@@ -51,6 +64,7 @@ export const QuizRevealScreen = () => {
       <ul className="flex flex-col gap-2">
         {question.options.map((option, index) => {
           const isCorrect = index === question.correctIndex;
+          const voters = votersByOption[index] ?? [];
           return (
             <li key={option}>
               <div
@@ -66,10 +80,34 @@ export const QuizRevealScreen = () => {
                 {option}
                 {isCorrect && <span className="ml-auto font-arcade text-[9px]">CORRECT</span>}
               </div>
+              {voters.length > 0 && (
+                <ul
+                  data-testid={`option-voters-${index}`}
+                  className="mt-1 flex flex-wrap gap-1 pl-3"
+                >
+                  {voters.map((voter) => (
+                    <li
+                      key={voter.id}
+                      className="border-2 border-black bg-white px-2 py-0.5 font-arcade text-[8px] text-black"
+                    >
+                      {voter.nickname}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           );
         })}
       </ul>
+
+      {noAnswerPlayers.length > 0 && (
+        <p
+          data-testid="no-answer-players"
+          className="text-center font-terminal text-lg text-gray-500"
+        >
+          No answer: {noAnswerPlayers.map((player) => player.nickname).join(', ')}
+        </p>
+      )}
 
       <ol className="flex flex-col gap-1">
         {scored.map(({ player, gained, total }) => (
