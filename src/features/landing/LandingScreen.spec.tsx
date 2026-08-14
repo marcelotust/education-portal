@@ -31,6 +31,9 @@ describe('Landing screen', () => {
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/eduparty/i);
     expect(screen.getByText(/4-letter pin/i)).toBeInTheDocument();
+    expect(screen.getByText(/100% free/i)).toBeInTheDocument();
+    expect(screen.getByText(/online english classes/i)).toBeInTheDocument();
+    expect(screen.getByText(/everyone.s invited/i)).toBeInTheDocument();
   });
 
   it('offers the two ways in', async () => {

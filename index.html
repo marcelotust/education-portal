@@ -4,14 +4,53 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="EduParty — arcade-themed portal for online classes." />
+    <meta
+      name="description"
+      content="EduParty is a free, no-signup arcade game portal built to support online English classes. Host a room, share a 4-letter PIN, and play together — everyone is welcome."
+    />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
       rel="stylesheet"
     />
-    <title>EduParty</title>
+    <title>EduParty — Free Party Games for Online English Classes</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EduParty" />
+    <meta property="og:title" content="EduParty — Free Party Games for Online English Classes" />
+    <meta
+      property="og:description"
+      content="A free, no-signup arcade game portal built to support online English classes. Host a room, share a 4-letter PIN, and play together — everyone is welcome."
+    />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <!-- No og:image yet: ships with the branded logo/OG asset in #51, at which
+         point this should switch to twitter:card=summary_large_image too. -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="EduParty — Free Party Games for Online English Classes" />
+    <meta
+      name="twitter:description"
+      content="A free, no-signup arcade game portal built to support online English classes. Everyone is welcome."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "EduParty",
+        "url": "%VITE_SITE_URL%/",
+        "description": "A free, no-signup arcade game portal built to support online English classes. Everyone is welcome to play.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any (runs in the browser)",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
