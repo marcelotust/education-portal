@@ -149,5 +149,9 @@ describe('Landing screen', () => {
       'href',
       '/legal#children',
     );
+    expect(screen.getByRole('link', { name: /suggestions.*bug reports/i })).toHaveAttribute(
+      'href',
+      '/contact',
+    );
   });
 });

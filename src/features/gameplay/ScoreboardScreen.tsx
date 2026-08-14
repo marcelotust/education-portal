@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
@@ -53,6 +55,13 @@ export const ScoreboardScreen = () => {
           BACK TO LOBBY
         </RetroButton>
       )}
+
+      <Link
+        to="/contact"
+        className="text-center font-terminal text-sm text-gray-500 underline hover:text-gray-700"
+      >
+        Got a suggestion or found a bug?
+      </Link>
     </RetroContainer>
   );
 };

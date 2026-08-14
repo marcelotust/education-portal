@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
@@ -21,10 +22,12 @@ const standings = (): RoomState => ({
 
 const renderScoreboard = (role: PlayerRole, room: RoomState = standings()): void => {
   render(
-    <RoomProvider initialState={room} role={role}>
-      <StatusProbe />
-      <ScoreboardScreen />
-    </RoomProvider>,
+    <MemoryRouter>
+      <RoomProvider initialState={room} role={role}>
+        <StatusProbe />
+        <ScoreboardScreen />
+      </RoomProvider>
+    </MemoryRouter>,
   );
 };
 
@@ -58,5 +61,14 @@ describe('Scoreboard', () => {
     renderScoreboard('PLAYER');
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('offers a way to send a suggestion or report a bug', () => {
+    renderScoreboard('PLAYER');
+
+    expect(screen.getByRole('link', { name: /suggestion or found a bug/i })).toHaveAttribute(
+      'href',
+      '/contact',
+    );
   });
 });

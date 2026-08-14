@@ -104,6 +104,12 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           >
             Children&apos;s Privacy
           </Link>
+          <Link
+            to="/contact"
+            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
+          >
+            Suggestions &amp; Bug Reports
+          </Link>
         </div>
         <p className="font-terminal text-xs text-gray-400">© 2026 EduParty</p>
       </footer>
