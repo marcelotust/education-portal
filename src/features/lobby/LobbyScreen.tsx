@@ -17,7 +17,12 @@ export const LobbyScreen = () => {
 
   return (
     <section className="flex flex-col gap-5">
-      <RoomPinBanner pin={state.pin} playerCount={countPlayers(state)} maxPlayers={MAX_PLAYERS} />
+      <RoomPinBanner
+        pin={state.pin}
+        playerCount={countPlayers(state)}
+        maxPlayers={MAX_PLAYERS}
+        isHost={isHost}
+      />
 
       <CharacterSelectGrid slots={state.slots} scores={state.scores} />
 

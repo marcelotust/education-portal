@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import type * as ReactRouter from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
@@ -57,6 +57,53 @@ describe('Lobby feature', () => {
       await user.click(screen.getByRole('button', { name: /back to start/i }));
 
       expect(navigate).toHaveBeenCalledWith('/');
+    });
+  });
+
+  describe('invite link', () => {
+    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    const originalShare = Object.getOwnPropertyDescriptor(navigator, 'share');
+
+    afterEach(() => {
+      if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard);
+      if (originalShare) Object.defineProperty(navigator, 'share', originalShare);
+    });
+
+    it('copies a join link with the PIN to the clipboard', async () => {
+      // user-event installs its own clipboard stub on setup(), so ours must
+      // be defined afterwards or it gets shadowed by theirs.
+      const user = userEvent.setup();
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /^invite$/i }));
+
+      expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/play?pin=ABCD'));
+      expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();
+    });
+
+    it('prefers the native share sheet when the device offers one', async () => {
+      const user = userEvent.setup();
+      const share = vi.fn().mockResolvedValue(undefined);
+      const writeText = vi.fn();
+      Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /^invite$/i }));
+
+      expect(share).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining('/play?pin=ABCD') }),
+      );
+      expect(writeText).not.toHaveBeenCalled();
+    });
+
+    it('never offers a Player a way to invite themselves', () => {
+      renderLobby('PLAYER');
+
+      expect(screen.queryByRole('button', { name: /^invite$/i })).not.toBeInTheDocument();
     });
   });
 
