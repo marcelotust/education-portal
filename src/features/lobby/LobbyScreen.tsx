@@ -15,15 +15,13 @@ export const LobbyScreen = () => {
   const { state, isHost } = useRoom();
   const navigate = useNavigate();
 
-  return (
-    <section className="flex flex-col gap-5">
-      <RoomPinBanner
-        pin={state.pin}
-        playerCount={countPlayers(state)}
-        maxPlayers={MAX_PLAYERS}
-        isHost={isHost}
-      />
+  // The Host scrolls past the board on purpose, tapping through the picker down to
+  // START GAME. A Player has nothing to click, so put the setup they're watching
+  // above the board instead of burying it below three rows of slots.
+  const setupFirst = !isHost && state.status === 'CONFIGURING_GAME';
 
+  const board = (
+    <>
       <CharacterSelectGrid slots={state.slots} scores={state.scores} />
 
       {Object.keys(state.lastRoundPoints).length > 0 && (
@@ -33,8 +31,31 @@ export const LobbyScreen = () => {
           lastRoundPoints={state.lastRoundPoints}
         />
       )}
+    </>
+  );
 
-      {isHost ? <HostLobbyControls /> : <PlayerLobbyControls />}
+  const controls = isHost ? <HostLobbyControls /> : <PlayerLobbyControls />;
+
+  return (
+    <section className="flex flex-col gap-5">
+      <RoomPinBanner
+        pin={state.pin}
+        playerCount={countPlayers(state)}
+        maxPlayers={MAX_PLAYERS}
+        isHost={isHost}
+      />
+
+      {setupFirst ? (
+        <>
+          {controls}
+          {board}
+        </>
+      ) : (
+        <>
+          {board}
+          {controls}
+        </>
+      )}
 
       <ArcadeButton tone="cyan" onClick={() => void navigate('/')}>
         BACK TO START

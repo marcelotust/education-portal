@@ -360,6 +360,44 @@ describe('Lobby feature', () => {
     });
   });
 
+  describe('setup visibility on mobile (issue #30)', () => {
+    it('keeps the board above the setup for the Host, who scrolls to reach START GAME', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+
+      const board = screen.getByTestId('player-slot-0');
+      const cartridgePicker = screen.getByRole('button', { name: /^stop$/i });
+
+      expect(
+        board.compareDocumentPosition(cartridgePicker) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('moves the setup above the board for a Player watching the Host configure the game', () => {
+      const room = { ...makeRoom({ status: 'CONFIGURING_GAME' }), selectedGameId: 'STOP' as const };
+      renderLobby('PLAYER', room);
+
+      const board = screen.getByTestId('player-slot-0');
+      const cartridgePicker = screen.getByRole('button', { name: /^stop$/i });
+
+      expect(
+        cartridgePicker.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('leaves the board first for a Player before the Host starts configuring', () => {
+      renderLobby('PLAYER');
+
+      const board = screen.getByTestId('player-slot-0');
+      const waitingMessage = screen.getByText(/waiting for the Host/i);
+
+      expect(
+        board.compareDocumentPosition(waitingMessage) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+  });
+
   describe('Player (read-only listener)', () => {
     it('never renders the Host controls', () => {
       renderLobby('PLAYER');
