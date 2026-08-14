@@ -1,5 +1,4 @@
 import { RetroButton } from '@/components/ui/RetroButton';
-import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { GameId } from '@/types';
 import { GAME_CARTRIDGES } from '../cartridges';
 
@@ -14,7 +13,9 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
 
   return (
     <div className="flex flex-col gap-2">
-      <SectionLabel>{isReadOnly ? 'Cartridge shelf' : 'Choose a cartridge'}</SectionLabel>
+      <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+        {isReadOnly ? 'Cartridge shelf' : 'Choose a cartridge'}
+      </p>
 
       {GAME_CARTRIDGES.map((cartridge) => {
         const isSelected = selectedGameId === cartridge.id;

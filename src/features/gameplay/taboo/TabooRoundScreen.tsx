@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroInput } from '@/components/ui/RetroInput';
-import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useRoom } from '@/hooks/useRoom';
 import { useTabooGuessBroadcast } from '@/hooks/useTabooGuessBroadcast';
@@ -95,14 +94,18 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <SectionLabel>Turn</SectionLabel>
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+            Turn
+          </span>
           <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">
             {turnIndex + 1}/{round.turns.length}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <SectionLabel>Time</SectionLabel>
+          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+            Time
+          </span>
           <span
             data-testid="round-timer"
             data-urgency={urgency}
@@ -127,10 +130,14 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
 
       {isClueGiver ? (
         <div className="flex flex-col items-center gap-4">
-          <SectionLabel>Make them say</SectionLabel>
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+            Make them say
+          </p>
           <p className="text-solid-shadow font-arcade text-2xl text-green-600">{turn.card.word}</p>
 
-          <SectionLabel>Without saying</SectionLabel>
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+            Without saying
+          </p>
           <ul className="flex flex-col gap-2">
             {turn.card.forbidden.map((word) => (
               <li

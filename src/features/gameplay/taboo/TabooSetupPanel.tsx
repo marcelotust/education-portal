@@ -1,4 +1,3 @@
-import { SectionLabel } from '@/components/ui/SectionLabel';
 import { TABOO_ROUND_DURATIONS, type RoundDuration, type TabooSetup } from '@/types';
 import { cn } from '@/utils/cn';
 import { TABOO_CATEGORY_CATALOG } from './tabooRound';
@@ -21,7 +20,9 @@ export const TabooSetupPanel = ({
   return (
     <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
       <div className="flex flex-col gap-2">
-        <SectionLabel>Turn length</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+          Turn length
+        </p>
         <div className="grid grid-cols-3 gap-2">
           {TABOO_ROUND_DURATIONS.map((seconds) => (
             <button
@@ -48,7 +49,9 @@ export const TabooSetupPanel = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <SectionLabel>Categories ({chosen})</SectionLabel>
+        <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
+          Categories ({chosen})
+        </p>
 
         <div className="flex flex-wrap gap-2">
           {TABOO_CATEGORY_CATALOG.map((category) => {
