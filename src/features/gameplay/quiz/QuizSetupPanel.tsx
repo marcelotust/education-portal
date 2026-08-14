@@ -7,7 +7,7 @@ import {
   type RoundDuration,
 } from '@/types';
 import { cn } from '@/utils/cn';
-import { QUIZ_TOPICS } from './questionPacks';
+import { QUIZ_TOPICS } from './quizRound';
 
 interface QuizSetupPanelProps {
   setup: QuizSetup;

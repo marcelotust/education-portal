@@ -12,6 +12,33 @@ export type Database = {
   };
   public: {
     Tables: {
+      quiz_questions: {
+        Row: {
+          correct_index: number;
+          created_at: string;
+          id: string;
+          options: string[];
+          prompt: string;
+          topic: string;
+        };
+        Insert: {
+          correct_index: number;
+          created_at?: string;
+          id: string;
+          options: string[];
+          prompt: string;
+          topic: string;
+        };
+        Update: {
+          correct_index?: number;
+          created_at?: string;
+          id?: string;
+          options?: string[];
+          prompt?: string;
+          topic?: string;
+        };
+        Relationships: [];
+      };
       rooms: {
         Row: {
           created_at: string;
@@ -39,6 +66,30 @@ export type Database = {
           pin?: string;
           state?: Json;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      taboo_cards: {
+        Row: {
+          category: string;
+          created_at: string;
+          forbidden: string[];
+          id: string;
+          word: string;
+        };
+        Insert: {
+          category: string;
+          created_at?: string;
+          forbidden: string[];
+          id: string;
+          word: string;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          forbidden?: string[];
+          id?: string;
+          word?: string;
         };
         Relationships: [];
       };
