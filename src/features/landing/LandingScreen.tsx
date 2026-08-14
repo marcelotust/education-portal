@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
@@ -78,6 +78,30 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           </RetroButton>
         </div>
       )}
+
+      <footer className="flex flex-col items-center gap-2 border-t-4 border-black pt-4 text-center">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          <Link
+            to="/legal#privacy"
+            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            to="/legal#terms"
+            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
+          >
+            Terms of Service
+          </Link>
+          <Link
+            to="/legal#children"
+            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
+          >
+            Children&apos;s Privacy
+          </Link>
+        </div>
+        <p className="font-terminal text-xs text-gray-400">© 2026 EduParty</p>
+      </footer>
     </RetroContainer>
   );
 };

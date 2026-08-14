@@ -129,4 +129,22 @@ describe('Landing screen', () => {
 
     expect(screen.queryByRole('button', { name: /rejoin/i })).not.toBeInTheDocument();
   });
+
+  it('carries a copyright line and links to the legal notices', () => {
+    renderLanding();
+
+    expect(screen.getByText(/© 2026 eduparty/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /privacy policy/i })).toHaveAttribute(
+      'href',
+      '/legal#privacy',
+    );
+    expect(screen.getByRole('link', { name: /terms of service/i })).toHaveAttribute(
+      'href',
+      '/legal#terms',
+    );
+    expect(screen.getByRole('link', { name: /children's privacy/i })).toHaveAttribute(
+      'href',
+      '/legal#children',
+    );
+  });
 });

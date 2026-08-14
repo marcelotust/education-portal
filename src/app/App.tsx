@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { LandingRoute } from './LandingRoute';
+import { LegalRoute } from './LegalRoute';
 import { RoomRoute } from './RoomRoute';
 
 export const App = () => (
@@ -11,6 +12,7 @@ export const App = () => (
       <Route path="/" element={<LandingRoute />} />
       <Route path="/host" element={<RoomRoute role="HOST" />} />
       <Route path="/play" element={<RoomRoute role="PLAYER" />} />
+      <Route path="/legal" element={<LegalRoute />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
 
