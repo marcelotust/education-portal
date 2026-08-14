@@ -35,12 +35,6 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
         </p>
       </header>
 
-      {resumableRoom !== null && (
-        <ArcadeButton tone="yellow" onClick={() => void navigate('/host')}>
-          RESUME {resumableRoom.pin}
-        </ArcadeButton>
-      )}
-
       <div className="flex flex-col gap-3">
         <ArcadeButton tone="green" onClick={() => void navigate('/host')}>
           CREATE A ROOM
@@ -72,6 +66,18 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           <p className="font-terminal text-sm text-slate-600">
             Saved on this device only — the room itself may already be over.
           </p>
+        </div>
+      )}
+
+      {resumableRoom !== null && (
+        <div className="flex flex-col gap-2">
+          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-slate-400">
+            Load your last room
+          </p>
+
+          <ArcadeButton tone="yellow" onClick={() => void navigate('/host')}>
+            RESUME {resumableRoom.pin}
+          </ArcadeButton>
         </div>
       )}
     </section>

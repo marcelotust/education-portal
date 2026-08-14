@@ -1,12 +1,20 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import type * as ReactRouter from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
 import { makeRoom } from '@/test/factories';
 import type { PlayerRole, RoomState } from '@/types';
 import { LobbyScreen } from './LobbyScreen';
+
+const navigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof ReactRouter>('react-router-dom');
+  return { ...actual, useNavigate: () => navigate };
+});
 
 /** Test-only probe: exposes the FSM state so specs can assert transitions. */
 const StatusProbe = () => {
@@ -16,16 +24,42 @@ const StatusProbe = () => {
 
 const renderLobby = (role: PlayerRole, room: RoomState = makeRoom()): void => {
   render(
-    <RoomProvider initialState={room} role={role}>
-      <StatusProbe />
-      <LobbyScreen />
-    </RoomProvider>,
+    <MemoryRouter>
+      <RoomProvider initialState={room} role={role}>
+        <StatusProbe />
+        <LobbyScreen />
+      </RoomProvider>
+    </MemoryRouter>,
   );
 };
 
 const status = () => screen.getByTestId('room-status').textContent;
 
 describe('Lobby feature', () => {
+  beforeEach(() => {
+    navigate.mockClear();
+  });
+
+  describe('leaving the lobby', () => {
+    it('sends the Host back to the start page', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /back to start/i }));
+
+      expect(navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('sends a Player back to the start page too', async () => {
+      const user = userEvent.setup();
+      renderLobby('PLAYER');
+
+      await user.click(screen.getByRole('button', { name: /back to start/i }));
+
+      expect(navigate).toHaveBeenCalledWith('/');
+    });
+  });
+
   describe('character select board', () => {
     it('always renders the 6 slots of the room', () => {
       renderLobby('HOST', makeRoom({ playerCount: 2 }));
@@ -210,7 +244,7 @@ describe('Lobby feature', () => {
       renderLobby('HOST');
 
       await user.click(screen.getByRole('button', { name: /select game/i }));
-      await user.click(screen.getByRole('button', { name: /back/i }));
+      await user.click(screen.getByRole('button', { name: /^back$/i }));
 
       expect(status()).toBe('LOBBY_IDLE');
       expect(screen.getByRole('button', { name: /select game/i })).toBeInTheDocument();
