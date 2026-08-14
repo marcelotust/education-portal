@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroInput } from '@/components/ui/RetroInput';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { StopRound } from '@/types';
 import { cn } from '@/utils/cn';
 
@@ -75,9 +76,7 @@ export const StopTypingScreen = ({
           the clock in a timed game is losing the game. */}
       <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Letter
-          </span>
+          <SectionLabel>Letter</SectionLabel>
           <span
             data-testid="round-letter"
             className="text-solid-shadow font-arcade text-4xl text-yellow-400"
@@ -87,9 +86,7 @@ export const StopTypingScreen = ({
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Time
-          </span>
+          <SectionLabel>Time</SectionLabel>
           <span
             data-testid="round-timer"
             data-urgency={urgencyFor(secondsLeft)}
