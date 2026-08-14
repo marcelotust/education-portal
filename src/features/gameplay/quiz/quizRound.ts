@@ -1,5 +1,6 @@
+import { type EduPartyClient } from '@/lib/supabase';
 import type { QuizAnswer, QuizQuestion, QuizRound, QuizSetup } from '@/types';
-import { QUESTION_PACKS, type QuestionPack } from './questionPacks';
+import { fetchQuizQuestions } from './quizContent';
 
 /** Points for a correct answer; the fastest correct answer earns a bonus. */
 export const CORRECT_POINTS = 10;
@@ -11,8 +12,12 @@ export const DEFAULT_QUIZ_SETUP: QuizSetup = {
   questionCount: 5,
 };
 
-const packFor = (topic: string): QuestionPack =>
-  QUESTION_PACKS.find((p) => p.topic === topic) ?? QUESTION_PACKS[0]!;
+/**
+ * Topic names, unlike the questions themselves, are not a spoiler: they stay
+ * in code so the setup panel never waits on a fetch (#34). Adding a topic to
+ * `quiz_questions` also means adding its name here.
+ */
+export const QUIZ_TOPICS: readonly string[] = ['GENERAL', 'SCIENCE'];
 
 const shuffled = <T>(items: readonly T[]): T[] => {
   const copy = [...items];
@@ -24,16 +29,17 @@ const shuffled = <T>(items: readonly T[]): T[] => {
 };
 
 /**
- * Draws the whole match up front: questions the room has not seen yet first,
- * topped up with older ones rather than running a shorter match. A topic with
- * fewer questions than asked for caps the match — never repeats inside one.
+ * Draws the whole match from an already-fetched pool: questions the room has
+ * not seen yet first, topped up with older ones rather than running a
+ * shorter match. A topic with fewer questions than asked for caps the match
+ * — never repeats inside one.
  */
-export const createQuizRound = (
+export const drawQuizQuestions = (
+  pool: readonly QuizQuestion[],
   setup: QuizSetup,
-  askedIds: readonly string[] = [],
-  now = new Date(),
+  askedIds: readonly string[],
+  now: Date,
 ): QuizRound => {
-  const pool = packFor(setup.topic).questions;
   const unasked = shuffled(pool.filter((question) => !askedIds.includes(question.id)));
   const asked = shuffled(pool.filter((question) => askedIds.includes(question.id)));
   const questions = [...unasked, ...asked].slice(0, Math.min(setup.questionCount, pool.length));
@@ -48,6 +54,21 @@ export const createQuizRound = (
     endsAt: new Date(now.getTime() + setup.roundDurationSeconds * 1000).toISOString(),
     isScored: false,
   };
+};
+
+/**
+ * Fetches the chosen topic's bank from `public.quiz_questions` (#34) and
+ * draws the match from it. Correctness of the draw itself is covered by
+ * `drawQuizQuestions`, which this just wires up to the real content source.
+ */
+export const createQuizRound = async (
+  setup: QuizSetup,
+  askedIds: readonly string[] = [],
+  now = new Date(),
+  client?: EduPartyClient,
+): Promise<QuizRound> => {
+  const pool = await fetchQuizQuestions(setup.topic, client);
+  return drawQuizQuestions(pool, setup, askedIds, now);
 };
 
 /** The question on screen. `undefined` only if a round arrives malformed. */

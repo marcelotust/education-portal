@@ -1,18 +1,27 @@
 import { describe, expect, it } from 'vitest';
 
+import type { EduPartyClient } from '@/lib/supabase';
 import { makeTabooRound } from '@/test/factories';
-import type { TabooGuess, TabooRound, TabooSetup } from '@/types';
+import type { TabooCard, TabooGuess, TabooRound, TabooSetup } from '@/types';
 import {
   TABOO_CATEGORY_CATALOG,
   TABOO_CORRECT_POINTS,
   computeTabooScores,
   createTabooRound,
   currentTurn,
+  drawTabooTurns,
   hasEveryoneGuessed,
   hasGuessed,
   isCorrectGuess,
   isLastTurn,
 } from './tabooRound';
+
+const cardPool: TabooCard[] = Array.from({ length: 8 }, (_, index) => ({
+  id: `card-${index}`,
+  category: 'ANIMALS',
+  word: `WORD_${index}`,
+  forbidden: ['A', 'B'],
+}));
 
 const setup = (overrides: Partial<TabooSetup> = {}): TabooSetup => ({
   roundDurationSeconds: 120,
@@ -22,26 +31,32 @@ const setup = (overrides: Partial<TabooSetup> = {}): TabooSetup => ({
 
 const seated = ['player-0', 'player-1', 'player-2'];
 
-describe('TABOO match', () => {
-  it('draws one turn per seated player, each card from a chosen category', () => {
-    const round = createTabooRound(setup(), seated);
+const fakeClient = (data: TabooCard[] | null): EduPartyClient => {
+  const rows = data?.map((c) => ({ ...c })) ?? null;
+  const chain = { select: () => chain, in: () => Promise.resolve({ data: rows, error: null }) };
+  return { from: () => chain } as unknown as EduPartyClient;
+};
+
+describe('drawing a TABOO match from a fetched deck', () => {
+  it('draws one turn per seated player, each card from the fetched deck', () => {
+    const round = drawTabooTurns(cardPool, setup(), seated, new Date());
 
     expect(round.turns).toHaveLength(seated.length);
-    expect(round.turns.every((turn) => TABOO_CATEGORY_CATALOG.includes(turn.card.category))).toBe(
+    expect(round.turns.every((turn) => cardPool.some((card) => card.id === turn.card.id))).toBe(
       true,
     );
     expect(round.currentIndex).toBe(0);
   });
 
   it('never repeats a card or a clue-giver inside one match', () => {
-    const round = createTabooRound(setup(), seated);
+    const round = drawTabooTurns(cardPool, setup(), seated, new Date());
 
     expect(new Set(round.turns.map((turn) => turn.card.id)).size).toBe(round.turns.length);
     expect(new Set(round.turns.map((turn) => turn.clueGiverId)).size).toBe(round.turns.length);
   });
 
   it('only draws clue-givers from who is actually seated', () => {
-    const round = createTabooRound(setup(), seated);
+    const round = drawTabooTurns(cardPool, setup(), seated, new Date());
 
     for (const turn of round.turns) {
       expect(seated).toContain(turn.clueGiverId);
@@ -49,18 +64,17 @@ describe('TABOO match', () => {
   });
 
   it('caps the match at whichever runs out first: seats or cards', () => {
-    // More fake seats than any single category's deck could possibly hold.
     const manySeats = Array.from({ length: 50 }, (_, index) => `p${index}`);
 
-    const oneCategory = createTabooRound(setup({ categories: ['ANIMALS'] }), manySeats);
+    const round = drawTabooTurns(cardPool, setup(), manySeats, new Date());
 
-    expect(oneCategory.turns.length).toBeLessThan(manySeats.length);
+    expect(round.turns.length).toBeLessThan(manySeats.length);
   });
 
   it('sets a deadline for the first turn from the chosen length', () => {
     const now = new Date('2026-07-25T10:00:00.000Z');
 
-    const round = createTabooRound(setup({ roundDurationSeconds: 60 }), seated, now);
+    const round = drawTabooTurns(cardPool, setup({ roundDurationSeconds: 60 }), seated, now);
 
     expect(round.endsAt).toBe('2026-07-25T10:01:00.000Z');
   });
@@ -71,6 +85,28 @@ describe('TABOO match', () => {
     expect(currentTurn(round)?.clueGiverId).toBe('player-1');
     expect(isLastTurn(round)).toBe(false);
     expect(isLastTurn({ ...round, currentIndex: 2 })).toBe(true);
+  });
+});
+
+describe('fetching a TABOO match', () => {
+  it('draws from whatever the chosen categories return', async () => {
+    const client = fakeClient(cardPool);
+
+    const round = await createTabooRound(setup(), seated, new Date(), client);
+
+    expect(round.turns).toHaveLength(seated.length);
+  });
+
+  it('lets a fetch failure surface instead of dealing an empty match silently', async () => {
+    const failing = {
+      from: () => ({
+        select: () => ({
+          in: () => Promise.resolve({ data: null, error: { message: 'down' } }),
+        }),
+      }),
+    } as unknown as EduPartyClient;
+
+    await expect(createTabooRound(setup(), seated, new Date(), failing)).rejects.toThrow(/down/);
   });
 });
 

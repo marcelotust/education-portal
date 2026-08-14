@@ -28,18 +28,31 @@ export const AdBreakScreen = () => {
 
   useEffect(() => {
     if (!isHost || secondsLeft > 0) return;
+    let isCurrent = true;
 
-    // Only the Host draws the round, so everyone plays the same one.
-    if (state.gameSetup.game === 'QUIZ') {
-      dispatch({ type: 'AD_FINISHED', round: createQuizRound(state.gameSetup) });
-    } else if (state.gameSetup.game === 'TABOO') {
-      const seated = state.slots
-        .filter((slot): slot is Player => slot !== null)
-        .map((player) => player.id);
-      dispatch({ type: 'AD_FINISHED', round: createTabooRound(state.gameSetup, seated) });
-    } else {
-      dispatch({ type: 'AD_FINISHED', round: createStopRound(state.gameSetup) });
-    }
+    // Only the Host draws the round, so everyone plays the same one. QUIZ and
+    // TABOO fetch their content from Postgres (#34), so drawing is async;
+    // `isCurrent` drops a result that resolves after this effect re-runs.
+    const draw = async () => {
+      if (state.gameSetup.game === 'QUIZ') {
+        const round = await createQuizRound(state.gameSetup);
+        if (isCurrent) dispatch({ type: 'AD_FINISHED', round });
+      } else if (state.gameSetup.game === 'TABOO') {
+        const seated = state.slots
+          .filter((slot): slot is Player => slot !== null)
+          .map((player) => player.id);
+        const round = await createTabooRound(state.gameSetup, seated);
+        if (isCurrent) dispatch({ type: 'AD_FINISHED', round });
+      } else {
+        dispatch({ type: 'AD_FINISHED', round: createStopRound(state.gameSetup) });
+      }
+    };
+
+    void draw();
+
+    return () => {
+      isCurrent = false;
+    };
   }, [isHost, secondsLeft, state.gameSetup, state.slots, dispatch]);
 
   return (

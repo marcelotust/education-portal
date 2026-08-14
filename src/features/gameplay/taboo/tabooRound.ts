@@ -1,5 +1,6 @@
-import type { TabooGuess, TabooRound, TabooSetup, TabooTurn } from '@/types';
-import { TABOO_DECK } from './tabooCards';
+import type { EduPartyClient } from '@/lib/supabase';
+import type { TabooCard, TabooGuess, TabooRound, TabooSetup, TabooTurn } from '@/types';
+import { fetchTabooCards } from './tabooContent';
 
 /** Flat points for a correct guess; nobody is judged, so there is no bonus to argue about. */
 export const TABOO_CORRECT_POINTS = 10;
@@ -29,16 +30,18 @@ const shuffled = <T>(items: readonly T[]): T[] => {
 };
 
 /**
- * Draws the whole match up front, like QUIZ: one card per seated player, so
- * every screen agrees on who goes next. A thin deck or a thin room caps the
- * match short rather than repeating a card or a clue-giver.
+ * Draws the whole match from an already-fetched deck, like QUIZ: one card per
+ * seated player, so every screen agrees on who goes next. A thin deck or a
+ * thin room caps the match short rather than repeating a card or a
+ * clue-giver.
  */
-export const createTabooRound = (
+export const drawTabooTurns = (
+  cardPool: readonly TabooCard[],
   setup: TabooSetup,
   seatedPlayerIds: readonly string[],
-  now = new Date(),
+  now: Date,
 ): TabooRound => {
-  const cards = shuffled(TABOO_DECK.filter((card) => setup.categories.includes(card.category)));
+  const cards = shuffled(cardPool);
   const clueGivers = shuffled(seatedPlayerIds);
   const turnCount = Math.min(clueGivers.length, cards.length);
 
@@ -56,6 +59,21 @@ export const createTabooRound = (
     endsAt: new Date(now.getTime() + setup.roundDurationSeconds * 1000).toISOString(),
     isScored: false,
   };
+};
+
+/**
+ * Fetches the chosen categories' cards from `public.taboo_cards` (#34) and
+ * draws the match from them. Correctness of the draw itself is covered by
+ * `drawTabooTurns`, which this just wires up to the real content source.
+ */
+export const createTabooRound = async (
+  setup: TabooSetup,
+  seatedPlayerIds: readonly string[],
+  now = new Date(),
+  client?: EduPartyClient,
+): Promise<TabooRound> => {
+  const cardPool = await fetchTabooCards(setup.categories, client);
+  return drawTabooTurns(cardPool, setup, seatedPlayerIds, now);
 };
 
 /** The turn on screen. `undefined` only if a round arrives malformed. */
