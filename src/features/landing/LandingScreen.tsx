@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { listRecentRooms } from '@/lib/recentRooms';
 
 interface LandingScreenProps {
@@ -47,9 +48,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
 
       {recentRooms.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Rooms you joined
-          </p>
+          <SectionLabel>Rooms you joined</SectionLabel>
 
           {recentRooms.map((room) => (
             <button
@@ -72,9 +71,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
 
       {resumableRoom !== null && (
         <div className="flex flex-col gap-2">
-          <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Load your last room
-          </p>
+          <SectionLabel>Load your last room</SectionLabel>
 
           <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
             RESUME {resumableRoom.pin}

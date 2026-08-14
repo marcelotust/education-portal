@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useQuizAnswerBroadcast } from '@/hooks/useQuizAnswerBroadcast';
 import { useRoom } from '@/hooks/useRoom';
@@ -94,18 +95,14 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Question
-          </span>
+          <SectionLabel>Question</SectionLabel>
           <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
             {questionIndex + 1}/{round.questions.length}
           </span>
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">
-            Time
-          </span>
+          <SectionLabel>Time</SectionLabel>
           <span
             data-testid="round-timer"
             data-urgency={urgency}
