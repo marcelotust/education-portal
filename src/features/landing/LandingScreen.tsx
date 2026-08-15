@@ -28,7 +28,9 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
   return (
     <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-3 text-center">
-        <h1 className="sr-only">EduParty</h1>
+        <h1 className="font-terminal text-2xl text-rose-500">
+          A retro arcade built to make online classes feel like game night.
+        </h1>
         <p className="font-arcade text-[10px] uppercase tracking-widest text-green-600">
           100% Free
         </p>
@@ -67,7 +69,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
         </div>
 
         <p className="text-center font-terminal text-sm text-gray-500">
-          More cartridges are already in the works.
+          More games are already in the works.
         </p>
       </div>
 

@@ -9,7 +9,7 @@ import { createSupabaseRoomService } from '@/lib/room/supabaseRoomService';
 /** Front door of the app: presentation plus the ways back into a room. */
 export const LandingRoute = () => {
   useDocumentMeta({
-    title: 'EduParty — Free Party Games for Online English Classes',
+    title: 'EduParty — Education Party Games Portal',
     description:
       'EduParty is a free, no-signup game portal for online English classes. Host a room, share a 4-letter PIN, and play STOP, QUIZ, or TABOO together.',
   });

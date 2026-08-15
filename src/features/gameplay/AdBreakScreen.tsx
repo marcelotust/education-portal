@@ -69,9 +69,7 @@ export const AdBreakScreen = () => {
         {secondsLeft > 0 ? secondsLeft : 'GO!'}
       </p>
 
-      <p className="font-terminal text-lg text-gray-600">
-        Loading cartridge {state.selectedGameId ?? ''}...
-      </p>
+      <p className="font-terminal text-lg text-gray-600">Loading {state.selectedGameId ?? ''}...</p>
 
       <InlineAdSlot label="AD SPACE" />
     </RetroContainer>

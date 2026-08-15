@@ -14,7 +14,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
 
   return (
     <div className="flex flex-col gap-2">
-      <SectionLabel>{isReadOnly ? 'Cartridge shelf' : 'Choose a cartridge'}</SectionLabel>
+      <SectionLabel>{isReadOnly ? 'Game shelf' : 'Choose a game'}</SectionLabel>
 
       {GAME_CARTRIDGES.map((cartridge) => {
         const isSelected = selectedGameId === cartridge.id;

@@ -29,7 +29,7 @@ describe('Landing screen', () => {
   it('says what EduParty is to somebody who just arrived', () => {
     renderLanding();
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/eduparty/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/game night/i);
     expect(screen.getByText(/4-letter pin/i)).toBeInTheDocument();
     expect(screen.getByText(/100% free/i)).toBeInTheDocument();
     expect(screen.getByText(/online english classes/i)).toBeInTheDocument();
@@ -144,10 +144,10 @@ describe('Landing screen', () => {
     expect(screen.getByText(/say anything but the word/i)).toBeInTheDocument();
   });
 
-  it('says more cartridges are coming without naming a date', () => {
+  it('says more games are coming without naming a date', () => {
     renderLanding();
 
-    expect(screen.getByText(/more cartridges/i)).toBeInTheDocument();
+    expect(screen.getByText(/more games/i)).toBeInTheDocument();
   });
 
   it('places the game library below the two ways in', () => {
