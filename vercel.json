@@ -9,6 +9,12 @@
       "has": [{ "type": "host", "value": "www.eduparty.online" }],
       "destination": "https://eduparty.online/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "education-portal-swart.vercel.app" }],
+      "destination": "https://eduparty.online/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
