@@ -15,7 +15,7 @@ interface AppLayoutProps {
  * own bordered panel (see RetroContainer), so this stays plain.
  */
 export const AppLayout = ({ children }: AppLayoutProps) => (
-  <div className="flex min-h-full w-full flex-col bg-sky-400">
+  <div className="flex min-h-dvh w-full flex-col bg-sky-400">
     <Header />
 
     <div className="flex w-full flex-1 justify-center gap-6 p-4 lg:p-8">
