@@ -6,6 +6,11 @@ import { fileURLToPath, URL } from 'node:url';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    // Real stack traces for whatever error monitoring lands per #56, instead
+    // of minified-and-mangled ones.
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
