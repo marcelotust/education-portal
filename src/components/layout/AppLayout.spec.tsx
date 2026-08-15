@@ -26,6 +26,12 @@ describe('AppLayout', () => {
     expect(screen.getByRole('link', { name: /privacy policy/i })).toBeInTheDocument();
   });
 
+  it('carries the brand header on every screen', () => {
+    renderLayout(<p>SCREEN CONTENT</p>);
+
+    expect(screen.getByRole('link', { name: /eduparty/i })).toHaveAttribute('href', '/');
+  });
+
   it('renders the two lateral ad spaces reserved for desktop', () => {
     renderLayout(<p>SCREEN CONTENT</p>);
 
