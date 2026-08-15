@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Placeholder domain until #56 lands a custom one — regenerate this file
-     (and the Sitemap line in robots.txt) once it does. /host, /play and
-     /legal are left out: they carry no unique searchable content and /legal
-     is disallowed in robots.txt. -->
+<!-- /host, /play, /legal, and /contact are left out: they carry no unique
+     searchable content, and /legal and /contact are disallowed in robots.txt. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://education-portal-swart.vercel.app/</loc>
+    <loc>https://eduparty.online/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
