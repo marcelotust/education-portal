@@ -28,7 +28,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
   return (
     <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-3 text-center">
-        <h1 className="font-arcade text-lg text-rose-500">EDUPARTY</h1>
+        <h1 className="sr-only">EduParty</h1>
         <p className="font-arcade text-[10px] uppercase tracking-widest text-green-600">
           100% Free
         </p>
