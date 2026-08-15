@@ -74,7 +74,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
         <header className="flex flex-col items-center gap-2 text-center">
           <h1 className="font-arcade text-lg text-rose-500">CONTACT</h1>
           <p className="font-terminal text-lg text-gray-500">
-            Suggestions, new game requests, bug reports — this goes straight to us.
+            Suggestions, new game requests, bug reports. This goes straight to us.
           </p>
         </header>
 

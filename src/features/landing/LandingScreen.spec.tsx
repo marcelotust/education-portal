@@ -133,25 +133,29 @@ describe('Landing screen', () => {
     expect(screen.queryByRole('button', { name: /rejoin/i })).not.toBeInTheDocument();
   });
 
-  it('carries a copyright line and links to the legal notices', () => {
+  it('shows off the game library with its real taglines', () => {
     renderLanding();
 
-    expect(screen.getByText(/© 2026 eduparty/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /privacy policy/i })).toHaveAttribute(
-      'href',
-      '/legal#privacy',
-    );
-    expect(screen.getByRole('link', { name: /terms of service/i })).toHaveAttribute(
-      'href',
-      '/legal#terms',
-    );
-    expect(screen.getByRole('link', { name: /children's privacy/i })).toHaveAttribute(
-      'href',
-      '/legal#children',
-    );
-    expect(screen.getByRole('link', { name: /suggestions.*bug reports/i })).toHaveAttribute(
-      'href',
-      '/contact',
-    );
+    expect(screen.getByText('STOP')).toBeInTheDocument();
+    expect(screen.getByText(/categories against the clock/i)).toBeInTheDocument();
+    expect(screen.getByText('QUIZ')).toBeInTheDocument();
+    expect(screen.getByText(/multiple choice, fastest wins/i)).toBeInTheDocument();
+    expect(screen.getByText('TABOO')).toBeInTheDocument();
+    expect(screen.getByText(/say anything but the word/i)).toBeInTheDocument();
+  });
+
+  it('says more cartridges are coming without naming a date', () => {
+    renderLanding();
+
+    expect(screen.getByText(/more cartridges/i)).toBeInTheDocument();
+  });
+
+  it('places the game library below the two ways in', () => {
+    renderLanding();
+
+    const join = screen.getByRole('button', { name: /join a room/i });
+    const games = screen.getByText('STOP');
+
+    expect(join.compareDocumentPosition(games) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
