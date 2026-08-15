@@ -11,7 +11,7 @@ export const LandingRoute = () => {
   useDocumentMeta({
     title: 'EduParty — Free Party Games for Online English Classes',
     description:
-      'EduParty is a free, no-signup game portal built to support online English classes. Host a room, share a 4-letter PIN, and play together — everyone is welcome.',
+      'EduParty is a free, no-signup game portal for online English classes. Host a room, share a 4-letter PIN, and play STOP, QUIZ, or TABOO together.',
   });
   const service = useMemo(() => createSupabaseRoomService(), []);
   const [resumableRoom, setResumableRoom] = useState<{ pin: string } | null>(null);

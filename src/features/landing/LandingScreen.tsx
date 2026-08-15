@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { GAME_CARTRIDGES } from '@/features/lobby/cartridges';
 import { listRecentRooms } from '@/lib/recentRooms';
 
 interface LandingScreenProps {
@@ -32,13 +33,12 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           100% Free
         </p>
         <p className="font-terminal text-xl text-gray-700">
-          Built to support online English classes — the Host opens a room, everyone joins with a
-          4-letter PIN, and you play together as a warm-up, wrap-up, or reward. No accounts, no
-          downloads.
+          The Host opens a room, everyone joins with a 4-letter PIN, and you play together as a
+          warm-up, wrap-up, or reward for online English classes. No accounts, no downloads.
         </p>
         <p className="font-terminal text-lg text-gray-500">
-          Not in an English class? Everyone&apos;s invited — grab a PIN and play. Up to 6 players
-          per room.
+          Not in an English class? Everyone&apos;s invited. Grab a PIN and play. Up to 6 players per
+          room.
         </p>
       </header>
 
@@ -49,6 +49,26 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
         <RetroButton tone="cyan" onClick={() => void navigate('/play')}>
           JOIN A ROOM
         </RetroButton>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Play these today</SectionLabel>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {GAME_CARTRIDGES.map((cartridge) => (
+            <div
+              key={cartridge.id}
+              className="flex flex-col gap-1 border-4 border-black bg-white p-3 text-center"
+            >
+              <span className="font-arcade text-xs text-rose-500">{cartridge.title}</span>
+              <span className="font-terminal text-base text-gray-600">{cartridge.tagline}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-center font-terminal text-sm text-gray-500">
+          More cartridges are already in the works.
+        </p>
       </div>
 
       {recentRooms.length > 0 && (
@@ -83,36 +103,6 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           </RetroButton>
         </div>
       )}
-
-      <footer className="flex flex-col items-center gap-2 border-t-4 border-black pt-4 text-center">
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-          <Link
-            to="/legal#privacy"
-            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            to="/legal#terms"
-            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            to="/legal#children"
-            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
-          >
-            Children&apos;s Privacy
-          </Link>
-          <Link
-            to="/contact"
-            className="font-terminal text-sm text-gray-500 underline hover:text-gray-700"
-          >
-            Suggestions &amp; Bug Reports
-          </Link>
-        </div>
-        <p className="font-terminal text-xs text-gray-400">© 2026 EduParty</p>
-      </footer>
     </RetroContainer>
   );
 };

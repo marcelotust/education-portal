@@ -3,6 +3,17 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      colors: {
+        // Retro Platformer ground band: grass strip over a dirt band.
+        grass: {
+          light: '#65a30d',
+          dark: '#4d7c0f',
+        },
+        dirt: {
+          light: '#92400e',
+          dark: '#78350f',
+        },
+      },
       fontFamily: {
         // Headings, buttons and any "arcade cabinet" chrome.
         arcade: ['"Press Start 2P"', 'monospace'],
