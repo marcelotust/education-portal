@@ -14,10 +14,24 @@
     <link rel="canonical" href="%VITE_SITE_URL%/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Loaded as a non-blocking preload so the font request doesn't hold up
+         first paint; display=swap on the stylesheet itself already prevents
+         invisible text while it loads. -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-      rel="stylesheet"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <title>EduParty — Education Party Games Portal</title>
 
     <meta property="og:type" content="website" />
