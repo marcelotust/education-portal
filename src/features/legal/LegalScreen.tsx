@@ -66,8 +66,8 @@ export const LegalScreen = () => {
           </p>
           <p>
             Whoever creates a room (the Host) is responsible for what happens in it: who is invited,
-            what nicknames are allowed, and how content from the game cartridges is used. Don&apos;t
-            use a room&apos;s PIN to disrupt a game you were not invited to.
+            what nicknames are allowed, and how content from the games is used. Don&apos;t use a
+            room&apos;s PIN to disrupt a game you were not invited to.
           </p>
           <p>
             These terms may change as the app changes. Continuing to use EduParty after a change
