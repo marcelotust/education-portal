@@ -134,6 +134,11 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               type="button"
               disabled={picked !== null}
               aria-pressed={picked === index}
+              // A mouse/touch click shouldn't leave the button focused: the
+              // "everyone answered" banner that can mount right above once
+              // the last pick comes in would otherwise trigger the
+              // browser's scroll-to-focused-element correction.
+              onMouseDown={(event) => event.preventDefault()}
               onClick={() => answer(index)}
               className={cn(
                 'flex w-full items-center gap-3 border-4 px-3 py-3 text-left font-terminal text-xl transition-transform',
@@ -148,13 +153,15 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
             >
               <span
                 className={cn(
-                  'font-arcade text-[10px]',
-                  picked === index ? 'text-white/70' : 'text-gray-500',
+                  'flex h-6 w-6 shrink-0 items-center justify-center border-2 font-arcade text-[10px]',
+                  picked === index
+                    ? 'border-white/70 text-white/70'
+                    : 'border-gray-400 text-gray-500',
                 )}
               >
                 {LETTERS[index]}
               </span>
-              {option}
+              <span>{option}</span>
             </button>
           </li>
         ))}

@@ -27,7 +27,11 @@ const screenFor = (state: RoomState, playerId: string): ReactNode => {
       return <StopRoundScreen playerId={playerId} />;
     case 'SHOWING_ANSWER':
       // Only QUIZ and TABOO pause for a reveal; STOP never reaches this state.
-      return state.currentRound?.game === 'TABOO' ? <TabooRevealScreen /> : <QuizRevealScreen />;
+      return state.currentRound?.game === 'TABOO' ? (
+        <TabooRevealScreen />
+      ) : (
+        <QuizRevealScreen playerId={playerId} />
+      );
     case 'CALCULATING_SCORES':
       // The Host judges first; the standings replace the table once confirmed.
       return state.currentRound?.isScored === true ? (
