@@ -26,79 +26,85 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
     livePins == null ? remembered : remembered.filter((room) => livePins.includes(room.pin));
 
   return (
-    <RetroContainer className="flex flex-col gap-6 p-6">
-      <header className="flex flex-col items-center gap-3 text-center">
-        <h1 className="font-terminal text-2xl text-rose-500">
-          A retro arcade built to make online classes feel like game night.
+    <div className="flex flex-col gap-6">
+      {/* Direct on the page's sky-blue, matching the logo above it instead of
+          jumping straight into a boxed white card. */}
+      <header className="flex flex-col items-center gap-3 px-2 text-center">
+        <h1 className="text-solid-shadow font-arcade text-lg text-yellow-400">
+          A live game portal for video classes.
         </h1>
-        <p className="font-arcade text-[10px] uppercase tracking-widest text-green-600">
-          100% Free
+        <p className="font-terminal text-xl text-ink">
+          EduParty turns any video call into a shared arcade — one Host opens a room, everyone else
+          joins by typing a 4-letter PIN into their own browser, and you&apos;re playing together
+          inside the same call.
         </p>
-        <p className="font-terminal text-xl text-gray-700">
-          The Host opens a room, everyone joins with a 4-letter PIN, and you play together as a
-          warm-up, wrap-up, or reward for online English classes. No accounts, no downloads.
+        <p className="font-terminal text-lg text-ink/80">
+          Built for language teachers who need a two-minute warm-up or wrap-up between drills, and
+          open to any host who wants a free, no-download way to make a call feel like a room full of
+          people instead of a grid of faces.
         </p>
-        <p className="font-terminal text-lg text-gray-500">
-          Not in an English class? Everyone&apos;s invited. Grab a PIN and play. Up to 6 players per
-          room.
+        <p className="font-arcade text-[9px] uppercase tracking-widest text-ink">
+          Free · No accounts · Up to 6 players · Live in under a minute
         </p>
       </header>
 
-      <div className="flex flex-col gap-3">
-        <RetroButton tone="green" onClick={() => void navigate('/host')}>
-          CREATE A ROOM
-        </RetroButton>
-        <RetroButton tone="cyan" onClick={() => void navigate('/play')}>
-          JOIN A ROOM
-        </RetroButton>
-      </div>
-
-      <div className="flex flex-col gap-2 text-center">
-        <SectionLabel>Play these today</SectionLabel>
-        <p className="font-terminal text-xl text-gray-700">
-          {GAME_CARTRIDGES.map((cartridge) => cartridge.title).join(', ')} — more games are on the
-          way.
-        </p>
-        <Link
-          to="/contact?category=GAME_REQUEST"
-          className="font-terminal text-lg text-sky-600 underline hover:text-sky-700"
-        >
-          Tell us what game you want to play
-        </Link>
-      </div>
-
-      {recentRooms.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <SectionLabel>Rooms you joined</SectionLabel>
-
-          {recentRooms.map((room) => (
-            <button
-              key={room.pin}
-              type="button"
-              aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
-              onClick={() => void navigate(`/play?pin=${room.pin}`)}
-              className="flex min-h-11 items-center justify-between gap-3 border-4 border-ink bg-white px-3 py-3 font-arcade text-[10px] text-black transition-colors hover:bg-gray-50"
-            >
-              <span className="tracking-[0.3em] text-sky-500">{room.pin}</span>
-              <span className="text-gray-500">{room.nickname}</span>
-            </button>
-          ))}
-
-          <p className="font-terminal text-sm text-gray-500">
-            Saved on this device only — the room itself may already be over.
-          </p>
-        </div>
-      )}
-
-      {resumableRoom !== null && (
-        <div className="flex flex-col gap-2">
-          <SectionLabel>Load your last room</SectionLabel>
-
-          <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
-            RESUME {resumableRoom.pin}
+      <RetroContainer className="flex flex-col gap-6 p-6">
+        <div className="flex flex-col gap-3">
+          <RetroButton tone="green" onClick={() => void navigate('/host')}>
+            CREATE A ROOM
+          </RetroButton>
+          <RetroButton tone="cyan" onClick={() => void navigate('/play')}>
+            JOIN A ROOM
           </RetroButton>
         </div>
-      )}
-    </RetroContainer>
+
+        <div className="flex flex-col gap-2 text-center">
+          <SectionLabel>Play these today</SectionLabel>
+          <p className="font-terminal text-xl text-gray-700">
+            {GAME_CARTRIDGES.map((cartridge) => cartridge.title).join(', ')} — more games are on the
+            way.
+          </p>
+          <Link
+            to="/contact?category=GAME_REQUEST"
+            className="font-terminal text-lg text-sky-600 underline hover:text-sky-700"
+          >
+            Tell us what game you want to play
+          </Link>
+        </div>
+
+        {recentRooms.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <SectionLabel>Rooms you joined</SectionLabel>
+
+            {recentRooms.map((room) => (
+              <button
+                key={room.pin}
+                type="button"
+                aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
+                onClick={() => void navigate(`/play?pin=${room.pin}`)}
+                className="flex min-h-11 items-center justify-between gap-3 border-4 border-ink bg-white px-3 py-3 font-arcade text-[10px] text-black transition-colors hover:bg-gray-50"
+              >
+                <span className="tracking-[0.3em] text-sky-500">{room.pin}</span>
+                <span className="text-gray-500">{room.nickname}</span>
+              </button>
+            ))}
+
+            <p className="font-terminal text-sm text-gray-500">
+              Saved on this device only — the room itself may already be over.
+            </p>
+          </div>
+        )}
+
+        {resumableRoom !== null && (
+          <div className="flex flex-col gap-2">
+            <SectionLabel>Load your last room</SectionLabel>
+
+            <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
+              RESUME {resumableRoom.pin}
+            </RetroButton>
+          </div>
+        )}
+      </RetroContainer>
+    </div>
   );
 };
