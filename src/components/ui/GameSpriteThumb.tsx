@@ -14,7 +14,7 @@ export const GameSpriteThumb = ({ spritePosition, className }: GameSpriteThumbPr
   <div
     aria-hidden="true"
     className={cn(
-      "aspect-[4/3] w-full border-2 border-black bg-[url('/games.png')] bg-[length:200%_200%]",
+      "aspect-[4/3] w-full border-2 border-ink bg-[url('/games.png')] bg-[length:200%_200%]",
       className,
     )}
     style={{ backgroundPosition: spritePosition, imageRendering: 'pixelated' }}

@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
  */
 export const Footer = () => (
   <footer className="w-full">
-    <div className="bg-grass-band h-4 w-full border-y-4 border-black" aria-hidden="true" />
-    <div className="bg-dirt-band flex flex-col items-center gap-2 border-b-4 border-black px-4 py-4 text-center">
+    <div className="bg-grass-band h-4 w-full border-y-4 border-ink" aria-hidden="true" />
+    <div className="bg-dirt-band flex flex-col items-center gap-2 border-b-4 border-ink px-4 py-4 text-center">
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
         <Link
           to="/legal#privacy"

@@ -19,7 +19,7 @@ export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
       aria-label={copied ? 'Copied!' : 'Invite'}
       onClick={() => void copyInviteLink()}
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center border-4 border-black font-arcade text-base transition-transform',
+        'flex h-9 w-9 shrink-0 items-center justify-center border-4 border-ink font-arcade text-base transition-transform',
         'shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
         copied ? 'bg-green-400 text-black' : 'bg-rose-500 text-white hover:bg-rose-400',

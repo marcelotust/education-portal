@@ -28,7 +28,7 @@ export const PlayerSlotCard = ({ index, slot, score, isLeader }: PlayerSlotCardP
       // control, and the shadow-retro treatment reads as a button.
       'flex min-h-11 items-center gap-3 border-4 px-3 py-1.5',
       slot
-        ? cn('bg-white', isLeader ? 'border-yellow-400' : 'border-black')
+        ? cn('bg-white', isLeader ? 'border-yellow-400' : 'border-ink')
         : 'border-dashed border-gray-300 bg-gray-50',
     )}
   >
@@ -37,7 +37,7 @@ export const PlayerSlotCard = ({ index, slot, score, isLeader }: PlayerSlotCardP
       className={cn(
         'flex h-8 w-8 shrink-0 items-center justify-center border-2 font-arcade text-base',
         slot
-          ? cn(AVATAR_BLOCK_COLORS[slot.avatarId], 'border-black text-white')
+          ? cn(AVATAR_BLOCK_COLORS[slot.avatarId], 'border-ink text-white')
           : 'border-dashed border-gray-300 text-gray-300',
       )}
     >

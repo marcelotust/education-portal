@@ -19,7 +19,7 @@ export const TabooSetupPanel = ({
   const chosen = setup.categories.length;
 
   return (
-    <div className="flex flex-col gap-4 border-4 border-black bg-white p-3">
+    <div className="flex flex-col gap-4 border-4 border-ink bg-white p-3">
       <div className="flex flex-col gap-2">
         <SectionLabel>Turn length</SectionLabel>
         <div className="grid grid-cols-3 gap-2">
@@ -32,7 +32,7 @@ export const TabooSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 border-4 border-black py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 border-4 border-ink py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.roundDurationSeconds === seconds
                   ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
                   : cn(
@@ -63,7 +63,7 @@ export const TabooSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 border-4 border-black px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
+                  'min-h-11 border-4 border-ink px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
                   isChosen
                     ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
                     : cn(
