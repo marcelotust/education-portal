@@ -75,7 +75,6 @@ describe('Lobby feature', () => {
       const user = userEvent.setup();
       const writeText = vi.fn().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
-      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
       renderLobby('HOST');
 
       await user.click(screen.getByRole('button', { name: /^invite$/i }));
@@ -84,42 +83,53 @@ describe('Lobby feature', () => {
       expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();
     });
 
-    it('prefers the native share sheet when the device offers one', async () => {
-      const user = userEvent.setup();
-      const share = vi.fn().mockResolvedValue(undefined);
-      const writeText = vi.fn();
-      Object.defineProperty(navigator, 'share', { value: share, configurable: true });
-      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
-      renderLobby('HOST');
-
-      await user.click(screen.getByRole('button', { name: /^invite$/i }));
-
-      expect(share).toHaveBeenCalledWith(
-        expect.objectContaining({ url: expect.stringContaining('/play?pin=ABCD') }),
-      );
-      expect(writeText).not.toHaveBeenCalled();
-    });
-
     it('never offers a Player a way to invite themselves', () => {
       renderLobby('PLAYER');
 
       expect(screen.queryByRole('button', { name: /^invite$/i })).not.toBeInTheDocument();
     });
+
+    it('copies the join link when the Host taps the invite seat', async () => {
+      const user = userEvent.setup();
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      renderLobby('HOST', makeRoom({ playerCount: 2 }));
+
+      await user.click(screen.getByTestId('invite-slot'));
+
+      expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/play?pin=ABCD'));
+      expect(await screen.findByText(/copied/i)).toBeInTheDocument();
+    });
   });
 
   describe('character select board', () => {
-    it('always renders the 6 slots of the room', () => {
-      renderLobby('HOST', makeRoom({ playerCount: 2 }));
-
-      expect(screen.getAllByTestId(/^player-slot-/)).toHaveLength(6);
-    });
-
-    it('shows the nickname of connected players and marks the open slots as free', () => {
+    it('shows every filled seat plus exactly one open seat, not all 6 at once', () => {
       renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
 
       expect(screen.getByText('ANA')).toBeInTheDocument();
       expect(screen.getByText('BRUNO')).toBeInTheDocument();
-      expect(screen.getAllByText('OPEN')).toHaveLength(4);
+      expect(screen.getAllByTestId(/^player-slot-/)).toHaveLength(3);
+      expect(screen.getAllByText('OPEN')).toHaveLength(1);
+    });
+
+    it('hides the open seat once the room is full', () => {
+      renderLobby('PLAYER', makeRoom({ playerCount: 6 }));
+
+      expect(screen.getAllByTestId(/^player-slot-/)).toHaveLength(6);
+      expect(screen.queryByText('OPEN')).not.toBeInTheDocument();
+    });
+
+    it("offers the Host that one open seat as an invite CTA, not a plain 'OPEN' row", () => {
+      renderLobby('HOST', makeRoom({ playerCount: 2 }));
+
+      expect(screen.getByTestId('invite-slot')).toBeInTheDocument();
+      expect(screen.queryByText('OPEN')).not.toBeInTheDocument();
+    });
+
+    it('never offers a Player the invite seat', () => {
+      renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
+
+      expect(screen.queryByTestId('invite-slot')).not.toBeInTheDocument();
     });
 
     it('shows how many of the 6 seats are taken', () => {

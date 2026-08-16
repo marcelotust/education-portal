@@ -24,16 +24,18 @@ export const PlayerSlotCard = ({ index, slot, score, isLeader }: PlayerSlotCardP
     data-testid={`player-slot-${index}`}
     data-leader={isLeader}
     className={cn(
-      'flex min-h-14 items-center gap-3 border-4 border-black px-3 py-2',
+      // Flat, no shadow or press states — a seat is information, not a
+      // control, and the shadow-retro treatment reads as a button.
+      'flex min-h-11 items-center gap-3 border-4 px-3 py-1.5',
       slot
-        ? cn('bg-white', isLeader ? 'shadow-[4px_4px_0px_0px_rgba(234,179,8,1)]' : 'shadow-retro')
+        ? cn('bg-white', isLeader ? 'border-yellow-400' : 'border-black')
         : 'border-dashed border-gray-300 bg-gray-50',
     )}
   >
     <span
       aria-hidden
       className={cn(
-        'flex h-10 w-10 shrink-0 items-center justify-center border-2 font-arcade text-lg',
+        'flex h-8 w-8 shrink-0 items-center justify-center border-2 font-arcade text-base',
         slot
           ? cn(AVATAR_BLOCK_COLORS[slot.avatarId], 'border-black text-white')
           : 'border-dashed border-gray-300 text-gray-300',
