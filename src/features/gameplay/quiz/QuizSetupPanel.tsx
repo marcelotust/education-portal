@@ -41,9 +41,9 @@ export const QuizSetupPanel = ({
               className={cn(
                 'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-sky-500 text-white shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
                   : cn(
-                      'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}
@@ -68,9 +68,9 @@ export const QuizSetupPanel = ({
               className={cn(
                 'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.questionCount === count
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-rose-500 text-white shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-rose text-black shadow-none'
                   : cn(
-                      'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                      'border-ink bg-rose-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}
@@ -95,9 +95,9 @@ export const QuizSetupPanel = ({
               className={cn(
                 'min-h-11 border-4 px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
                 setup.topic === topic
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-green-500 text-white shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-green text-black shadow-none'
                   : cn(
-                      'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                      'border-ink bg-green-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}

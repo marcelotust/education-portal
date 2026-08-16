@@ -143,9 +143,9 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               className={cn(
                 'flex w-full items-center gap-3 border-4 px-3 py-3 text-left font-terminal text-xl transition-transform',
                 picked === index
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-sky-500 text-white shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
                   : cn(
-                      'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:opacity-60',
                     ),
                 'disabled:cursor-not-allowed',
@@ -155,8 +155,8 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
                 className={cn(
                   'flex h-6 w-6 shrink-0 items-center justify-center border-2 font-arcade text-[10px]',
                   picked === index
-                    ? 'border-white/70 text-white/70'
-                    : 'border-gray-400 text-gray-500',
+                    ? 'border-black/40 text-black/70'
+                    : 'border-white/70 text-white/70',
                 )}
               >
                 {LETTERS[index]}

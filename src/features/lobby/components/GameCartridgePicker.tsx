@@ -24,7 +24,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
           return (
             <RetroButton
               key={cartridge.id}
-              tone={isSelected ? 'yellow' : 'white'}
+              tone="yellow"
               pressed={isSelected}
               aria-label={cartridge.title}
               aria-pressed={isSelected}

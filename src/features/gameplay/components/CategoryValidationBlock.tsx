@@ -78,11 +78,11 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, true)}
                   className={cn(
-                    'flex min-h-11 min-w-11 items-center justify-center border-4 font-arcade text-xl transition-transform disabled:cursor-not-allowed',
+                    'flex min-h-11 min-w-11 items-center justify-center border-4 border-ink font-arcade text-3xl transition-transform disabled:cursor-not-allowed',
                     isApproved
-                      ? 'translate-x-[2px] translate-y-[2px] border-flare bg-green-400 text-black shadow-none'
+                      ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
                       : cn(
-                          'border-ink bg-white text-green-500 shadow-[2px_2px_0px_0px_#381a41]',
+                          'bg-white text-green-500 shadow-[2px_2px_0px_0px_#381a41]',
                           'disabled:text-gray-300 disabled:shadow-none',
                         ),
                   )}
@@ -97,11 +97,11 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, false)}
                   className={cn(
-                    'flex min-h-11 min-w-11 items-center justify-center border-4 font-arcade text-xl transition-transform disabled:cursor-not-allowed',
+                    'flex min-h-11 min-w-11 items-center justify-center border-4 border-ink font-arcade text-3xl transition-transform disabled:cursor-not-allowed',
                     isRejected
-                      ? 'translate-x-[2px] translate-y-[2px] border-flare bg-rose-400 text-black shadow-none'
+                      ? 'translate-x-[2px] translate-y-[2px] bg-rose-500 text-white shadow-none'
                       : cn(
-                          'border-ink bg-white text-rose-500 shadow-[2px_2px_0px_0px_#381a41]',
+                          'bg-white text-rose-500 shadow-[2px_2px_0px_0px_#381a41]',
                           'disabled:text-gray-300 disabled:shadow-none',
                         ),
                   )}
