@@ -24,11 +24,16 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
           return (
             <RetroButton
               key={cartridge.id}
-              tone="yellow"
+              tone={isSelected ? 'yellow' : 'white'}
               pressed={isSelected}
               aria-label={cartridge.title}
               aria-pressed={isSelected}
               disabled={isReadOnly}
+              // A mouse/touch click shouldn't leave the button focused: the
+              // setup panel that mounts right below it once selected would
+              // otherwise trigger the browser's scroll-to-focused-element
+              // correction, jumping the page under the Host's thumb.
+              onMouseDown={(event) => event.preventDefault()}
               onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
               className="flex flex-col items-center gap-2 text-center"
             >
@@ -47,7 +52,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
           aria-label={`${LOADING_CARD.title}: ${LOADING_CARD.tagline}`}
           className="flex flex-col items-center gap-2 text-center"
         >
-          <GameSpriteThumb spritePosition={LOADING_CARD.spritePosition} />
+          <GameSpriteThumb spritePosition={LOADING_CARD.spritePosition} className="opacity-80" />
           <span>{LOADING_CARD.title}</span>
           <span className="font-terminal text-sm normal-case opacity-80">
             {LOADING_CARD.tagline}

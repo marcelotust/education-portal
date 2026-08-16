@@ -74,7 +74,7 @@ export const StopTypingScreen = ({
     <RetroContainer className="flex flex-col gap-4 p-6">
       {/* Sticky: with eight categories the fields scroll, and losing sight of
           the clock in a timed game is losing the game. */}
-      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur">
+      <header className="sticky top-16 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur sm:top-[72px]">
         <div className="flex flex-col items-center">
           <SectionLabel>Letter</SectionLabel>
           <span

@@ -33,11 +33,11 @@ export const StopSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 border-4 border-ink py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-sky-500 text-white shadow-none'
                   : cn(
-                      'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                      'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}
@@ -64,11 +64,11 @@ export const StopSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 border-4 border-ink px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
+                  'min-h-11 border-4 px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
                   isChosen
-                    ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
+                    ? 'translate-x-[2px] translate-y-[2px] border-flare bg-green-500 text-white shadow-none'
                     : cn(
-                        'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
+                        'border-ink bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                         'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                       ),
                 )}

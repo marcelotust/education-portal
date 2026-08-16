@@ -93,7 +93,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur">
+      <header className="sticky top-16 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur sm:top-[72px]">
         <div className="flex flex-col items-center">
           <SectionLabel>Turn</SectionLabel>
           <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">

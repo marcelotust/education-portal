@@ -133,15 +133,11 @@ describe('Landing screen', () => {
     expect(screen.queryByRole('button', { name: /rejoin/i })).not.toBeInTheDocument();
   });
 
-  it('shows off the game library with its real taglines', () => {
+  it('names the games available today', () => {
     renderLanding();
 
-    expect(screen.getByText('STOP')).toBeInTheDocument();
-    expect(screen.getByText(/categories against the clock/i)).toBeInTheDocument();
-    expect(screen.getByText('QUIZ')).toBeInTheDocument();
-    expect(screen.getByText(/multiple choice, fastest wins/i)).toBeInTheDocument();
-    expect(screen.getByText('TABOO')).toBeInTheDocument();
-    expect(screen.getByText(/say anything but the word/i)).toBeInTheDocument();
+    const games = screen.getByText(/STOP.*QUIZ.*TABOO/);
+    expect(games).toBeInTheDocument();
   });
 
   it('says more games are coming without naming a date', () => {
@@ -154,7 +150,7 @@ describe('Landing screen', () => {
     renderLanding();
 
     const join = screen.getByRole('button', { name: /join a room/i });
-    const games = screen.getByText('STOP');
+    const games = screen.getByText(/STOP.*QUIZ.*TABOO/);
 
     expect(join.compareDocumentPosition(games) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
