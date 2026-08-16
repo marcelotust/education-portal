@@ -14,11 +14,20 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers, isHost }: RoomPinB
 
     <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Room PIN</p>
 
-    <div className="flex items-center gap-3">
-      <p className="text-solid-shadow font-arcade text-3xl tracking-[0.3em] text-yellow-400">
-        {pin}
-      </p>
-      {isHost && <InviteLinkButton pin={pin} />}
+    <div className="flex justify-center">
+      {/* Relative to just the PIN's own width, not the full-width row, so
+          the PIN stays visually centered and the icon floats beside it
+          instead of the pair being centered as one wider unit. */}
+      <div className="relative inline-flex">
+        <p className="text-solid-shadow font-arcade text-3xl tracking-[0.3em] text-yellow-400">
+          {pin}
+        </p>
+        {isHost && (
+          <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
+            <InviteLinkButton pin={pin} />
+          </span>
+        )}
+      </div>
     </div>
 
     <p className="border-4 border-black bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">

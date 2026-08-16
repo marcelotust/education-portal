@@ -93,7 +93,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
+      <header className="sticky top-16 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur sm:top-[72px]">
         <div className="flex flex-col items-center">
           <SectionLabel>Turn</SectionLabel>
           <span data-testid="turn-progress" className="font-arcade text-sm text-green-600">
@@ -119,7 +119,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
       {everyoneGuessed && (
         <p
           role="alert"
-          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
+          className="animate-blink border-4 border-ink bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           EVERYONE HAS GUESSED! ENDING ROUND
         </p>
@@ -135,7 +135,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
             {turn.card.forbidden.map((word) => (
               <li
                 key={word}
-                className="border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
+                className="border-4 border-ink bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
               >
                 {word}
               </li>

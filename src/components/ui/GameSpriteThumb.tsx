@@ -13,10 +13,7 @@ interface GameSpriteThumbProps {
 export const GameSpriteThumb = ({ spritePosition, className }: GameSpriteThumbProps) => (
   <div
     aria-hidden="true"
-    className={cn(
-      "aspect-[4/3] w-full border-2 border-black bg-[url('/games.png')] bg-[length:200%_200%]",
-      className,
-    )}
+    className={cn("aspect-[4/3] w-full bg-[url('/games.png')] bg-[length:200%_200%]", className)}
     style={{ backgroundPosition: spritePosition, imageRendering: 'pixelated' }}
   />
 );

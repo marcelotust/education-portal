@@ -15,6 +15,8 @@ export default {
         },
         // Retro Platformer's shadow/outline color, in place of flat black.
         ink: '#381a41',
+        // The logo mark's pink outline — borrowed to flag a selected control.
+        flare: '#f8245c',
       },
       fontFamily: {
         // Headings, buttons and any "arcade cabinet" chrome.

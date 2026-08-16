@@ -74,7 +74,7 @@ export const StopTypingScreen = ({
     <RetroContainer className="flex flex-col gap-4 p-6">
       {/* Sticky: with eight categories the fields scroll, and losing sight of
           the clock in a timed game is losing the game. */}
-      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
+      <header className="sticky top-16 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur sm:top-[72px]">
         <div className="flex flex-col items-center">
           <SectionLabel>Letter</SectionLabel>
           <span
@@ -103,7 +103,7 @@ export const StopTypingScreen = ({
       {round.stoppedBy !== null && (
         <p
           role="alert"
-          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
+          className="animate-blink border-4 border-ink bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           {stoppedByNickname ?? 'SOMEBODY'} CALLED STOP! LAST SECONDS
         </p>

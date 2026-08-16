@@ -41,16 +41,17 @@ export const RetroButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'min-h-11 border-4 border-black px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
+      'min-h-11 border-4 px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
       'disabled:cursor-not-allowed',
       pressed
         ? // A pressed-and-disabled button (e.g. the Host's pick, shown read-only
           // to a Player) still needs to read clearly, so it skips the generic
-          // disabled graying rather than fighting it for specificity.
-          'translate-x-[4px] translate-y-[4px] shadow-none'
+          // disabled graying rather than fighting it for specificity. The
+          // border picks up the logo's pink to flag the selection itself.
+          'translate-x-[4px] translate-y-[4px] border-flare shadow-none'
         : cn(
-            'shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+            'border-ink shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
             'disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:hover:bg-gray-300',
           ),
       TONE_STYLES[tone],
