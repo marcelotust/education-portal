@@ -13,6 +13,8 @@ export default {
           light: '#92400e',
           dark: '#78350f',
         },
+        // Retro Platformer's shadow/outline color, in place of flat black.
+        ink: '#381a41',
       },
       fontFamily: {
         // Headings, buttons and any "arcade cabinet" chrome.
@@ -22,7 +24,7 @@ export default {
       },
       boxShadow: {
         // Retro Platformer: solid offset shadow, no blur.
-        retro: '4px 4px 0px 0px rgba(0,0,0,1)',
+        retro: '4px 4px 0px 0px #381a41',
       },
       keyframes: {
         blink: {

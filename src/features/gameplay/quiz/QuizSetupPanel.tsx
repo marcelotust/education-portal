@@ -43,7 +43,7 @@ export const QuizSetupPanel = ({
                 setup.roundDurationSeconds === seconds
                   ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
                   : cn(
-                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}
@@ -70,7 +70,7 @@ export const QuizSetupPanel = ({
                 setup.questionCount === count
                   ? 'translate-x-[2px] translate-y-[2px] bg-rose-500 text-white shadow-none'
                   : cn(
-                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}
@@ -97,7 +97,7 @@ export const QuizSetupPanel = ({
                 setup.topic === topic
                   ? 'translate-x-[2px] translate-y-[2px] bg-green-500 text-white shadow-none'
                   : cn(
-                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
                     ),
               )}

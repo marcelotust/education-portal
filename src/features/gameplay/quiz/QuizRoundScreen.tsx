@@ -140,7 +140,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
                 picked === index
                   ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
                   : cn(
-                      'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'bg-white text-black shadow-[2px_2px_0px_0px_#381a41]',
                       'disabled:opacity-60',
                     ),
                 'disabled:cursor-not-allowed',
