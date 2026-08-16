@@ -23,7 +23,12 @@ export const LobbyScreen = () => {
 
   const board = (
     <>
-      <CharacterSelectGrid slots={state.slots} scores={state.scores} />
+      <CharacterSelectGrid
+        slots={state.slots}
+        scores={state.scores}
+        pin={state.pin}
+        isHost={isHost}
+      />
 
       {Object.keys(state.lastRoundPoints).length > 0 && (
         <LastRoundStandings
