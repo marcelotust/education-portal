@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { RetroGlossButton } from '@/components/ui/RetroGlossButton';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import { GAME_CARTRIDGES, LOADING_CARD } from '@/features/lobby/cartridges';
 import { listRecentRooms } from '@/lib/recentRooms';
@@ -46,12 +47,12 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
       </header>
 
       <div className="flex flex-col gap-3">
-        <RetroButton tone="green" onClick={() => void navigate('/host')}>
+        <RetroGlossButton tone="green" onClick={() => void navigate('/host')}>
           CREATE A ROOM
-        </RetroButton>
-        <RetroButton tone="cyan" onClick={() => void navigate('/play')}>
+        </RetroGlossButton>
+        <RetroGlossButton tone="cyan" onClick={() => void navigate('/play')}>
           JOIN A ROOM
-        </RetroButton>
+        </RetroGlossButton>
       </div>
 
       <div className="flex flex-col gap-3">
