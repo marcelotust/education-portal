@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
@@ -13,6 +13,9 @@ const CATEGORIES: readonly { id: FeedbackCategory; label: string }[] = [
   { id: 'BUG', label: 'Bug Report' },
 ];
 
+const isFeedbackCategory = (value: string | null): value is FeedbackCategory =>
+  CATEGORIES.some((category) => category.id === value);
+
 const MAX_MESSAGE_LENGTH = 500;
 
 interface ContactScreenProps {
@@ -22,7 +25,13 @@ interface ContactScreenProps {
 /** Lets anyone leave a suggestion, ask for a new cartridge, or report a bug. */
 export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
   const navigate = useNavigate();
-  const [category, setCategory] = useState<FeedbackCategory | null>(null);
+  // A landing-page CTA can point straight at a category (e.g. `?category=GAME_REQUEST`)
+  // instead of making the visitor pick it again.
+  const [searchParams] = useSearchParams();
+  const requestedCategory = searchParams.get('category');
+  const [category, setCategory] = useState<FeedbackCategory | null>(
+    isFeedbackCategory(requestedCategory) ? requestedCategory : null,
+  );
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

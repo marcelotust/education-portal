@@ -140,6 +140,13 @@ describe('Landing screen', () => {
     expect(games).toBeInTheDocument();
   });
 
+  it('invites a game request straight into the right contact category', () => {
+    renderLanding();
+
+    const link = screen.getByRole('link', { name: /tell us what game you want to play/i });
+    expect(link).toHaveAttribute('href', '/contact?category=GAME_REQUEST');
+  });
+
   it('says more games are coming without naming a date', () => {
     renderLanding();
 

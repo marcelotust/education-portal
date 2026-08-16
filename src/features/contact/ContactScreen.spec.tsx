@@ -12,9 +12,12 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => navigate };
 });
 
-const renderContact = (submitFeedback = vi.fn().mockResolvedValue(undefined)) => {
+const renderContact = (
+  submitFeedback = vi.fn().mockResolvedValue(undefined),
+  initialEntries: string[] = ['/contact'],
+) => {
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <ContactScreen submitFeedback={submitFeedback} />
     </MemoryRouter>,
   );
@@ -76,6 +79,24 @@ describe('Contact screen', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not send/i);
     expect(screen.getByLabelText(/message/i)).toHaveValue('More cartridges please.');
+  });
+
+  it('preselects the category a link asked for', () => {
+    renderContact(vi.fn(), ['/contact?category=GAME_REQUEST']);
+
+    expect(
+      screen.getByRole('button', { name: /new game request/i, pressed: true }),
+    ).toBeInTheDocument();
+  });
+
+  it('ignores an unrecognized category in the URL', () => {
+    renderContact(vi.fn(), ['/contact?category=NOT_A_REAL_CATEGORY']);
+
+    expect(screen.getByRole('button', { name: /suggestion/i, pressed: false })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /new game request/i, pressed: false }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /bug report/i, pressed: false })).toBeInTheDocument();
   });
 
   it('takes you back to the landing page', async () => {

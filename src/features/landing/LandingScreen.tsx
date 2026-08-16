@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
@@ -59,6 +59,12 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           {GAME_CARTRIDGES.map((cartridge) => cartridge.title).join(', ')} — more games are on the
           way.
         </p>
+        <Link
+          to="/contact?category=GAME_REQUEST"
+          className="font-terminal text-lg text-sky-600 underline hover:text-sky-700"
+        >
+          Tell us what game you want to play
+        </Link>
       </div>
 
       {recentRooms.length > 0 && (
