@@ -21,7 +21,7 @@
   /* Retro Platformer: solid drop shadow for large display text (PIN, big
      headings) instead of a boxed background. */
   .text-solid-shadow {
-    text-shadow: 3px 3px 0px #000;
+    text-shadow: 3px 3px 0px #381a41;
   }
 
   /* Ground band textures: diagonal stripes stand in for grass blades and
