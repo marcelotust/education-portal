@@ -29,11 +29,11 @@ describe('Landing screen', () => {
   it('says what EduParty is to somebody who just arrived', () => {
     renderLanding();
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/game night/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/video classes/i);
     expect(screen.getByText(/4-letter pin/i)).toBeInTheDocument();
-    expect(screen.getByText(/100% free/i)).toBeInTheDocument();
-    expect(screen.getByText(/online english classes/i)).toBeInTheDocument();
-    expect(screen.getByText(/everyone.s invited/i)).toBeInTheDocument();
+    expect(screen.getByText(/language teachers/i)).toBeInTheDocument();
+    expect(screen.getByText(/no accounts/i)).toBeInTheDocument();
+    expect(screen.getByText(/up to 6 players/i)).toBeInTheDocument();
   });
 
   it('offers the two ways in', async () => {

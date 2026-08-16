@@ -93,7 +93,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <header className="sticky top-16 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur sm:top-[72px]">
+      <header className="sticky top-[var(--header-height,64px)] z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
           <SectionLabel>Question</SectionLabel>
           <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
