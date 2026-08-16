@@ -1,7 +1,8 @@
+import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { GameId } from '@/types';
-import { GAME_CARTRIDGES } from '../cartridges';
+import { GAME_CARTRIDGES, LOADING_CARD } from '../cartridges';
 
 interface GameCartridgePickerProps {
   selectedGameId: GameId | null;
@@ -16,27 +17,43 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
     <div className="flex flex-col gap-2">
       <SectionLabel>{isReadOnly ? 'Game shelf' : 'Choose a game'}</SectionLabel>
 
-      {GAME_CARTRIDGES.map((cartridge) => {
-        const isSelected = selectedGameId === cartridge.id;
+      <div className="grid grid-cols-2 gap-3">
+        {GAME_CARTRIDGES.map((cartridge) => {
+          const isSelected = selectedGameId === cartridge.id;
 
-        return (
-          <RetroButton
-            key={cartridge.id}
-            tone="yellow"
-            pressed={isSelected}
-            aria-label={cartridge.title}
-            aria-pressed={isSelected}
-            disabled={isReadOnly}
-            onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
-            className="flex flex-col items-start gap-1 text-left"
-          >
-            <span>{cartridge.title}</span>
-            <span className="font-terminal text-sm normal-case opacity-80">
-              {cartridge.tagline}
-            </span>
-          </RetroButton>
-        );
-      })}
+          return (
+            <RetroButton
+              key={cartridge.id}
+              tone="yellow"
+              pressed={isSelected}
+              aria-label={cartridge.title}
+              aria-pressed={isSelected}
+              disabled={isReadOnly}
+              onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
+              className="flex flex-col items-center gap-2 text-center"
+            >
+              <GameSpriteThumb spritePosition={cartridge.spritePosition} />
+              <span>{cartridge.title}</span>
+              <span className="font-terminal text-sm normal-case opacity-80">
+                {cartridge.tagline}
+              </span>
+            </RetroButton>
+          );
+        })}
+
+        <RetroButton
+          tone="white"
+          disabled
+          aria-label={`${LOADING_CARD.title}: ${LOADING_CARD.tagline}`}
+          className="flex flex-col items-center gap-2 text-center"
+        >
+          <GameSpriteThumb spritePosition={LOADING_CARD.spritePosition} />
+          <span>{LOADING_CARD.title}</span>
+          <span className="font-terminal text-sm normal-case opacity-80">
+            {LOADING_CARD.tagline}
+          </span>
+        </RetroButton>
+      </div>
     </div>
   );
 };

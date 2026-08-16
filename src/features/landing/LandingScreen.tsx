@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { SectionLabel } from '@/components/ui/SectionLabel';
-import { GAME_CARTRIDGES } from '@/features/lobby/cartridges';
+import { GAME_CARTRIDGES, LOADING_CARD } from '@/features/lobby/cartridges';
 import { listRecentRooms } from '@/lib/recentRooms';
 
 interface LandingScreenProps {
@@ -56,21 +57,24 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
       <div className="flex flex-col gap-3">
         <SectionLabel>Play these today</SectionLabel>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3">
           {GAME_CARTRIDGES.map((cartridge) => (
             <div
               key={cartridge.id}
-              className="flex flex-col gap-1 border-4 border-black bg-white p-3 text-center"
+              className="flex flex-col items-center gap-2 border-4 border-black bg-white p-3 text-center"
             >
+              <GameSpriteThumb spritePosition={cartridge.spritePosition} />
               <span className="font-arcade text-xs text-rose-500">{cartridge.title}</span>
               <span className="font-terminal text-base text-gray-600">{cartridge.tagline}</span>
             </div>
           ))}
-        </div>
 
-        <p className="text-center font-terminal text-sm text-gray-500">
-          More games are already in the works.
-        </p>
+          <div className="flex flex-col items-center gap-2 border-4 border-black bg-gray-100 p-3 text-center text-gray-500">
+            <GameSpriteThumb spritePosition={LOADING_CARD.spritePosition} />
+            <span className="font-arcade text-xs">{LOADING_CARD.title}</span>
+            <span className="font-terminal text-base">{LOADING_CARD.tagline}</span>
+          </div>
+        </div>
       </div>
 
       {recentRooms.length > 0 && (

@@ -5,6 +5,8 @@ export interface GameCartridge {
   id: GameId;
   title: string;
   tagline: string;
+  /** CSS `background-position` into `public/games.png`'s 2x2 spritesheet. */
+  spritePosition: string;
   /** Seconds the typing phase lasts. */
   roundDurationSeconds: number;
 }
