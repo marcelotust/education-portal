@@ -22,7 +22,7 @@ export const NewMatchControl = ({ onConfirm }: NewMatchControlProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-2 border-4 border-black bg-orange-50 p-3">
+    <div className="flex flex-col gap-2 border-4 border-ink bg-orange-50 p-3">
       <p className="font-terminal text-lg leading-tight text-black">
         Start a new match? Every score goes back to zero. The room, the PIN and everyone seated stay
         exactly as they are.

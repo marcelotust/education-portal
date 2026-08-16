@@ -42,7 +42,7 @@ export const CategoryValidationBlock = ({
               // A pending answer is visibly unfinished business.
               value !== '' && !isApproved && !isRejected
                 ? 'border-dashed border-gray-400'
-                : 'border-black',
+                : 'border-ink',
             )}
           >
             <span className="w-14 shrink-0 font-arcade text-[9px] text-gray-500">
@@ -78,7 +78,7 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, true)}
                   className={cn(
-                    'min-h-11 min-w-11 border-2 border-black px-2 py-1 font-arcade text-[10px] transition-colors',
+                    'min-h-11 min-w-11 border-2 border-ink px-2 py-1 font-arcade text-[10px] transition-colors',
                     isApproved ? 'bg-green-400 text-black' : 'bg-white text-gray-400',
                     'disabled:cursor-not-allowed disabled:opacity-60',
                   )}
@@ -93,7 +93,7 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, false)}
                   className={cn(
-                    'min-h-11 min-w-11 border-2 border-black px-2 py-1 font-arcade text-[10px] transition-colors',
+                    'min-h-11 min-w-11 border-2 border-ink px-2 py-1 font-arcade text-[10px] transition-colors',
                     isRejected ? 'bg-rose-400 text-black' : 'bg-white text-gray-400',
                     'disabled:cursor-not-allowed disabled:opacity-60',
                   )}
