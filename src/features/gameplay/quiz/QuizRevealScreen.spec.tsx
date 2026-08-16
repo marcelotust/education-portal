@@ -28,11 +28,15 @@ const revealing = (round: Partial<QuizRound> = {}): RoomState => ({
   }),
 });
 
-const renderReveal = (role: PlayerRole, room: RoomState = revealing()): void => {
+const renderReveal = (
+  role: PlayerRole,
+  room: RoomState = revealing(),
+  playerId = 'player-0',
+): void => {
   render(
     <RoomProvider initialState={room} role={role}>
       <StatusProbe />
-      <QuizRevealScreen />
+      <QuizRevealScreen playerId={playerId} />
     </RoomProvider>,
   );
 };
@@ -40,10 +44,31 @@ const renderReveal = (role: PlayerRole, room: RoomState = revealing()): void => 
 const status = () => screen.getByTestId('room-status').textContent;
 
 describe('QUIZ reveal', () => {
+  it('titles the screen VALIDATION, like STOP does', () => {
+    renderReveal('PLAYER');
+
+    expect(screen.getByRole('heading', { name: /validation/i })).toBeInTheDocument();
+  });
+
   it('finally tells everyone what the right answer was', () => {
     renderReveal('PLAYER');
 
     expect(screen.getByTestId('correct-option')).toHaveTextContent('Mercury');
+  });
+
+  it("shows the viewer's own wrong pick in red, not just the correct answer in green", () => {
+    // player-1 picked index 0 (Venus); the correct answer is index 1 (Mercury).
+    renderReveal('PLAYER', revealing(), 'player-1');
+
+    expect(screen.getByText('Venus').closest('div')).toHaveTextContent('YOUR PICK');
+    expect(screen.getByTestId('correct-option')).toHaveTextContent('Mercury');
+  });
+
+  it("says nothing extra when the viewer's own pick was correct", () => {
+    // player-0 picked index 1 (Mercury), the correct answer.
+    renderReveal('PLAYER', revealing(), 'player-0');
+
+    expect(screen.queryByText('YOUR PICK')).not.toBeInTheDocument();
   });
 
   it('shows who picked each option, right or wrong', () => {

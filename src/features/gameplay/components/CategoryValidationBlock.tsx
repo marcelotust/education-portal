@@ -78,9 +78,13 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, true)}
                   className={cn(
-                    'min-h-11 min-w-11 border-2 border-ink px-2 py-1 font-arcade text-[10px] transition-colors',
-                    isApproved ? 'bg-green-400 text-black' : 'bg-white text-gray-400',
-                    'disabled:cursor-not-allowed disabled:opacity-60',
+                    'flex min-h-11 min-w-11 items-center justify-center border-4 font-arcade text-xl transition-transform disabled:cursor-not-allowed',
+                    isApproved
+                      ? 'translate-x-[2px] translate-y-[2px] border-flare bg-green-400 text-black shadow-none'
+                      : cn(
+                          'border-ink bg-white text-green-500 shadow-[2px_2px_0px_0px_#381a41]',
+                          'disabled:text-gray-300 disabled:shadow-none',
+                        ),
                   )}
                 >
                   ✓
@@ -93,9 +97,13 @@ export const CategoryValidationBlock = ({
                   disabled={!canJudge}
                   onClick={() => onJudge(player.id, false)}
                   className={cn(
-                    'min-h-11 min-w-11 border-2 border-ink px-2 py-1 font-arcade text-[10px] transition-colors',
-                    isRejected ? 'bg-rose-400 text-black' : 'bg-white text-gray-400',
-                    'disabled:cursor-not-allowed disabled:opacity-60',
+                    'flex min-h-11 min-w-11 items-center justify-center border-4 font-arcade text-xl transition-transform disabled:cursor-not-allowed',
+                    isRejected
+                      ? 'translate-x-[2px] translate-y-[2px] border-flare bg-rose-400 text-black shadow-none'
+                      : cn(
+                          'border-ink bg-white text-rose-500 shadow-[2px_2px_0px_0px_#381a41]',
+                          'disabled:text-gray-300 disabled:shadow-none',
+                        ),
                   )}
                 >
                   ✕

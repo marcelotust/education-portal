@@ -8,16 +8,24 @@ import { currentQuestion, isLastQuestion } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
+interface QuizRevealScreenProps {
+  playerId: string;
+}
+
 /**
  * The pause between two questions. Until now a QUIZ never told anyone what the
  * right answer was — the round simply ended. This is that moment, and it waits
  * for the Host so they can explain before the next question starts.
  */
-export const QuizRevealScreen = () => {
+export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
   const { state, isHost, dispatch } = useRoom();
   const round = state.currentRound?.game === 'QUIZ' ? state.currentRound : null;
   const question = round === null ? undefined : currentQuestion(round);
   if (round === null || question === undefined) return null;
+
+  const ownAnswer = round.answers.find((answer) => answer.playerId === playerId);
+  const ownWrongIndex =
+    ownAnswer !== undefined && ownAnswer.choice !== question.correctIndex ? ownAnswer.choice : null;
 
   const seatedPlayers = state.slots.filter((slot): slot is Player => slot !== null);
   const playersById = new Map(seatedPlayers.map((player) => [player.id, player]));
@@ -53,17 +61,19 @@ export const QuizRevealScreen = () => {
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-1">
+        <h1 className="font-arcade text-sm text-yellow-500">VALIDATION</h1>
         <SectionLabel>Question</SectionLabel>
         <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
           {round.currentIndex + 1}/{round.questions.length}
         </span>
       </header>
 
-      <h1 className="text-center font-terminal text-2xl text-black">{question.prompt}</h1>
+      <h2 className="text-center font-terminal text-2xl text-black">{question.prompt}</h2>
 
       <ul className="flex flex-col gap-2">
         {question.options.map((option, index) => {
           const isCorrect = index === question.correctIndex;
+          const isOwnWrongPick = index === ownWrongIndex;
           const voters = votersByOption[index] ?? [];
           return (
             <li key={option}>
@@ -71,14 +81,26 @@ export const QuizRevealScreen = () => {
                 {...(isCorrect ? { 'data-testid': 'correct-option' } : {})}
                 className={cn(
                   'flex items-center gap-3 border-4 px-3 py-3 font-terminal text-xl',
-                  isCorrect
-                    ? 'border-ink bg-green-100 text-green-700'
-                    : 'border-ink bg-white text-gray-500',
+                  isCorrect && 'border-ink bg-green-100 text-green-700',
+                  isOwnWrongPick && 'border-ink bg-rose-100 text-rose-700',
+                  !isCorrect && !isOwnWrongPick && 'border-ink bg-white text-gray-500',
                 )}
               >
-                <span className="font-arcade text-[10px] text-gray-500">{LETTERS[index]}</span>
-                {option}
+                <span
+                  className={cn(
+                    'flex h-6 w-6 shrink-0 items-center justify-center border-2 font-arcade text-[10px]',
+                    isCorrect && 'border-green-700 text-green-700',
+                    isOwnWrongPick && 'border-rose-700 text-rose-700',
+                    !isCorrect && !isOwnWrongPick && 'border-gray-400 text-gray-500',
+                  )}
+                >
+                  {LETTERS[index]}
+                </span>
+                <span>{option}</span>
                 {isCorrect && <span className="ml-auto font-arcade text-[9px]">CORRECT</span>}
+                {isOwnWrongPick && (
+                  <span className="ml-auto font-arcade text-[9px]">YOUR PICK</span>
+                )}
               </div>
               {voters.length > 0 && (
                 <ul
