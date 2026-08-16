@@ -72,8 +72,8 @@ export const QuizRevealScreen = () => {
                 className={cn(
                   'flex items-center gap-3 border-4 px-3 py-3 font-terminal text-xl',
                   isCorrect
-                    ? 'border-black bg-green-100 text-green-700'
-                    : 'border-black bg-white text-gray-500',
+                    ? 'border-ink bg-green-100 text-green-700'
+                    : 'border-ink bg-white text-gray-500',
                 )}
               >
                 <span className="font-arcade text-[10px] text-gray-500">{LETTERS[index]}</span>
@@ -88,7 +88,7 @@ export const QuizRevealScreen = () => {
                   {voters.map((voter) => (
                     <li
                       key={voter.id}
-                      className="border-2 border-black bg-white px-2 py-0.5 font-arcade text-[8px] text-black"
+                      className="border-2 border-ink bg-white px-2 py-0.5 font-arcade text-[8px] text-black"
                     >
                       {voter.nickname}
                     </li>
@@ -115,7 +115,7 @@ export const QuizRevealScreen = () => {
             key={player.id}
             data-testid={`reveal-row-${player.id}`}
             className={cn(
-              'flex items-center gap-2 border-2 border-black px-2 py-1',
+              'flex items-center gap-2 border-2 border-ink px-2 py-1',
               gained > 0 ? 'bg-green-100' : 'bg-white',
             )}
           >

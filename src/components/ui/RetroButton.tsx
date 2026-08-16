@@ -41,7 +41,7 @@ export const RetroButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'min-h-11 border-4 border-black px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
+      'min-h-11 border-4 border-ink px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
       'disabled:cursor-not-allowed',
       pressed

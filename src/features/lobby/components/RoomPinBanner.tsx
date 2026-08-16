@@ -21,7 +21,7 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers, isHost }: RoomPinB
       {isHost && <InviteLinkButton pin={pin} />}
     </div>
 
-    <p className="border-4 border-black bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
+    <p className="border-4 border-ink bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
       {playerCount}/{maxPlayers} PLAYERS
     </p>
   </header>

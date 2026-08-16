@@ -11,7 +11,7 @@ export const InlineAdSlot = ({ label }: InlineAdSlotProps) => (
   <div
     data-testid="inline-ad-slot"
     aria-hidden="true"
-    className="flex h-16 items-center justify-center border-4 border-dashed border-black/20 text-black/40 lg:hidden"
+    className="flex h-16 items-center justify-center border-4 border-dashed border-ink/20 text-black/40 lg:hidden"
   >
     <span className="font-arcade text-[9px] tracking-widest">{label}</span>
   </div>

@@ -11,7 +11,7 @@ interface RetroContainerProps extends HTMLAttributes<HTMLDivElement> {
  * glow. Used for menus, modals and card-like groupings.
  */
 export const RetroContainer = ({ className, children, ...divProps }: RetroContainerProps) => (
-  <div {...divProps} className={cn('border-4 border-black bg-white shadow-retro', className)}>
+  <div {...divProps} className={cn('border-4 border-ink bg-white shadow-retro', className)}>
     {children}
   </div>
 );

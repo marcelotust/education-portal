@@ -32,7 +32,7 @@ export const ScoreboardScreen = () => {
             key={player.id}
             data-testid="scoreboard-row"
             className={cn(
-              'flex items-center justify-between gap-3 border-2 border-black px-3 py-2',
+              'flex items-center justify-between gap-3 border-2 border-ink px-3 py-2',
               position === 0 ? 'bg-yellow-200' : 'bg-white',
             )}
           >

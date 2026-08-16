@@ -35,7 +35,7 @@ export const LastRoundStandings = ({
           <li
             key={player.id}
             className={cn(
-              'flex items-center gap-2 border-2 border-black px-2 py-1',
+              'flex items-center gap-2 border-2 border-ink px-2 py-1',
               position === 0 ? 'bg-yellow-200' : 'bg-white',
             )}
           >

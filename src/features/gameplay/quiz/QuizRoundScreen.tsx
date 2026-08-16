@@ -93,7 +93,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-black bg-white/95 px-6 py-2 backdrop-blur">
+      <header className="sticky top-0 z-10 -mx-6 -mt-6 flex items-center justify-between gap-3 border-b-4 border-ink bg-white/95 px-6 py-2 backdrop-blur">
         <div className="flex flex-col items-center">
           <SectionLabel>Question</SectionLabel>
           <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
@@ -121,7 +121,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
       {everyoneAnswered && (
         <p
           role="alert"
-          className="animate-blink border-4 border-black bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
+          className="animate-blink border-4 border-ink bg-rose-100 px-3 py-2 text-center font-arcade text-[10px] text-rose-600"
         >
           EVERYONE HAS ANSWERED! ENDING ROUND
         </p>
@@ -136,7 +136,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               aria-pressed={picked === index}
               onClick={() => answer(index)}
               className={cn(
-                'flex w-full items-center gap-3 border-4 border-black px-3 py-3 text-left font-terminal text-xl transition-transform',
+                'flex w-full items-center gap-3 border-4 border-ink px-3 py-3 text-left font-terminal text-xl transition-transform',
                 picked === index
                   ? 'translate-x-[2px] translate-y-[2px] bg-sky-500 text-white shadow-none'
                   : cn(
