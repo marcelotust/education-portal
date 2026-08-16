@@ -12,6 +12,17 @@ const TONE_STYLES: Record<RetroButtonTone, string> = {
   white: 'bg-white text-black hover:bg-gray-100',
 };
 
+// Almost-white tint of the same tone, for a selected control: the color
+// stays bold until picked, then pales instead of the button turning plain
+// white or staying the same bold fill.
+const TONE_SELECTED_STYLES: Record<RetroButtonTone, string> = {
+  green: 'bg-selected-green text-black',
+  pink: 'bg-selected-rose text-black',
+  cyan: 'bg-selected-sky text-black',
+  yellow: 'bg-selected-yellow text-black',
+  white: 'bg-white text-black',
+};
+
 interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tone?: RetroButtonTone;
   /**
@@ -49,12 +60,15 @@ export const RetroButton = ({
           // to a Player) still needs to read clearly, so it skips the generic
           // disabled graying rather than fighting it for specificity. The
           // border picks up the logo's pink to flag the selection itself.
-          'translate-x-[4px] translate-y-[4px] border-flare shadow-none'
+          cn(
+            'translate-x-[4px] translate-y-[4px] border-flare shadow-none',
+            TONE_SELECTED_STYLES[tone],
+          )
         : cn(
             'border-ink shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
             'disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:hover:bg-gray-300',
+            TONE_STYLES[tone],
           ),
-      TONE_STYLES[tone],
       className,
     )}
   >
