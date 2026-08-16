@@ -23,7 +23,7 @@ describe('AppLayout', () => {
     renderLayout(<p>SCREEN CONTENT</p>);
 
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /privacy policy/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^terms$/i })).toBeInTheDocument();
   });
 
   it('carries the brand header on every screen', () => {

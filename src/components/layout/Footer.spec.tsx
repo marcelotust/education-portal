@@ -12,26 +12,12 @@ const renderFooter = () =>
   );
 
 describe('Footer', () => {
-  it('carries a copyright line and links to the legal notices', () => {
+  it('carries a copyright line and links to the legal notices and contact form', () => {
     renderFooter();
 
     expect(screen.getByText(/© 2026 eduparty/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /privacy policy/i })).toHaveAttribute(
-      'href',
-      '/legal#privacy',
-    );
-    expect(screen.getByRole('link', { name: /terms of service/i })).toHaveAttribute(
-      'href',
-      '/legal#terms',
-    );
-    expect(screen.getByRole('link', { name: /children's privacy/i })).toHaveAttribute(
-      'href',
-      '/legal#children',
-    );
-    expect(screen.getByRole('link', { name: /suggestions.*bug reports/i })).toHaveAttribute(
-      'href',
-      '/contact',
-    );
+    expect(screen.getByRole('link', { name: /^terms$/i })).toHaveAttribute('href', '/legal');
+    expect(screen.getByRole('link', { name: /^contact$/i })).toHaveAttribute('href', '/contact');
   });
 
   it('renders as a landmark so it reads as page-level chrome, not screen content', () => {

@@ -45,7 +45,7 @@ export const Header = () => {
             height={95}
             className={cn(
               'w-auto transition-[height] duration-200',
-              scrolled ? 'h-6' : 'h-8 sm:h-10',
+              scrolled ? 'h-6' : 'h-11 sm:h-14',
             )}
           />
         </Link>
