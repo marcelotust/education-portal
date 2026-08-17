@@ -39,7 +39,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
             >
               <GameSpriteThumb
                 spritePosition={cartridge.spritePosition}
-                className="drop-shadow-md"
+                className="drop-shadow-[3px_5px_4px_rgba(56,26,65,0.55)]"
               />
               <span>{cartridge.title}</span>
               <span className="font-terminal text-sm normal-case opacity-80">
@@ -59,7 +59,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
         <div className="w-16 shrink-0">
           <GameSpriteThumb
             spritePosition={LOADING_CARD.spritePosition}
-            className="opacity-80 drop-shadow-md"
+            className="opacity-80 drop-shadow-[3px_5px_4px_rgba(56,26,65,0.55)]"
           />
         </div>
         <div className="flex flex-col gap-1">
