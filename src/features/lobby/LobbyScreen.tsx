@@ -23,12 +23,7 @@ export const LobbyScreen = () => {
 
   const board = (
     <>
-      <CharacterSelectGrid
-        slots={state.slots}
-        scores={state.scores}
-        pin={state.pin}
-        isHost={isHost}
-      />
+      <CharacterSelectGrid slots={state.slots} scores={state.scores} pin={state.pin} />
 
       {Object.keys(state.lastRoundPoints).length > 0 && (
         <LastRoundStandings
@@ -44,12 +39,7 @@ export const LobbyScreen = () => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <RoomPinBanner
-        pin={state.pin}
-        playerCount={countPlayers(state)}
-        maxPlayers={MAX_PLAYERS}
-        isHost={isHost}
-      />
+      <RoomPinBanner pin={state.pin} playerCount={countPlayers(state)} maxPlayers={MAX_PLAYERS} />
 
       {setupFirst ? (
         <>

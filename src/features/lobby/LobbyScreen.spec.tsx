@@ -89,10 +89,16 @@ describe('Lobby feature', () => {
       expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();
     });
 
-    it('never offers a Player a way to invite themselves', () => {
+    it('lets a Player invite others too, not just the Host (#104)', async () => {
+      const user = userEvent.setup();
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
       renderLobby('PLAYER');
 
-      expect(screen.queryByRole('button', { name: /^invite$/i })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /^invite$/i }));
+
+      expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/play?pin=ABCD'));
+      expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();
     });
 
     it('copies the join link when the Host taps the invite seat', async () => {
@@ -114,8 +120,8 @@ describe('Lobby feature', () => {
 
       expect(screen.getByText('ANA')).toBeInTheDocument();
       expect(screen.getByText('BRUNO')).toBeInTheDocument();
-      expect(screen.getAllByTestId(/^player-slot-/)).toHaveLength(3);
-      expect(screen.getAllByText('OPEN')).toHaveLength(1);
+      expect(screen.getAllByTestId(/^player-slot-/)).toHaveLength(2);
+      expect(screen.getByTestId('invite-slot')).toBeInTheDocument();
     });
 
     it('hides the open seat once the room is full', () => {
@@ -132,10 +138,11 @@ describe('Lobby feature', () => {
       expect(screen.queryByText('OPEN')).not.toBeInTheDocument();
     });
 
-    it('never offers a Player the invite seat', () => {
+    it("offers a Player that one open seat as an invite CTA too, not a plain 'OPEN' row (#104)", () => {
       renderLobby('PLAYER', makeRoom({ playerCount: 2 }));
 
-      expect(screen.queryByTestId('invite-slot')).not.toBeInTheDocument();
+      expect(screen.getByTestId('invite-slot')).toBeInTheDocument();
+      expect(screen.queryByText('OPEN')).not.toBeInTheDocument();
     });
 
     it('shows how many of the 6 seats are taken', () => {

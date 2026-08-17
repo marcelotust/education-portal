@@ -4,11 +4,10 @@ interface RoomPinBannerProps {
   pin: string;
   playerCount: number;
   maxPlayers: number;
-  isHost: boolean;
 }
 
 /** Header of the lobby: the PIN Players type plus the seat counter. */
-export const RoomPinBanner = ({ pin, playerCount, maxPlayers, isHost }: RoomPinBannerProps) => (
+export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerProps) => (
   <header className="mb-5 flex flex-col items-center gap-2">
     <h1 className="font-arcade text-xs text-rose-500">LOBBY</h1>
 
@@ -22,11 +21,9 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers, isHost }: RoomPinB
         <p className="text-solid-shadow font-arcade text-3xl tracking-[0.3em] text-yellow-400">
           {pin}
         </p>
-        {isHost && (
-          <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
-            <InviteLinkButton pin={pin} />
-          </span>
-        )}
+        <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
+          <InviteLinkButton pin={pin} />
+        </span>
       </div>
     </div>
 

@@ -7,8 +7,8 @@ interface InviteLinkButtonProps {
 
 /**
  * Copies the room's join link to the clipboard. A bare icon beside the PIN,
- * not a boxed button — inviting is a secondary action here, not the thing
- * this screen is asking the Host to do.
+ * not a boxed button — inviting is a secondary action here, available to
+ * anyone seated, not just the Host.
  */
 export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   const { copied, copyInviteLink } = useInviteCopy(pin);

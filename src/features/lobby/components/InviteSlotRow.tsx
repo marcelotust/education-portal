@@ -5,7 +5,7 @@ interface InviteSlotRowProps {
   pin: string;
 }
 
-/** The board's one open seat, standing in as an invite CTA for the Host. */
+/** The board's one open seat, standing in as an invite CTA for anyone seated. */
 export const InviteSlotRow = ({ pin }: InviteSlotRowProps) => {
   const { copied, copyInviteLink } = useInviteCopy(pin);
 
