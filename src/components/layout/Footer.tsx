@@ -1,13 +1,22 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Full-bleed platformer horizon: a grass strip over a dirt band, carrying
- * the legal/contact links every screen ends on.
+ * Full-bleed platformer horizon: the footer.png ground tile (#89) repeated
+ * into a single strip, carrying the legal/contact links every screen ends
+ * on. Replaces the old two-band CSS gradient (see #61/#68) with real art.
  */
 export const Footer = () => (
   <footer className="w-full">
-    <div className="bg-grass-band h-4 w-full border-y-4 border-ink" aria-hidden="true" />
-    <div className="bg-dirt-band flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b-4 border-ink px-4 py-4 text-center">
+    <div
+      className="h-8 w-full border-y-4 border-ink bg-repeat-x"
+      style={{
+        backgroundImage: "url('/footer.png')",
+        backgroundSize: '32px 32px',
+        imageRendering: 'pixelated',
+      }}
+      aria-hidden="true"
+    />
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b-4 border-ink bg-dirt-dark px-4 py-3 text-center">
       <Link to="/legal" className="font-terminal text-sm text-amber-50 underline hover:text-white">
         Terms
       </Link>

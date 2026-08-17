@@ -23,26 +23,4 @@
   .text-solid-shadow {
     text-shadow: 3px 3px 0px #381a41;
   }
-
-  /* Ground band textures: diagonal stripes stand in for grass blades and
-     dirt clumps without a drawn asset. */
-  .bg-grass-band {
-    background-image: repeating-linear-gradient(
-      115deg,
-      theme('colors.grass.dark') 0px,
-      theme('colors.grass.dark') 8px,
-      theme('colors.grass.light') 8px,
-      theme('colors.grass.light') 16px
-    );
-  }
-
-  .bg-dirt-band {
-    background-image: repeating-linear-gradient(
-      45deg,
-      theme('colors.dirt.dark') 0px,
-      theme('colors.dirt.dark') 10px,
-      theme('colors.dirt.light') 10px,
-      theme('colors.dirt.light') 20px
-    );
-  }
 }
