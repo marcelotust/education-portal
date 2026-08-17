@@ -17,7 +17,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
     <div className="flex flex-col gap-2">
       <SectionLabel>{isReadOnly ? 'Game shelf' : 'Choose a game'}</SectionLabel>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {GAME_CARTRIDGES.map((cartridge) => {
           const isSelected = selectedGameId === cartridge.id;
 
@@ -37,7 +37,10 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
               onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
               className="flex flex-col items-center gap-2 text-center"
             >
-              <GameSpriteThumb spritePosition={cartridge.spritePosition} />
+              <GameSpriteThumb
+                spritePosition={cartridge.spritePosition}
+                className="drop-shadow-md"
+              />
               <span>{cartridge.title}</span>
               <span className="font-terminal text-sm normal-case opacity-80">
                 {cartridge.tagline}
@@ -45,20 +48,27 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
             </RetroButton>
           );
         })}
+      </div>
 
-        <RetroButton
-          tone="white"
-          disabled
-          aria-label={`${LOADING_CARD.title}: ${LOADING_CARD.tagline}`}
-          className="flex flex-col items-center gap-2 text-center"
-        >
-          <GameSpriteThumb spritePosition={LOADING_CARD.spritePosition} className="opacity-80" />
+      <RetroButton
+        tone="white"
+        disabled
+        aria-label={`${LOADING_CARD.title}: ${LOADING_CARD.tagline}`}
+        className="flex w-full items-center gap-3 text-left"
+      >
+        <div className="w-16 shrink-0">
+          <GameSpriteThumb
+            spritePosition={LOADING_CARD.spritePosition}
+            className="opacity-80 drop-shadow-md"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
           <span>{LOADING_CARD.title}</span>
           <span className="font-terminal text-sm normal-case opacity-80">
             {LOADING_CARD.tagline}
           </span>
-        </RetroButton>
-      </div>
+        </div>
+      </RetroButton>
     </div>
   );
 };
