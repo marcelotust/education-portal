@@ -2,6 +2,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { loadGoogleAnalytics, trackPageView } from './analytics';
 
+// gtag.js's bootstrapping relies on dataLayer entries being genuine
+// `arguments` objects (see analytics.ts) rather than arrays, so compare by
+// value instead of relying on toContainEqual's array identity checks.
+const dataLayerAsArrays = () =>
+  window.dataLayer.map((entry) => Array.from(entry as ArrayLike<unknown>));
+
 afterEach(() => {
   document.head.innerHTML = '';
   Reflect.deleteProperty(window, 'gtag');
@@ -28,7 +34,7 @@ describe('loadGoogleAnalytics', () => {
   it('queues the initial config call onto the dataLayer', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    expect(window.dataLayer).toContainEqual(['config', 'G-TEST123', { send_page_view: false }]);
+    expect(dataLayerAsArrays()).toContainEqual(['config', 'G-TEST123', { send_page_view: false }]);
   });
 });
 
@@ -38,7 +44,7 @@ describe('trackPageView', () => {
 
     trackPageView('/host');
 
-    expect(window.dataLayer).toContainEqual([
+    expect(dataLayerAsArrays()).toContainEqual([
       'event',
       'page_view',
       expect.objectContaining({ page_path: '/host' }),
