@@ -32,9 +32,11 @@ describe('Ad break', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllEnvs();
   });
 
   it('gives a phone somewhere to put an ad, since the lateral AdSlot is desktop-only', () => {
+    vi.stubEnv('VITE_ADSENSE_PUBLISHER_ID', 'pub-test-123');
     renderBreak();
 
     expect(screen.getByTestId('inline-ad-slot')).toHaveTextContent('AD SPACE');
