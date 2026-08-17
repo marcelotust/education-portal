@@ -16,17 +16,14 @@ export const Footer = () => (
       }}
       aria-hidden="true"
     />
-    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-dirt-dark px-4 py-1.5 text-center">
-      <Link to="/legal" className="font-terminal text-sm text-amber-50 underline hover:text-white">
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-dirt-dark px-4 py-1.5 text-center text-[#d9a266]">
+      <Link to="/legal" className="font-terminal text-sm underline hover:text-white">
         Terms
       </Link>
-      <Link
-        to="/contact"
-        className="font-terminal text-sm text-amber-50 underline hover:text-white"
-      >
+      <Link to="/contact" className="font-terminal text-sm underline hover:text-white">
         Contact
       </Link>
-      <p className="font-terminal text-xs text-amber-100/80">© 2026 EduParty</p>
+      <p className="font-terminal text-xs opacity-80">© 2026 EduParty</p>
     </div>
   </footer>
 );
