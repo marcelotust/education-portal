@@ -3,6 +3,8 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { GoogleAnalytics } from '@/components/layout/GoogleAnalytics';
+
 // Lazy: each route pulls in its own gameplay/legal/contact code, and a
 // visitor only ever needs one of them on first load.
 const LandingRoute = lazy(() =>
@@ -30,5 +32,6 @@ export const App = () => (
     {/* Vercel telemetry: both are no-ops outside Vercel deployments. */}
     <Analytics />
     <SpeedInsights />
+    <GoogleAnalytics />
   </BrowserRouter>
 );
