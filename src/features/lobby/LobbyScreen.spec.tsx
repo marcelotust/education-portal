@@ -35,6 +35,12 @@ const renderLobby = (role: PlayerRole, room: RoomState = makeRoom()): void => {
 
 const status = () => screen.getByTestId('room-status').textContent;
 
+/** makeRoom seats every slot as role 'PLAYER'; flip the first back to 'HOST' for tests that care. */
+const markSlotZeroAsHost = (room: RoomState): RoomState => ({
+  ...room,
+  slots: room.slots.map((slot, index) => (index === 0 && slot ? { ...slot, role: 'HOST' } : slot)),
+});
+
 describe('Lobby feature', () => {
   beforeEach(() => {
     navigate.mockClear();
@@ -229,6 +235,32 @@ describe('Lobby feature', () => {
 
       await user.click(screen.getByRole('button', { name: /^stop$/i }));
       expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
+    });
+
+    it('blocks the start and explains why when the Host is alone in the lobby', async () => {
+      const user = userEvent.setup();
+      const soloHostRoom: RoomState = markSlotZeroAsHost(
+        makeRoom({ playerCount: 1, status: 'CONFIGURING_GAME' }),
+      );
+      renderLobby('HOST', soloHostRoom);
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
+      expect(screen.getByText(/waiting for at least 1 more player/i)).toBeInTheDocument();
+    });
+
+    it('enables the start once a second player is seated', async () => {
+      const user = userEvent.setup();
+      const twoPlayerRoom: RoomState = markSlotZeroAsHost(
+        makeRoom({ playerCount: 2, status: 'CONFIGURING_GAME' }),
+      );
+      renderLobby('HOST', twoPlayerRoom);
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
+      expect(screen.queryByText(/waiting for at least 1 more player/i)).not.toBeInTheDocument();
     });
 
     it('transitions CONFIGURING_GAME -> PLAYING_AD when the Host starts the selected game', async () => {
