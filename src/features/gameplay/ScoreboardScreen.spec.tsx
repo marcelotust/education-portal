@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
@@ -32,6 +32,10 @@ const renderScoreboard = (role: PlayerRole, room: RoomState = standings()): void
 };
 
 describe('Scoreboard', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('ranks players by score, highest first', () => {
     renderScoreboard('PLAYER');
 
@@ -41,6 +45,7 @@ describe('Scoreboard', () => {
   });
 
   it('gives this quiet moment somewhere for an ad, everyone included, Host or not (#18)', () => {
+    vi.stubEnv('VITE_ADSENSE_PUBLISHER_ID', 'pub-test-123');
     renderScoreboard('PLAYER');
     expect(screen.getByTestId('inline-ad-slot')).toHaveTextContent('AD SPACE');
 
