@@ -30,6 +30,10 @@ export const HostLobbyControls = () => {
 
   if (state.status !== 'CONFIGURING_GAME') return null;
 
+  // The Host holds a slot too; at least one other filled slot must belong to
+  // a Player, or there's no one to race/answer/guess against.
+  const hasAtLeastOnePlayer = state.slots.some((slot) => slot?.role === 'PLAYER');
+
   return (
     <div className="flex flex-col gap-3">
       <GameCartridgePicker
@@ -64,9 +68,16 @@ export const HostLobbyControls = () => {
         />
       )}
 
+      {!hasAtLeastOnePlayer && (
+        <p className="text-center font-terminal text-base text-gray-500">
+          Waiting for at least 1 more player to join...
+        </p>
+      )}
+
       <RetroButton
         tone="green"
         disabled={
+          !hasAtLeastOnePlayer ||
           state.selectedGameId === null ||
           (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES) ||
           (state.gameSetup.game === 'TABOO' && state.gameSetup.categories.length < 1)
