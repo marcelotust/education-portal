@@ -42,6 +42,8 @@ describe('GoogleAnalytics', () => {
   });
 
   it('does not load gtag until a measurement ID is configured (#91)', () => {
+    vi.stubEnv('VITE_GA_MEASUREMENT_ID', '');
+
     render(
       <MemoryRouter>
         <GoogleAnalytics />

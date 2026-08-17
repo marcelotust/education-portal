@@ -21,8 +21,13 @@ export const loadGoogleAnalytics = (measurementId: string) => {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer ?? [];
-  window.gtag = (...args: unknown[]) => {
-    window.dataLayer.push(args);
+  // gtag.js's own bootstrapping code expects the raw `arguments` object it
+  // queues and replays once loaded — pushing a rest-params array instead
+  // looks equivalent but gtag.js silently never drains it (no cookie ever
+  // gets set, no hit ever sent). Match the official snippet exactly.
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params -- must be the real `arguments` object, see above.
+    window.dataLayer.push(arguments);
   };
   window.gtag('js', new Date());
   // send_page_view is off here because the SPA fires its own page_view per
