@@ -34,7 +34,7 @@ describe('Header', () => {
     const logo = screen.getByRole('img', { name: /eduparty/i });
     const fullSizeClasses = logo.className;
 
-    act(() => setScrollY(50));
+    act(() => setScrollY(100));
 
     expect(logo.className).not.toBe(fullSizeClasses);
   });

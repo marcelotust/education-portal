@@ -19,19 +19,36 @@ describe('useScrolled', () => {
     expect(result.current).toBe(false);
   });
 
-  it('flips true once the page scrolls past the threshold', () => {
+  it('flips true once the page scrolls past the enter threshold', () => {
     const { result } = renderHook(() => useScrolled());
 
-    act(() => setScrollY(50));
+    act(() => setScrollY(100));
 
     expect(result.current).toBe(true);
   });
 
-  it('flips back false once scrolled back near the top', () => {
+  it('flips back false once scrolled back under the exit threshold', () => {
     const { result } = renderHook(() => useScrolled());
 
-    act(() => setScrollY(50));
+    act(() => setScrollY(100));
     act(() => setScrollY(0));
+
+    expect(result.current).toBe(false);
+  });
+
+  it('stays true within the hysteresis band, so a header-collapse-driven scroll dip cannot flip it back', () => {
+    const { result } = renderHook(() => useScrolled());
+
+    act(() => setScrollY(100));
+    act(() => setScrollY(20));
+
+    expect(result.current).toBe(true);
+  });
+
+  it('does not flip true just from crossing the lower exit threshold', () => {
+    const { result } = renderHook(() => useScrolled());
+
+    act(() => setScrollY(20));
 
     expect(result.current).toBe(false);
   });
