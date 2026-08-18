@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { makeRoom } from '@/test/factories';
@@ -15,6 +15,15 @@ const session = (): RoomSession => ({
   joinedAt: '2026-07-24T12:06:00.000Z',
 });
 
+/** Types one PIN letter per box, matching how a Player actually fills it in. */
+const typePin = async (user: UserEvent, pin: string) => {
+  for (let index = 0; index < pin.length; index += 1) {
+    const letter = pin[index];
+    if (letter === undefined) continue;
+    await user.type(screen.getByLabelText(new RegExp(`room pin letter ${index + 1}`, 'i')), letter);
+  }
+};
+
 describe('Join room screen', () => {
   it('joins with the PIN and nickname the Player typed', async () => {
     const user = userEvent.setup();
@@ -22,28 +31,39 @@ describe('Join room screen', () => {
     const onReady = vi.fn();
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={onReady} />);
 
-    await user.type(screen.getByLabelText(/room pin/i), 'kpzt');
+    // The PIN is stored uppercase, so typing it in lowercase must still work.
+    await typePin(user, 'kpzt');
     await user.type(screen.getByLabelText(/nickname/i), 'ANA');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
-    // The PIN is stored uppercase, so typing it in lowercase must still work.
     expect(joinRoom).toHaveBeenCalledWith('KPZT', 'ANA');
     await waitFor(() =>
       expect(onReady).toHaveBeenCalledWith(expect.objectContaining({ role: 'PLAYER' })),
     );
   });
 
-  it('rejects a PIN that is not 4 letters before hitting the backend', async () => {
+  it('keeps JOIN disabled until both the PIN and a nickname are filled in', async () => {
     const user = userEvent.setup();
-    const joinRoom = vi.fn();
-    render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);
+    render(<JoinRoomScreen joinRoom={vi.fn()} onReady={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/room pin/i), 'AB');
+    const joinButton = screen.getByRole('button', { name: /join/i });
+    expect(joinButton).toBeDisabled();
+
+    await typePin(user, 'KPZT');
+    expect(joinButton).toBeDisabled();
+
     await user.type(screen.getByLabelText(/nickname/i), 'ANA');
-    await user.click(screen.getByRole('button', { name: /join/i }));
+    expect(joinButton).toBeEnabled();
+  });
 
-    expect(joinRoom).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent(/4 letters/i);
+  it('keeps JOIN disabled while the PIN is not yet 4 letters', async () => {
+    const user = userEvent.setup();
+    render(<JoinRoomScreen joinRoom={vi.fn()} onReady={vi.fn()} />);
+
+    await typePin(user, 'AB');
+    await user.type(screen.getByLabelText(/nickname/i), 'ANA');
+
+    expect(screen.getByRole('button', { name: /join/i })).toBeDisabled();
   });
 
   it('tells the Player when the room does not exist', async () => {
@@ -51,7 +71,7 @@ describe('Join room screen', () => {
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/room pin/i), 'ZZZZ');
+    await typePin(user, 'ZZZZ');
     await user.type(screen.getByLabelText(/nickname/i), 'ANA');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
@@ -74,8 +94,8 @@ describe('Join room screen', () => {
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} initialPin="KPZT" />);
 
-    await user.clear(screen.getByLabelText(/room pin/i));
-    await user.type(screen.getByLabelText(/room pin/i), 'ZZZZ');
+    // Typing over the prefilled PIN replaces it, box by box.
+    await typePin(user, 'ZZZZ');
     await user.type(screen.getByLabelText(/nickname/i), 'ANA');
     await user.click(screen.getByRole('button', { name: /join/i }));
 
@@ -87,7 +107,7 @@ describe('Join room screen', () => {
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_FULL'));
     render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/room pin/i), 'KPZT');
+    await typePin(user, 'KPZT');
     await user.type(screen.getByLabelText(/nickname/i), 'ANA');
     await user.click(screen.getByRole('button', { name: /join/i }));
 

@@ -67,6 +67,9 @@ export const HostEntryScreen = ({
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"
+          autoCapitalize="characters"
+          containerClassName="items-center"
+          className="w-48 text-center uppercase"
           onChange={(event) => setNickname(event.target.value)}
         />
 

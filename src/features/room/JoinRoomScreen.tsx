@@ -7,6 +7,7 @@ import { RetroInput } from '@/components/ui/RetroInput';
 import { rememberRoom } from '@/lib/recentRooms';
 import { RoomJoinError, type JoinRoom, type RoomSession } from '@/types/roomService';
 import { MAX_NICKNAME_LENGTH, PIN_LENGTH, isValidPin } from '@/utils/room';
+import { PinInput } from './PinInput';
 
 const FAILURE_MESSAGES: Record<string, string> = {
   ROOM_NOT_FOUND: 'There is no room with that PIN.',
@@ -34,6 +35,8 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+
+  const canSubmit = isValidPin(pin.trim().toUpperCase()) && nickname.trim() !== '';
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -80,15 +83,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         </header>
 
-        <RetroInput
-          label="Room PIN"
-          value={pin}
-          maxLength={PIN_LENGTH}
-          autoComplete="off"
-          autoCapitalize="characters"
-          className="text-center uppercase tracking-[0.5em]"
-          onChange={(event) => setPin(event.target.value)}
-        />
+        <PinInput value={pin} onChange={setPin} />
 
         <RetroInput
           label="Nickname"
@@ -96,6 +91,9 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"
+          autoCapitalize="characters"
+          containerClassName="items-center"
+          className="w-48 text-center uppercase"
           onChange={(event) => setNickname(event.target.value)}
         />
 
@@ -105,7 +103,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         )}
 
-        <RetroButton type="submit" tone="cyan" disabled={isJoining}>
+        <RetroButton type="submit" tone="cyan" disabled={isJoining || !canSubmit}>
           {isJoining ? 'JOINING...' : 'JOIN'}
         </RetroButton>
       </RetroContainer>

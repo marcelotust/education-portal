@@ -4,6 +4,8 @@ import { cn } from '@/utils/cn';
 
 interface RetroInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   label: string;
+  /** Classes for the wrapping label+input column — e.g. `items-center` to center a narrowed input. */
+  containerClassName?: string;
 }
 
 /**
@@ -11,11 +13,16 @@ interface RetroInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'i
  * shadows are reserved for panels and buttons), a soft yellow tint and inset
  * shadow on focus instead of a glow.
  */
-export const RetroInput = ({ label, className, ...inputProps }: RetroInputProps) => {
+export const RetroInput = ({
+  label,
+  className,
+  containerClassName,
+  ...inputProps
+}: RetroInputProps) => {
   const id = useId();
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className={cn('flex flex-col gap-1', containerClassName)}>
       <label
         htmlFor={id}
         className="font-terminal text-sm uppercase tracking-[0.3em] text-gray-500"
