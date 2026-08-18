@@ -233,6 +233,21 @@ describe('Lobby feature', () => {
       expect(screen.getByRole('button', { name: /^stop$/i })).toBeInTheDocument();
     });
 
+    it('offers a game-request link below the coming-soon cartridge', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+
+      const comingSoon = screen.getByText(/more games on the way/i);
+      const link = screen.getByRole('link', { name: /tell us what game you want to play/i });
+
+      expect(link).toHaveAttribute('href', '/contact?category=GAME_REQUEST');
+      expect(
+        comingSoon.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
     it('keeps the start action blocked until a cartridge is selected', async () => {
       const user = userEvent.setup();
       renderLobby('HOST');

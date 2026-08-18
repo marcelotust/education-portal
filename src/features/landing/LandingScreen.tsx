@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import { GAME_CARTRIDGES } from '@/features/lobby/cartridges';
+import { ComingSoonCartridge } from '@/features/lobby/components/ComingSoonCartridge';
 import { listRecentRooms } from '@/lib/recentRooms';
 
 interface LandingScreenProps {
@@ -75,13 +76,7 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
               </li>
             ))}
           </ul>
-          <p className="font-terminal text-xl text-gray-700">More games are on the way.</p>
-          <Link
-            to="/contact?category=GAME_REQUEST"
-            className="font-terminal text-lg text-sky-600 underline hover:text-sky-700"
-          >
-            Tell us what game you want to play
-          </Link>
+          <ComingSoonCartridge />
         </div>
       </RetroContainer>
 

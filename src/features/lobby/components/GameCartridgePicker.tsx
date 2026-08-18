@@ -2,7 +2,8 @@ import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { GameId } from '@/types';
-import { GAME_CARTRIDGES, LOADING_CARD } from '../cartridges';
+import { GAME_CARTRIDGES } from '../cartridges';
+import { ComingSoonCartridge } from './ComingSoonCartridge';
 
 interface GameCartridgePickerProps {
   selectedGameId: GameId | null;
@@ -50,25 +51,7 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
         })}
       </div>
 
-      <RetroButton
-        tone="white"
-        disabled
-        aria-label={`${LOADING_CARD.title}: ${LOADING_CARD.tagline}`}
-        className="flex w-full items-center gap-3 text-left"
-      >
-        <div className="w-16 shrink-0">
-          <GameSpriteThumb
-            spritePosition={LOADING_CARD.spritePosition}
-            className="opacity-80 drop-shadow-[3px_5px_4px_rgba(56,26,65,0.55)]"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span>{LOADING_CARD.title}</span>
-          <span className="font-terminal text-sm normal-case opacity-80">
-            {LOADING_CARD.tagline}
-          </span>
-        </div>
-      </RetroButton>
+      <ComingSoonCartridge />
     </div>
   );
 };
