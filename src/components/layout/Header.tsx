@@ -27,8 +27,8 @@ export const Header = () => {
     <header
       ref={headerRef}
       className={cn(
-        'sticky top-0 z-20 w-full bg-sky-400 px-4 transition-[padding] duration-200',
-        scrolled ? 'py-2' : 'py-4',
+        'sticky top-0 z-20 w-full bg-sky-400 px-4 pb-2 transition-[padding] duration-200',
+        scrolled ? 'pt-2' : 'pt-4',
       )}
     >
       <div

@@ -8,18 +8,15 @@ import { useEffect, useState } from 'react';
 const ENTER_THRESHOLD_PX = 56;
 const EXIT_THRESHOLD_PX = 8;
 
-// Same hysteresis shape as the scroll thresholds above, but on document
-// height instead of scroll position: once overflow is on, collapsing the
-// header shrinks scrollHeight, which could pull the excess back under the
-// viewport and flip overflow off right after it flipped on. The exit margin
-// has to clear that collapse so the shrink itself can't retrigger the flip.
-const OVERFLOW_ENTER_MARGIN_PX = 0;
-const OVERFLOW_EXIT_MARGIN_PX = -64;
-
-const isOverflowing = (wasOverflowing: boolean): boolean => {
-  const excess = document.documentElement.scrollHeight - window.innerHeight;
-  return wasOverflowing ? excess > OVERFLOW_EXIT_MARGIN_PX : excess > OVERFLOW_ENTER_MARGIN_PX;
-};
+// No hysteresis here, unlike the scroll thresholds above: this only
+// recomputes from a real 'resize' or a childList/subtree DOM mutation (a
+// route or screen swap), never from the header's own collapse — that's a
+// className change with no node added or removed, so it doesn't trigger
+// either observer and can't feed back into this check. A plain comparison
+// is enough, and it's what lets navigating from a tall page to a short one
+// clear the compact state immediately instead of getting stuck by a stale
+// margin sized for a different page's content.
+const isPageOverflowing = (): boolean => document.documentElement.scrollHeight > window.innerHeight;
 
 /**
  * Whether the page has scrolled past a small threshold, or is already tall
@@ -43,7 +40,7 @@ export const useScrolled = (): boolean => {
   }, []);
 
   useEffect(() => {
-    const checkOverflow = () => setOverflowing(isOverflowing);
+    const checkOverflow = () => setOverflowing(isPageOverflowing());
     checkOverflow();
 
     window.addEventListener('resize', checkOverflow);

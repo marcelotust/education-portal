@@ -118,29 +118,35 @@ describe('useScrolled', () => {
     document.body.removeChild(node);
   });
 
-  it('does not flip overflow back off from a header-collapse-sized height shrink', () => {
+  it('flips overflow back off as soon as a resize makes the content fit again', () => {
     setLayout({ scrollHeight: 850, innerHeight: 800 });
     const { result } = renderHook(() => useScrolled());
     expect(result.current).toBe(true);
 
     act(() => {
-      setLayout({ scrollHeight: 800, innerHeight: 800 });
-      window.dispatchEvent(new Event('resize'));
-    });
-
-    expect(result.current).toBe(true);
-  });
-
-  it('flips overflow back off once the excess clears the exit margin', () => {
-    setLayout({ scrollHeight: 850, innerHeight: 800 });
-    const { result } = renderHook(() => useScrolled());
-    expect(result.current).toBe(true);
-
-    act(() => {
-      setLayout({ scrollHeight: 700, innerHeight: 800 });
+      setLayout({ scrollHeight: 850, innerHeight: 900 });
       window.dispatchEvent(new Event('resize'));
     });
 
     expect(result.current).toBe(false);
+  });
+
+  it('flips overflow back off when navigating from a tall screen to one that fits, with no stale margin left over', async () => {
+    setLayout({ scrollHeight: 2000, innerHeight: 800 });
+    const { result } = renderHook(() => useScrolled());
+    expect(result.current).toBe(true);
+
+    // A route/screen swap replaces DOM nodes (unlike the header's own
+    // collapse, which is just a className change) — that's what the
+    // MutationObserver is watching for.
+    const node = document.createElement('div');
+    await act(async () => {
+      setLayout({ scrollHeight: 600, innerHeight: 800 });
+      document.body.appendChild(node);
+      await Promise.resolve();
+    });
+
+    expect(result.current).toBe(false);
+    document.body.removeChild(node);
   });
 });
