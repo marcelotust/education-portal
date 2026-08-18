@@ -60,7 +60,14 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     (received: QuizAnswer) => dispatch({ type: 'QUIZ_ANSWERED', answer: received }),
     [dispatch],
   );
-  const channel = useQuizAnswerBroadcast({ pin: state.pin, onAnswer });
+  // Fast path for the sped-up/red countdown (#105): a Player applies a
+  // Host-originated deadline the instant the broadcast lands, instead of
+  // waiting on the much slower table write + postgres_changes round trip.
+  const onDeadline = useCallback(
+    (endsAt: string) => dispatch({ type: 'QUIZ_DEADLINE_RECEIVED', endsAt }),
+    [dispatch],
+  );
+  const channel = useQuizAnswerBroadcast({ pin: state.pin, onAnswer, onDeadline });
 
   useEffect(() => {
     // Only the Host pulls the deadline in, so it happens once for everyone.
@@ -68,11 +75,13 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     if (!hasEveryoneAnswered(round, countPlayers(state))) return;
 
     allAnsweredFor.current = questionIndex;
-    dispatch({
-      type: 'QUIZ_ALL_ANSWERED',
-      endsAt: new Date(Date.now() + QUIZ_GRACE_MS).toISOString(),
-    });
-  }, [isHost, round, questionIndex, state, dispatch]);
+    const endsAt = new Date(Date.now() + QUIZ_GRACE_MS).toISOString();
+    // Broadcast first: Players see it instantly. The dispatch below still
+    // persists to rooms.state, the source of truth for reconciliation and
+    // late joiners — see docs/decisions/0001-room-state-transport.md.
+    channel.sendDeadline(endsAt);
+    dispatch({ type: 'QUIZ_ALL_ANSWERED', endsAt });
+  }, [isHost, round, questionIndex, state, dispatch, channel]);
 
   const answer = useCallback(
     (choice: number) => {

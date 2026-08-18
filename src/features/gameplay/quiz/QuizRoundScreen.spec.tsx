@@ -5,11 +5,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
 import { makeQuizRound, makeRoom } from '@/test/factories';
-import type { QuizAnswer, QuizRound, RoomState } from '@/types';
+import type { PlayerRole, QuizAnswer, QuizRound, RoomState } from '@/types';
 import { QuizRoundScreen } from './QuizRoundScreen';
 
-const { sendAnswer, useQuizAnswerBroadcastMock } = vi.hoisted(() => ({
+const { sendAnswer, sendDeadline, useQuizAnswerBroadcastMock } = vi.hoisted(() => ({
   sendAnswer: vi.fn(),
+  sendDeadline: vi.fn(),
   useQuizAnswerBroadcastMock: vi.fn(),
 }));
 
@@ -38,9 +39,9 @@ const AdvanceProbe = () => {
   );
 };
 
-const renderRound = (room: RoomState = playing()) =>
+const renderRound = (room: RoomState = playing(), role: PlayerRole = 'HOST') =>
   render(
-    <RoomProvider initialState={room} role="HOST">
+    <RoomProvider initialState={room} role={role}>
       <QuizRoundScreen playerId="player-0" />
       <AdvanceProbe />
     </RoomProvider>,
@@ -50,14 +51,24 @@ const options = () => within(screen.getByRole('list')).getAllByRole('button');
 
 describe('QUIZ round screen', () => {
   let receiveAnswer: ((answer: QuizAnswer) => void) | null = null;
+  let receiveDeadline: ((endsAt: string) => void) | null = null;
 
   beforeEach(() => {
     sendAnswer.mockClear();
+    sendDeadline.mockClear();
     receiveAnswer = null;
+    receiveDeadline = null;
     useQuizAnswerBroadcastMock.mockImplementation(
-      ({ onAnswer }: { onAnswer: (answer: QuizAnswer) => void }) => {
+      ({
+        onAnswer,
+        onDeadline,
+      }: {
+        onAnswer: (answer: QuizAnswer) => void;
+        onDeadline: (endsAt: string) => void;
+      }) => {
         receiveAnswer = onAnswer;
-        return { sendAnswer };
+        receiveDeadline = onDeadline;
+        return { sendAnswer, sendDeadline };
       },
     );
   });
@@ -108,5 +119,28 @@ describe('QUIZ round screen', () => {
     act(() => receiveAnswer?.({ playerId: 'player-1', choice: 0, elapsedMs: 500 }));
 
     expect(screen.getByRole('alert')).toHaveTextContent(/everyone has answered/i);
+  });
+
+  it('broadcasts the shortened deadline the instant everyone answers, not just persisting it (#105)', async () => {
+    const user = userEvent.setup();
+    renderRound(playing());
+
+    await user.click(screen.getByRole('button', { name: /Mercury/ }));
+    expect(sendDeadline).not.toHaveBeenCalled();
+
+    act(() => receiveAnswer?.({ playerId: 'player-1', choice: 0, elapsedMs: 500 }));
+
+    expect(sendDeadline).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it("shortens a Player's own countdown immediately once the deadline broadcast lands, without waiting on the table round trip (#105)", () => {
+    renderRound(playing({ endsAt: new Date(Date.now() + 30_000).toISOString() }), 'PLAYER');
+    const secondsBefore = Number(screen.getByTestId('round-timer').textContent);
+
+    act(() => receiveDeadline?.(new Date(Date.now() + 3000).toISOString()));
+
+    const secondsAfter = Number(screen.getByTestId('round-timer').textContent);
+    expect(secondsAfter).toBeLessThan(secondsBefore);
+    expect(secondsAfter).toBeLessThanOrEqual(3);
   });
 });

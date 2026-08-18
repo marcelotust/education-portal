@@ -300,6 +300,32 @@ describe('Lobby feature', () => {
       );
     });
 
+    it('labels the setup panel OPTIONS once a cartridge is chosen, not before (#107)', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      expect(screen.queryByText(/^options$/i)).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      expect(screen.getByText(/^options$/i)).toBeInTheDocument();
+    });
+
+    it('scrolls the OPTIONS section into view once a cartridge is chosen (#107)', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- asserting on the jsdom stub, never calling it detached.
+      expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- asserting on the jsdom stub, never calling it detached.
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+    });
+
     it('lets the Host change the round length', async () => {
       const user = userEvent.setup();
       renderLobby('HOST');

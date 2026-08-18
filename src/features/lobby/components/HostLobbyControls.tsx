@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react';
+
 import { RetroButton } from '@/components/ui/RetroButton';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
@@ -10,6 +13,15 @@ import { NewMatchControl } from './NewMatchControl';
 /** Write-side of the lobby: only ever rendered for the Host. */
 export const HostLobbyControls = () => {
   const { state, dispatch } = useRoom();
+  const optionsRef = useRef<HTMLDivElement>(null);
+
+  // Selecting a cartridge mounts the setup panel below the fold on most
+  // screens; pull it into view instead of leaving the Host to scroll for it.
+  useEffect(() => {
+    if (state.selectedGameId !== null) {
+      optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [state.selectedGameId]);
 
   if (state.status === 'LOBBY_IDLE') {
     // Nothing played yet means nothing to zero, so the reset stays hidden.
@@ -41,31 +53,37 @@ export const HostLobbyControls = () => {
         onSelect={(gameId) => dispatch({ type: 'SELECT_GAME', gameId })}
       />
 
-      {state.gameSetup.game === 'STOP' && state.selectedGameId !== null && (
-        <StopSetupPanel
-          setup={state.gameSetup}
-          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
-          onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
-        />
-      )}
+      {state.selectedGameId !== null && (
+        <div ref={optionsRef} className="flex flex-col gap-2">
+          <SectionLabel>Options</SectionLabel>
 
-      {state.gameSetup.game === 'QUIZ' && state.selectedGameId !== null && (
-        <QuizSetupPanel
-          setup={state.gameSetup}
-          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
-          onSelectTopic={(topic) => dispatch({ type: 'QUIZ_TOPIC_SELECTED', topic })}
-          onSelectQuestionCount={(count) =>
-            dispatch({ type: 'QUIZ_QUESTION_COUNT_SELECTED', count })
-          }
-        />
-      )}
+          {state.gameSetup.game === 'STOP' && (
+            <StopSetupPanel
+              setup={state.gameSetup}
+              onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+              onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
+            />
+          )}
 
-      {state.gameSetup.game === 'TABOO' && state.selectedGameId !== null && (
-        <TabooSetupPanel
-          setup={state.gameSetup}
-          onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
-          onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
-        />
+          {state.gameSetup.game === 'QUIZ' && (
+            <QuizSetupPanel
+              setup={state.gameSetup}
+              onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+              onSelectTopic={(topic) => dispatch({ type: 'QUIZ_TOPIC_SELECTED', topic })}
+              onSelectQuestionCount={(count) =>
+                dispatch({ type: 'QUIZ_QUESTION_COUNT_SELECTED', count })
+              }
+            />
+          )}
+
+          {state.gameSetup.game === 'TABOO' && (
+            <TabooSetupPanel
+              setup={state.gameSetup}
+              onSelectDuration={(seconds) => dispatch({ type: 'ROUND_DURATION_SELECTED', seconds })}
+              onToggleCategory={(category) => dispatch({ type: 'CATEGORY_TOGGLED', category })}
+            />
+          )}
+        </div>
       )}
 
       {!hasAtLeastOnePlayer && (

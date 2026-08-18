@@ -70,6 +70,13 @@ export type RoomEvent =
   | { type: 'QUIZ_ANSWERED'; answer: QuizAnswer }
   /** Every seated player has picked; pull the deadline in instead of waiting out the clock. */
   | { type: 'QUIZ_ALL_ANSWERED'; endsAt: string }
+  /**
+   * Broadcast twin of QUIZ_ALL_ANSWERED (#105): same effect, but reaches
+   * Players over Broadcast instead of the slower table round trip. Allowed
+   * for every client since, like ROOM_STATE_RECEIVED, it only ever applies
+   * an endsAt the Host already decided — nobody originates it locally.
+   */
+  | { type: 'QUIZ_DEADLINE_RECEIVED'; endsAt: string }
   | { type: 'TABOO_GUESSED'; guess: TabooGuess }
   /** Every guesser has answered; pull the deadline in instead of waiting out the clock. */
   | { type: 'TABOO_ALL_GUESSED'; endsAt: string }

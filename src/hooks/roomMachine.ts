@@ -26,6 +26,8 @@ const PRESENCE_EVENTS: readonly RoomEventType[] = [
   'ANSWERS_SUBMITTED',
   'QUIZ_ANSWERED',
   'TABOO_GUESSED',
+  // Broadcast fast-path twin of a Host-only event; see its doc comment (#105).
+  'QUIZ_DEADLINE_RECEIVED',
 ];
 
 export const isHostOnlyEvent = (event: RoomEvent): boolean => !PRESENCE_EVENTS.includes(event.type);
@@ -257,6 +259,7 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return nextQuestion(state, event.endsAt);
 
     case 'QUIZ_ALL_ANSWERED':
+    case 'QUIZ_DEADLINE_RECEIVED':
       return allAnswered(state, event.endsAt);
 
     case 'TABOO_GUESSED':
