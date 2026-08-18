@@ -63,6 +63,7 @@ export const HostEntryScreen = ({
 
         <RetroInput
           label="Nickname"
+          placeholder="PLAYER 1"
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"

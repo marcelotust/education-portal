@@ -92,6 +92,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
 
         <RetroInput
           label="Nickname"
+          placeholder="PLAYER 2"
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"
