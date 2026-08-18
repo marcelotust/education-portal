@@ -6,9 +6,10 @@ interface InviteLinkButtonProps {
 }
 
 /**
- * Copies the room's join link to the clipboard. A bare icon beside the PIN,
- * not a boxed button — inviting is a secondary action here, available to
- * anyone seated, not just the Host.
+ * Copies the room's join link to the clipboard — the same action as the
+ * lobby's "INVITE NEW PLAYERS" open-seat CTA, offered again here beside the
+ * PIN so it's reachable without an open seat. Sized down from a standard
+ * RetroButton: it sits beside the PIN, not as a primary action of its own.
  */
 export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   const { copied, copyInviteLink } = useInviteCopy(pin);
@@ -16,16 +17,15 @@ export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   return (
     <button
       type="button"
-      aria-label={copied ? 'Copied!' : 'Invite'}
       onClick={() => void copyInviteLink()}
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center font-arcade text-xl transition-transform',
-        'active:scale-90',
+        'flex h-6 shrink-0 items-center justify-center whitespace-nowrap border-2 border-ink px-1.5 font-arcade text-[7px] tracking-wider shadow-retro transition-transform',
+        'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
-        copied ? 'text-green-500' : 'text-flare hover:text-rose-400',
+        copied ? 'bg-green-100 text-green-700' : 'bg-yellow-400 text-black hover:bg-yellow-300',
       )}
     >
-      <span aria-hidden="true">{copied ? '✓' : '❐'}</span>
+      {copied ? 'COPIED!' : 'SHARE'}
     </button>
   );
 };

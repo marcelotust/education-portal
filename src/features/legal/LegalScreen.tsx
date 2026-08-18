@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 
@@ -19,7 +20,7 @@ export const LegalScreen = () => {
   return (
     <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-2 text-center">
-        <h1 className="font-arcade text-lg text-rose-500">LEGAL</h1>
+        <PageTitle>LEGAL</PageTitle>
         <p className="font-terminal text-lg text-gray-500">© 2026 EduParty</p>
       </header>
 

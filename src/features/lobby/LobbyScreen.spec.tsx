@@ -83,7 +83,7 @@ describe('Lobby feature', () => {
       Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
       renderLobby('HOST');
 
-      await user.click(screen.getByRole('button', { name: /^invite$/i }));
+      await user.click(screen.getByRole('button', { name: /^share$/i }));
 
       expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/play?pin=ABCD'));
       expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('Lobby feature', () => {
       Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
       renderLobby('PLAYER');
 
-      await user.click(screen.getByRole('button', { name: /^invite$/i }));
+      await user.click(screen.getByRole('button', { name: /^share$/i }));
 
       expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/play?pin=ABCD'));
       expect(await screen.findByRole('button', { name: /copied/i })).toBeInTheDocument();

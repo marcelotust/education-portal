@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroInput } from '@/components/ui/RetroInput';
@@ -54,9 +55,7 @@ export const HostEntryScreen = ({
 
       <RetroContainer className="flex flex-col gap-5 p-6">
         <header className="flex flex-col items-center gap-2">
-          <h1 className="font-arcade text-sm text-rose-500">
-            {resumableRoom == null ? 'NEW ROOM' : 'OR START A NEW ROOM'}
-          </h1>
+          <PageTitle>{resumableRoom == null ? 'NEW ROOM' : 'OR START A NEW ROOM'}</PageTitle>
           <p className="text-center font-terminal text-lg text-gray-600">
             You host the room and play as player 1 of 6.
           </p>

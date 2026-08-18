@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
@@ -32,7 +33,7 @@ export const RoundValidationScreen = () => {
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-2">
-        <h1 className="font-arcade text-sm text-yellow-500">VALIDATION</h1>
+        <PageTitle tone="yellow">VALIDATION</PageTitle>
         <p className="font-terminal text-lg text-gray-600">
           {isHost ? 'Approve or reject every answer.' : 'The Host is checking the answers...'}
         </p>
