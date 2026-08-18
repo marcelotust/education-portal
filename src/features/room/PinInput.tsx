@@ -14,6 +14,8 @@ interface PinInputProps {
   onChange: (value: string) => void;
   /** Tints every box's border rose, e.g. once the Host says that PIN is wrong. */
   hasError?: boolean;
+  /** Fires once the last box is filled, so focus can move on to whatever comes next. */
+  onComplete?: () => void;
 }
 
 /**
@@ -24,7 +26,7 @@ interface PinInputProps {
  * character so typing replaces it; pasting a whole PIN fills every box at
  * once.
  */
-export const PinInput = ({ value, onChange, hasError = false }: PinInputProps) => {
+export const PinInput = ({ value, onChange, hasError = false, onComplete }: PinInputProps) => {
   const labelId = useId();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -42,8 +44,11 @@ export const PinInput = ({ value, onChange, hasError = false }: PinInputProps) =
     next[index] = char;
     setChars(next);
 
-    if (char !== '' && index < PIN_LENGTH - 1) {
+    if (char === '') return;
+    if (index < PIN_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
+    } else {
+      onComplete?.();
     }
   };
 
@@ -70,7 +75,11 @@ export const PinInput = ({ value, onChange, hasError = false }: PinInputProps) =
       cursor += 1;
     }
     setChars(next);
-    inputRefs.current[Math.min(cursor, PIN_LENGTH - 1)]?.focus();
+    if (cursor >= PIN_LENGTH) {
+      onComplete?.();
+    } else {
+      inputRefs.current[cursor]?.focus();
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 
 import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
@@ -35,6 +35,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const nicknameRef = useRef<HTMLInputElement>(null);
 
   const canSubmit = isValidPin(pin.trim().toUpperCase()) && nickname.trim() !== '';
 
@@ -83,9 +84,15 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         </header>
 
-        <PinInput value={pin} onChange={setPin} hasError={error !== null} />
+        <PinInput
+          value={pin}
+          onChange={setPin}
+          hasError={error !== null}
+          onComplete={() => nicknameRef.current?.focus()}
+        />
 
         <RetroInput
+          ref={nicknameRef}
           label="Nickname"
           placeholder="PLAYER 2"
           value={nickname}
@@ -93,7 +100,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           autoComplete="off"
           autoCapitalize="characters"
           containerClassName="items-center"
-          className="w-48 text-center uppercase"
+          className="w-48 text-center uppercase text-sky-600"
           onChange={(event) => setNickname(event.target.value)}
         />
 
