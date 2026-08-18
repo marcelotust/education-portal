@@ -11,7 +11,7 @@ export default {
         },
         dirt: {
           light: '#92400e',
-          dark: '#78350f',
+          dark: '#743f16',
         },
         // Retro Platformer's shadow/outline color, in place of flat black.
         ink: '#381a41',

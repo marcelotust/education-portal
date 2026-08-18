@@ -1,23 +1,29 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Full-bleed platformer horizon: a grass strip over a dirt band, carrying
- * the legal/contact links every screen ends on.
+ * Full-bleed platformer horizon: the footer.png ground tile (#89) IS the
+ * footer — its own dirt half carries the legal/contact links, and the
+ * footer's total height is exactly the tile's, no padding-driven band
+ * underneath it. Replaces the old two-band CSS gradient (see #61/#68)
+ * with real art.
  */
 export const Footer = () => (
-  <footer className="w-full">
-    <div className="bg-grass-band h-4 w-full border-y-4 border-ink" aria-hidden="true" />
-    <div className="bg-dirt-band flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b-4 border-ink px-4 py-4 text-center">
-      <Link to="/legal" className="font-terminal text-sm text-amber-50 underline hover:text-white">
+  <footer
+    className="flex h-[65px] w-full items-center justify-center bg-top bg-repeat-x"
+    style={{
+      backgroundImage: "url('/footer.png')",
+      backgroundSize: '48px 65px',
+      imageRendering: 'pixelated',
+    }}
+  >
+    <div className="flex translate-y-1.5 flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center text-white/80">
+      <Link to="/legal" className="font-terminal text-base underline hover:text-white">
         Terms
       </Link>
-      <Link
-        to="/contact"
-        className="font-terminal text-sm text-amber-50 underline hover:text-white"
-      >
+      <Link to="/contact" className="font-terminal text-base underline hover:text-white">
         Contact
       </Link>
-      <p className="font-terminal text-xs text-amber-100/80">© 2026 EduParty</p>
+      <p className="font-terminal text-sm font-bold">© 2026 EduParty</p>
     </div>
   </footer>
 );
