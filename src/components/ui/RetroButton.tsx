@@ -37,9 +37,10 @@ interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Retro Platformer button: thick black border, solid offset shadow, tone
- * changes on hover. On press it looks mechanically pushed in — shifts into
- * the shadow and the shadow disappears — instead of glowing.
+ * Retro Platformer button: a border thinner than its offset shadow — the
+ * shadow does the heavy lifting, not the outline — tone changes on hover. On
+ * press it looks mechanically pushed in — shifts into the shadow and the
+ * shadow disappears — instead of glowing.
  */
 export const RetroButton = ({
   tone = 'green',
@@ -52,7 +53,7 @@ export const RetroButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'min-h-11 border-4 px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
+      'min-h-11 border-[3px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
       'disabled:cursor-not-allowed',
       pressed
