@@ -83,7 +83,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         </header>
 
-        <PinInput value={pin} onChange={setPin} />
+        <PinInput value={pin} onChange={setPin} hasError={error !== null} />
 
         <RetroInput
           label="Nickname"

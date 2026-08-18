@@ -6,11 +6,14 @@ import {
   type KeyboardEvent,
 } from 'react';
 
+import { cn } from '@/utils/cn';
 import { PIN_LENGTH } from '@/utils/room';
 
 interface PinInputProps {
   value: string;
   onChange: (value: string) => void;
+  /** Tints every box's border rose, e.g. once the Host says that PIN is wrong. */
+  hasError?: boolean;
 }
 
 /**
@@ -21,7 +24,7 @@ interface PinInputProps {
  * character so typing replaces it; pasting a whole PIN fills every box at
  * once.
  */
-export const PinInput = ({ value, onChange }: PinInputProps) => {
+export const PinInput = ({ value, onChange, hasError = false }: PinInputProps) => {
   const labelId = useId();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -94,7 +97,11 @@ export const PinInput = ({ value, onChange }: PinInputProps) => {
             onKeyDown={handleKeyDown(index)}
             onPaste={handlePaste(index)}
             onFocus={(event) => event.target.select()}
-            className="h-14 w-12 border-4 border-ink bg-white text-center font-arcade text-xl uppercase text-orange-500 focus:bg-yellow-50 focus:shadow-[inset_2px_2px_0px_rgba(56,26,65,0.1)] focus:outline-none"
+            className={cn(
+              'h-14 w-12 border-4 bg-white text-center font-arcade text-xl uppercase text-orange-500',
+              'focus:bg-yellow-50 focus:shadow-[inset_2px_2px_0px_rgba(56,26,65,0.1)] focus:outline-none',
+              hasError ? 'border-rose-500' : 'border-ink',
+            )}
           />
         ))}
       </div>

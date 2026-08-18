@@ -78,6 +78,22 @@ describe('Join room screen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/no room with that pin/i);
   });
 
+  it('tints the PIN boxes once the room turns out to be wrong', async () => {
+    const user = userEvent.setup();
+    const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
+    render(<JoinRoomScreen joinRoom={joinRoom} onReady={vi.fn()} />);
+
+    await typePin(user, 'ZZZZ');
+    await user.type(screen.getByLabelText(/nickname/i), 'ANA');
+
+    expect(screen.getByLabelText(/room pin letter 1/i)).not.toHaveClass('border-rose-500');
+
+    await user.click(screen.getByRole('button', { name: /join/i }));
+    await screen.findByRole('alert');
+
+    expect(screen.getByLabelText(/room pin letter 1/i)).toHaveClass('border-rose-500');
+  });
+
   it('does not blame the Player when a suggested room has ended', async () => {
     const user = userEvent.setup();
     const joinRoom = vi.fn().mockRejectedValue(new RoomJoinError('ROOM_NOT_FOUND'));
