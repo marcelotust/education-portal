@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
@@ -60,7 +61,7 @@ export const AdBreakScreen = () => {
 
   return (
     <RetroContainer className="flex flex-col items-center gap-6 p-6 py-10 text-center">
-      <h1 className="font-arcade text-sm text-rose-500">GET READY</h1>
+      <PageTitle>GET READY</PageTitle>
 
       <p
         className="text-solid-shadow font-arcade text-6xl text-yellow-400"

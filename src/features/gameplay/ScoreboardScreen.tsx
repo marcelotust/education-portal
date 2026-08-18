@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
@@ -24,7 +25,7 @@ export const ScoreboardScreen = () => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <h1 className="text-center font-arcade text-sm text-yellow-500">SCOREBOARD</h1>
+      <PageTitle tone="yellow">SCOREBOARD</PageTitle>
 
       <ol className="flex flex-col gap-2">
         {ranked.map(({ player, score, gained }, position) => (

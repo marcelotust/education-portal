@@ -17,7 +17,7 @@ export const InviteSlotRow = ({ pin }: InviteSlotRowProps) => {
         aria-label={copied ? 'Copied!' : 'Invite new players'}
         onClick={() => void copyInviteLink()}
         className={cn(
-          'flex min-h-11 w-full items-center gap-3 border-4 border-dashed px-3 py-1.5 text-left transition-transform',
+          'flex min-h-11 w-full items-center justify-center border-4 border-dashed px-3 py-1.5 transition-transform',
           'active:translate-x-[4px] active:translate-y-[4px]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
           copied
@@ -26,18 +26,8 @@ export const InviteSlotRow = ({ pin }: InviteSlotRowProps) => {
         )}
       >
         <span
-          aria-hidden="true"
           className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center border-2 border-dashed font-arcade text-base',
-            copied ? 'border-green-400 text-green-600' : 'border-yellow-400 text-yellow-600',
-          )}
-        >
-          {copied ? '✓' : '❐'}
-        </span>
-
-        <span
-          className={cn(
-            'flex-1 truncate text-left font-arcade text-[10px]',
+            'truncate font-arcade text-[10px]',
             copied ? 'text-green-600' : 'text-yellow-700',
           )}
         >

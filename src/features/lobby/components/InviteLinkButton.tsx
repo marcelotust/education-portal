@@ -6,10 +6,10 @@ interface InviteLinkButtonProps {
 }
 
 /**
- * Copies the room's join link to the clipboard. A small bordered button
- * beside the PIN, in the same retro-button language as the rest of the app
- * (border, offset shadow, press-in on click) — inviting is a secondary
- * action here, available to anyone seated, not just the Host.
+ * Copies the room's join link to the clipboard — the same action as the
+ * lobby's "INVITE NEW PLAYERS" open-seat CTA, offered again here beside the
+ * PIN so it's reachable without an open seat. Sized down from a standard
+ * RetroButton: it sits beside the PIN, not as a primary action of its own.
  */
 export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   const { copied, copyInviteLink } = useInviteCopy(pin);
@@ -17,18 +17,15 @@ export const InviteLinkButton = ({ pin }: InviteLinkButtonProps) => {
   return (
     <button
       type="button"
-      aria-label={copied ? 'Copied!' : 'Invite'}
       onClick={() => void copyInviteLink()}
       className={cn(
-        'flex h-11 w-11 shrink-0 items-center justify-center border-4 border-ink text-2xl shadow-retro transition-transform',
+        'flex h-6 shrink-0 items-center justify-center whitespace-nowrap border-2 border-ink px-1.5 font-arcade text-[7px] tracking-wider shadow-retro transition-transform',
         'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
-        copied ? 'bg-green-100' : 'bg-white hover:bg-gray-100',
+        copied ? 'bg-green-100 text-green-700' : 'bg-yellow-400 text-black hover:bg-yellow-300',
       )}
     >
-      <span aria-hidden="true" className="font-arcade">
-        {copied ? '✓' : '🔗'}
-      </span>
+      {copied ? 'COPIED!' : 'SHARE'}
     </button>
   );
 };

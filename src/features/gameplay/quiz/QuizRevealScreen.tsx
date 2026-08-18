@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { SectionLabel } from '@/components/ui/SectionLabel';
@@ -61,7 +62,7 @@ export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
       <header className="flex flex-col items-center gap-1">
-        <h1 className="font-arcade text-sm text-yellow-500">VALIDATION</h1>
+        <PageTitle tone="yellow">VALIDATION</PageTitle>
         <SectionLabel>Question</SectionLabel>
         <span data-testid="question-progress" className="font-arcade text-sm text-green-600">
           {round.currentIndex + 1}/{round.questions.length}

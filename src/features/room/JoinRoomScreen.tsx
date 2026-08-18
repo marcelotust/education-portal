@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroInput } from '@/components/ui/RetroInput';
@@ -73,7 +74,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
     <form className="flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>
       <RetroContainer className="flex flex-col gap-5 p-6">
         <header className="flex flex-col items-center gap-2">
-          <h1 className="font-arcade text-sm text-sky-500">INSERT PIN</h1>
+          <PageTitle tone="cyan">INSERT PIN</PageTitle>
           <p className="text-center font-terminal text-lg text-gray-600">
             Ask the Host for the 4-letter PIN.
           </p>

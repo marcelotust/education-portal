@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroTextarea } from '@/components/ui/RetroTextarea';
@@ -66,7 +67,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
   if (isSent) {
     return (
       <RetroContainer className="flex flex-col items-center gap-5 p-6 text-center">
-        <h1 className="font-arcade text-lg text-rose-500">THANKS!</h1>
+        <PageTitle>THANKS!</PageTitle>
         <p className="font-terminal text-xl text-gray-700">
           Your message made it through. We read every one of these.
         </p>
@@ -81,7 +82,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
     <form className="flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>
       <RetroContainer className="flex flex-col gap-5 p-6">
         <header className="flex flex-col items-center gap-2 text-center">
-          <h1 className="font-arcade text-lg text-rose-500">CONTACT</h1>
+          <PageTitle>CONTACT</PageTitle>
           <p className="font-terminal text-lg text-gray-500">
             Suggestions, new game requests, bug reports. This goes straight to us.
           </p>
