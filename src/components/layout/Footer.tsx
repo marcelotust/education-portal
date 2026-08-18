@@ -16,7 +16,7 @@ export const Footer = () => (
       imageRendering: 'pixelated',
     }}
   >
-    <div className="flex translate-y-1.5 flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center text-white/80">
+    <div className="flex translate-y-2.5 flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center text-white/80">
       <Link to="/legal" className="font-terminal text-base underline hover:text-white">
         Terms
       </Link>
