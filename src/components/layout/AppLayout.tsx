@@ -17,7 +17,7 @@ interface AppLayoutProps {
 // stays consistent across tile-size changes instead of drifting into gaps
 // or flat, unblended stripes.
 const SKY_TILE_HEIGHT_PX = 300;
-const SKY_LAYER_OVERLAP_PX = 80;
+const SKY_LAYER_OVERLAP_PX = 30;
 const SKY_LAYER_SPACING_PX = SKY_TILE_HEIGHT_PX - SKY_LAYER_OVERLAP_PX;
 const SKY_TINTS = ['#51a0ff', '#5d7ed0', '#9d8ad0'] as const;
 const SKY_LAYERS = SKY_TINTS.map((tint, index) => ({
