@@ -161,4 +161,22 @@ describe('Landing screen', () => {
 
     expect(join.compareDocumentPosition(games) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
+
+  it('groups the returning-visitor content in its own panel, separate from the primary actions', () => {
+    rememberRoom({ pin: 'KPZT', nickname: 'ANA', joinedAt: new Date().toISOString() });
+    renderLanding({ pin: 'KPZT' });
+
+    const panel = screen.getByTestId('recent-rooms-panel');
+
+    expect(panel).toContainElement(screen.getByRole('button', { name: /rejoin KPZT/i }));
+    expect(panel).toContainElement(screen.getByRole('button', { name: /resume KPZT/i }));
+    expect(panel).not.toContainElement(screen.getByRole('button', { name: /create a room/i }));
+    expect(panel).not.toContainElement(screen.getByRole('button', { name: /join a room/i }));
+  });
+
+  it('renders no second panel for a first-time visitor with nothing to resume or rejoin', () => {
+    renderLanding();
+
+    expect(screen.queryByTestId('recent-rooms-panel')).not.toBeInTheDocument();
+  });
 });
