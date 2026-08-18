@@ -9,7 +9,11 @@ interface RoomPinBannerProps {
 /** Header of the lobby: the PIN Players type plus the seat counter. */
 export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerProps) => (
   <header className="mb-5 flex flex-col items-center gap-2">
-    <h1 className="font-arcade text-xs text-rose-500">LOBBY</h1>
+    <h1 className="text-solid-shadow font-arcade text-xs text-rose-500">LOBBY</h1>
+
+    <p className="border-4 border-ink bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
+      {playerCount}/{maxPlayers} PLAYERS
+    </p>
 
     <p className="font-terminal text-xs uppercase tracking-[0.3em] text-gray-500">Room PIN</p>
 
@@ -18,7 +22,7 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerPro
           the PIN stays visually centered and the icon floats beside it
           instead of the pair being centered as one wider unit. */}
       <div className="relative inline-flex">
-        <p className="text-solid-shadow border-4 border-ink bg-white/60 px-4 py-2 font-arcade text-5xl tracking-[0.3em] text-orange-600 shadow-retro">
+        <p className="text-solid-shadow border-4 border-ink bg-white/60 px-4 py-2 font-arcade text-4xl tracking-[0.3em] text-orange-600">
           {pin}
         </p>
         <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
@@ -26,9 +30,5 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerPro
         </span>
       </div>
     </div>
-
-    <p className="border-4 border-ink bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
-      {playerCount}/{maxPlayers} PLAYERS
-    </p>
   </header>
 );
