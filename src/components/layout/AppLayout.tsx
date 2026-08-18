@@ -18,7 +18,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => (
   <div className="flex min-h-dvh w-full flex-col bg-sky-400">
     <Header />
 
-    <div className="flex w-full flex-1 justify-center gap-6 p-4 lg:p-8">
+    <div className="flex w-full flex-1 justify-center gap-6 p-2 lg:p-8">
       <AdSlot label="AD SPACE" />
 
       <main className="flex w-full max-w-md flex-col">{children}</main>
