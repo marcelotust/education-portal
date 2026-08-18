@@ -48,12 +48,13 @@ describe('STOP validation screen', () => {
     expect(screen.getByText('BREAD')).toBeInTheDocument();
   });
 
-  it('shows the running score next to each player while the Host judges', () => {
+  it('does not show the running session score next to a player name on the validation screen', () => {
     const room = { ...judgingRoom(), scores: { 'player-0': 30 } };
     renderValidation('HOST', room);
 
-    expect(screen.getAllByText(/ANA · 30/)[0]).toBeInTheDocument();
-    expect(screen.getAllByText(/BRUNO · 0/)[0]).toBeInTheDocument();
+    // An exact match on the bare nickname only succeeds if there is no "· 30" suffix.
+    expect(screen.getAllByText('ANA')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('BRUNO')[0]).toBeInTheDocument();
   });
 
   it('shows a dash for a player who left the field empty', () => {
@@ -92,16 +93,27 @@ describe('STOP validation screen', () => {
     );
   });
 
-  it('shows what each answer is worth, and updates it when one is rejected', async () => {
+  it('hides what an answer is worth until the Host judges it', () => {
+    renderValidation('HOST');
+
+    // Nothing has been judged yet, so no point value is on screen.
+    const values = screen.getAllByTestId('answer-points').map((node) => node.textContent);
+    expect(values).not.toContain('5');
+    expect(values).not.toContain('10');
+  });
+
+  it('reveals what an answer is worth once judged, and keeps it live as duplicates change', async () => {
     const user = userEvent.setup();
     renderValidation('HOST');
 
-    // Both wrote BEAR, so each is worth half.
+    await user.click(screen.getByRole('button', { name: /approve BEAR from ANA/i }));
+
+    // BRUNO's copy is still pending but still counts, so ANA's judged BEAR is worth half.
     expect(screen.getAllByTestId('answer-points').map((node) => node.textContent)).toContain('5');
 
     await user.click(screen.getByRole('button', { name: /reject BEAR from BRUNO/i }));
 
-    // ANA's BEAR is unique again.
+    // BRUNO's copy no longer counts, so ANA's BEAR is unique again.
     expect(screen.getAllByTestId('answer-points').map((node) => node.textContent)).toContain('10');
   });
 
