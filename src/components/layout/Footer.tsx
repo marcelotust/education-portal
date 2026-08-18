@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Full-bleed platformer horizon: the footer.png ground tile (#89) IS the
+ * Full-bleed platformer horizon: the footer2.png ground tile (#89) IS the
  * footer — its own dirt half carries the legal/contact links, and the
  * footer's total height is exactly the tile's, no padding-driven band
  * underneath it. Replaces the old two-band CSS gradient (see #61/#68)
@@ -11,7 +11,7 @@ export const Footer = () => (
   <footer
     className="flex h-[65px] w-full items-center justify-center bg-top bg-repeat-x"
     style={{
-      backgroundImage: "url('/footer.png')",
+      backgroundImage: "url('/footer2.png')",
       backgroundSize: '48px 65px',
       imageRendering: 'pixelated',
     }}
