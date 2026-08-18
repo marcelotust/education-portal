@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { SectionLabel } from '@/components/ui/SectionLabel';
@@ -58,12 +59,23 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
           </RetroButton>
         </div>
 
-        <div className="flex flex-col gap-2 text-center">
+        <div className="flex flex-col gap-3 text-center">
           <SectionLabel>Play these today</SectionLabel>
-          <p className="font-terminal text-xl text-gray-700">
-            {GAME_CARTRIDGES.map((cartridge) => cartridge.title).join(', ')} — more games are on the
-            way.
-          </p>
+          <ul className="flex flex-wrap items-center justify-center gap-4">
+            {GAME_CARTRIDGES.map((cartridge) => (
+              <li
+                key={cartridge.id}
+                data-testid={`game-cartridge-${cartridge.id}`}
+                className="flex items-center gap-2"
+              >
+                <div className="w-10 shrink-0">
+                  <GameSpriteThumb spritePosition={cartridge.spritePosition} />
+                </div>
+                <span className="font-terminal text-xl text-gray-700">{cartridge.title}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="font-terminal text-xl text-gray-700">More games are on the way.</p>
           <Link
             to="/contact?category=GAME_REQUEST"
             className="font-terminal text-lg text-sky-600 underline hover:text-sky-700"

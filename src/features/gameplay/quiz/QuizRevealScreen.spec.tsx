@@ -98,6 +98,28 @@ describe('QUIZ reveal', () => {
     expect(screen.getByTestId('reveal-row-player-1')).toHaveTextContent('—');
   });
 
+  it('explains the +15 as a speed bonus for answering fastest', () => {
+    renderReveal('PLAYER');
+
+    expect(screen.getByTestId('reveal-row-player-0')).toHaveTextContent(/fastest/i);
+    expect(screen.getByTestId('reveal-row-player-1')).not.toHaveTextContent(/fastest/i);
+  });
+
+  it('shows no speed-bonus badge when nobody earned one', () => {
+    renderReveal(
+      'PLAYER',
+      revealing({
+        answers: [
+          { playerId: 'player-0', choice: 1, elapsedMs: 900 },
+          { playerId: 'player-1', choice: 0, elapsedMs: 1500 },
+        ],
+        questionPoints: { 'player-0': 0, 'player-1': 0 },
+      }),
+    );
+
+    expect(screen.queryByText(/fastest/i)).not.toBeInTheDocument();
+  });
+
   it('says where the match is up to', () => {
     renderReveal('PLAYER');
 
