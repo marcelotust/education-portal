@@ -71,40 +71,44 @@ export const LandingScreen = ({ resumableRoom, livePins }: LandingScreenProps) =
             Tell us what game you want to play
           </Link>
         </div>
-
-        {recentRooms.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <SectionLabel>Rooms you joined</SectionLabel>
-
-            {recentRooms.map((room) => (
-              <button
-                key={room.pin}
-                type="button"
-                aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
-                onClick={() => void navigate(`/play?pin=${room.pin}`)}
-                className="flex min-h-11 items-center justify-between gap-3 border-4 border-ink bg-white px-3 py-3 font-arcade text-[10px] text-black transition-colors hover:bg-gray-50"
-              >
-                <span className="tracking-[0.3em] text-sky-500">{room.pin}</span>
-                <span className="text-gray-500">{room.nickname}</span>
-              </button>
-            ))}
-
-            <p className="font-terminal text-sm text-gray-500">
-              Saved on this device only — the room itself may already be over.
-            </p>
-          </div>
-        )}
-
-        {resumableRoom !== null && (
-          <div className="flex flex-col gap-2">
-            <SectionLabel>Load your last room</SectionLabel>
-
-            <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
-              RESUME {resumableRoom.pin}
-            </RetroButton>
-          </div>
-        )}
       </RetroContainer>
+
+      {(recentRooms.length > 0 || resumableRoom !== null) && (
+        <RetroContainer data-testid="recent-rooms-panel" className="flex flex-col gap-6 p-6">
+          {recentRooms.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <SectionLabel>Rooms you joined</SectionLabel>
+
+              {recentRooms.map((room) => (
+                <button
+                  key={room.pin}
+                  type="button"
+                  aria-label={`Rejoin ${room.pin} as ${room.nickname}`}
+                  onClick={() => void navigate(`/play?pin=${room.pin}`)}
+                  className="flex min-h-11 items-center justify-between gap-3 border-4 border-ink bg-white px-3 py-3 font-arcade text-[10px] text-black transition-colors hover:bg-gray-50"
+                >
+                  <span className="tracking-[0.3em] text-sky-500">{room.pin}</span>
+                  <span className="text-gray-500">{room.nickname}</span>
+                </button>
+              ))}
+
+              <p className="font-terminal text-sm text-gray-500">
+                Saved on this device only — the room itself may already be over.
+              </p>
+            </div>
+          )}
+
+          {resumableRoom !== null && (
+            <div className="flex flex-col gap-2">
+              <SectionLabel>Load your last room</SectionLabel>
+
+              <RetroButton tone="yellow" onClick={() => void navigate('/host')}>
+                RESUME {resumableRoom.pin}
+              </RetroButton>
+            </div>
+          )}
+        </RetroContainer>
+      )}
     </div>
   );
 };
