@@ -47,7 +47,6 @@ export const RoundValidationScreen = () => {
           key={category}
           category={category}
           players={players}
-          scores={state.scores}
           answers={round.answers.filter((answer) => answer.category === category)}
           pointsByPlayer={pointsFor(category)}
           canJudge={isHost && !isScored}

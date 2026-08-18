@@ -4,10 +4,8 @@ import { cn } from '@/utils/cn';
 interface CategoryValidationBlockProps {
   category: string;
   players: readonly Player[];
-  /** Running session score, shown so the Host judges with context. */
-  scores: Readonly<Record<string, number>>;
   answers: readonly StopAnswer[];
-  /** What each answer is worth right now; it moves as the Host judges. */
+  /** What each answer is worth right now; it moves as the Host judges. Hidden until judged. */
   pointsByPlayer: Readonly<Record<string, number>>;
   canJudge: boolean;
   onJudge: (playerId: string, isValid: boolean) => void;
@@ -17,7 +15,6 @@ interface CategoryValidationBlockProps {
 export const CategoryValidationBlock = ({
   category,
   players,
-  scores,
   answers,
   pointsByPlayer,
   canJudge,
@@ -32,6 +29,7 @@ export const CategoryValidationBlock = ({
         const value = answer?.value.trim() ?? '';
         const isApproved = answer?.isValid === true;
         const isRejected = answer?.isValid === false;
+        const isJudged = isApproved || isRejected;
         const points = pointsByPlayer[player.id] ?? 0;
 
         return (
@@ -40,13 +38,11 @@ export const CategoryValidationBlock = ({
             className={cn(
               'flex items-center gap-2 border-2 bg-white px-2 py-2',
               // A pending answer is visibly unfinished business.
-              value !== '' && !isApproved && !isRejected
-                ? 'border-dashed border-gray-400'
-                : 'border-ink',
+              value !== '' && !isJudged ? 'border-dashed border-gray-400' : 'border-ink',
             )}
           >
-            <span className="w-14 shrink-0 font-arcade text-[9px] text-gray-500">
-              {player.nickname} · {scores[player.id] ?? 0}
+            <span className="min-w-14 shrink-0 font-arcade text-[9px] text-gray-500">
+              {player.nickname}
             </span>
 
             <span
@@ -68,7 +64,7 @@ export const CategoryValidationBlock = ({
                     points === 0 ? 'text-gray-400' : 'text-green-600',
                   )}
                 >
-                  {points}
+                  {isJudged ? points : ''}
                 </span>
 
                 <button
