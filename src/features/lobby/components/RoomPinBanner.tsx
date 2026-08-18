@@ -18,7 +18,7 @@ export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerPro
           the PIN stays visually centered and the icon floats beside it
           instead of the pair being centered as one wider unit. */}
       <div className="relative inline-flex">
-        <p className="text-solid-shadow font-arcade text-3xl tracking-[0.3em] text-yellow-400">
+        <p className="text-solid-shadow border-4 border-ink bg-white/60 px-4 py-2 font-arcade text-5xl tracking-[0.3em] text-orange-600 shadow-retro">
           {pin}
         </p>
         <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
