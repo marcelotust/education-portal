@@ -26,7 +26,7 @@ export const PlayerSlotCard = ({ index, slot, score, isLeader }: PlayerSlotCardP
     className={cn(
       // Flat, no shadow or press states — a seat is information, not a
       // control, and the shadow-retro treatment reads as a button.
-      'flex min-h-11 items-center gap-3 border-4 px-3 py-1.5',
+      'flex min-h-11 items-center gap-3 border-[3px] px-3 py-1.5',
       slot
         ? cn('bg-white', isLeader ? 'border-yellow-400' : 'border-ink')
         : 'border-dashed border-gray-300 bg-gray-50',
