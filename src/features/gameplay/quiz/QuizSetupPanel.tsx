@@ -26,7 +26,7 @@ export const QuizSetupPanel = ({
   const isReadOnly = onSelectDuration === undefined;
 
   return (
-    <div className="flex flex-col gap-4 border-4 border-ink bg-white p-3">
+    <div className="flex flex-col gap-4 border-4 border-ink bg-white/80 p-3">
       <div className="flex flex-col gap-2">
         <SectionLabel>Time to answer</SectionLabel>
         <div className="grid grid-cols-4 gap-2">

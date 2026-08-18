@@ -26,7 +26,7 @@ export const HostAwayOverlay = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6">
       <div
         role="alert"
-        className="flex max-w-sm flex-col items-center gap-4 border-4 border-ink bg-white px-6 py-8 text-center shadow-retro"
+        className="flex max-w-sm flex-col items-center gap-4 border-4 border-ink bg-white/80 px-6 py-8 text-center shadow-retro"
       >
         <p className="animate-blink font-arcade text-sm text-rose-500">PAUSED</p>
         <p className="font-arcade text-[10px] leading-relaxed text-yellow-500">
