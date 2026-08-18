@@ -136,8 +136,26 @@ describe('Landing screen', () => {
   it('names the games available today', () => {
     renderLanding();
 
-    const games = screen.getByText(/STOP.*QUIZ.*TABOO/);
-    expect(games).toBeInTheDocument();
+    expect(screen.getByText('STOP')).toBeInTheDocument();
+    expect(screen.getByText('QUIZ')).toBeInTheDocument();
+    expect(screen.getByText('TABOO')).toBeInTheDocument();
+  });
+
+  it('shows a cartridge thumbnail beside each game name', () => {
+    renderLanding();
+
+    for (const id of ['STOP', 'QUIZ', 'TABOO']) {
+      const item = screen.getByTestId(`game-cartridge-${id}`);
+      expect(item).toContainElement(screen.getByText(id));
+      expect(item.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+    }
+  });
+
+  it('keeps the more-games note on its own line, separate from the game names', () => {
+    renderLanding();
+
+    const moreGames = screen.getByText(/more games/i);
+    expect(moreGames).not.toHaveTextContent('STOP');
   });
 
   it('invites a game request straight into the right contact category', () => {
@@ -157,7 +175,7 @@ describe('Landing screen', () => {
     renderLanding();
 
     const join = screen.getByRole('button', { name: /join a room/i });
-    const games = screen.getByText(/STOP.*QUIZ.*TABOO/);
+    const games = screen.getByText('STOP');
 
     expect(join.compareDocumentPosition(games) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

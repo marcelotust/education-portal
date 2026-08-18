@@ -19,7 +19,7 @@ export const TabooSetupPanel = ({
   const chosen = setup.categories.length;
 
   return (
-    <div className="flex flex-col gap-4 border-4 border-ink bg-white/80 p-3">
+    <div className="flex flex-col gap-4 border-4 border-ink bg-white/60 p-3">
       <div className="flex flex-col gap-2">
         <SectionLabel>Turn length</SectionLabel>
         <div className="grid grid-cols-3 gap-2">

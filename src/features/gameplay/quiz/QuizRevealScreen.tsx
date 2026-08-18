@@ -4,7 +4,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
-import { currentQuestion, isLastQuestion } from './quizRound';
+import { CORRECT_POINTS, currentQuestion, isLastQuestion } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -142,6 +142,9 @@ export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
             )}
           >
             <span className="flex-1 font-arcade text-[9px] text-black">{player.nickname}</span>
+            {gained > CORRECT_POINTS && (
+              <span className="font-arcade text-[8px] text-amber-600">FASTEST</span>
+            )}
             <span className="font-arcade text-[9px] text-sky-600">
               {gained > 0 ? `+${gained}` : '—'}
             </span>
