@@ -8,9 +8,27 @@ import { useEffect, useState } from 'react';
 const ENTER_THRESHOLD_PX = 56;
 const EXIT_THRESHOLD_PX = 8;
 
-/** Whether the page has scrolled past a small threshold, for chrome that compacts once it does. */
+// Same hysteresis shape as the scroll thresholds above, but on document
+// height instead of scroll position: once overflow is on, collapsing the
+// header shrinks scrollHeight, which could pull the excess back under the
+// viewport and flip overflow off right after it flipped on. The exit margin
+// has to clear that collapse so the shrink itself can't retrigger the flip.
+const OVERFLOW_ENTER_MARGIN_PX = 0;
+const OVERFLOW_EXIT_MARGIN_PX = -64;
+
+const isOverflowing = (wasOverflowing: boolean): boolean => {
+  const excess = document.documentElement.scrollHeight - window.innerHeight;
+  return wasOverflowing ? excess > OVERFLOW_EXIT_MARGIN_PX : excess > OVERFLOW_ENTER_MARGIN_PX;
+};
+
+/**
+ * Whether the page has scrolled past a small threshold, or is already tall
+ * enough to need scrolling at all — for chrome that compacts once either is
+ * true, without waiting for a scroll gesture on long pages.
+ */
 export const useScrolled = (): boolean => {
   const [scrolled, setScrolled] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -24,5 +42,23 @@ export const useScrolled = (): boolean => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  return scrolled;
+  useEffect(() => {
+    const checkOverflow = () => setOverflowing(isOverflowing);
+    checkOverflow();
+
+    window.addEventListener('resize', checkOverflow);
+
+    // Content height can change without a resize or route change (data
+    // loading in, a panel expanding) — watch the DOM itself, not just the
+    // viewport.
+    const observer = new MutationObserver(checkOverflow);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+      observer.disconnect();
+    };
+  }, []);
+
+  return scrolled || overflowing;
 };

@@ -8,9 +8,29 @@ const setScrollY = (value: number) => {
   window.dispatchEvent(new Event('scroll'));
 };
 
+const setLayout = ({
+  scrollHeight,
+  innerHeight,
+}: {
+  scrollHeight: number;
+  innerHeight: number;
+}) => {
+  Object.defineProperty(document.documentElement, 'scrollHeight', {
+    value: scrollHeight,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(window, 'innerHeight', {
+    value: innerHeight,
+    writable: true,
+    configurable: true,
+  });
+};
+
 describe('useScrolled', () => {
   afterEach(() => {
     setScrollY(0);
+    setLayout({ scrollHeight: 0, innerHeight: 768 });
   });
 
   it('starts false at the top of the page', () => {
@@ -49,6 +69,77 @@ describe('useScrolled', () => {
     const { result } = renderHook(() => useScrolled());
 
     act(() => setScrollY(20));
+
+    expect(result.current).toBe(false);
+  });
+
+  it('starts true when the page is already tall enough to need scrolling, with no scroll gesture', () => {
+    setLayout({ scrollHeight: 2000, innerHeight: 800 });
+
+    const { result } = renderHook(() => useScrolled());
+
+    expect(result.current).toBe(true);
+  });
+
+  it('stays false on mount when content fits inside the viewport', () => {
+    setLayout({ scrollHeight: 600, innerHeight: 800 });
+
+    const { result } = renderHook(() => useScrolled());
+
+    expect(result.current).toBe(false);
+  });
+
+  it('flips true when a resize makes previously-fitting content overflow', () => {
+    setLayout({ scrollHeight: 600, innerHeight: 800 });
+    const { result } = renderHook(() => useScrolled());
+    expect(result.current).toBe(false);
+
+    act(() => {
+      setLayout({ scrollHeight: 600, innerHeight: 400 });
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    expect(result.current).toBe(true);
+  });
+
+  it('flips true when content grows tall enough to overflow, without a resize or navigation', async () => {
+    setLayout({ scrollHeight: 600, innerHeight: 800 });
+    const { result } = renderHook(() => useScrolled());
+    expect(result.current).toBe(false);
+
+    const node = document.createElement('div');
+    await act(async () => {
+      setLayout({ scrollHeight: 2000, innerHeight: 800 });
+      document.body.appendChild(node);
+      await Promise.resolve();
+    });
+
+    expect(result.current).toBe(true);
+    document.body.removeChild(node);
+  });
+
+  it('does not flip overflow back off from a header-collapse-sized height shrink', () => {
+    setLayout({ scrollHeight: 850, innerHeight: 800 });
+    const { result } = renderHook(() => useScrolled());
+    expect(result.current).toBe(true);
+
+    act(() => {
+      setLayout({ scrollHeight: 800, innerHeight: 800 });
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    expect(result.current).toBe(true);
+  });
+
+  it('flips overflow back off once the excess clears the exit margin', () => {
+    setLayout({ scrollHeight: 850, innerHeight: 800 });
+    const { result } = renderHook(() => useScrolled());
+    expect(result.current).toBe(true);
+
+    act(() => {
+      setLayout({ scrollHeight: 700, innerHeight: 800 });
+      window.dispatchEvent(new Event('resize'));
+    });
 
     expect(result.current).toBe(false);
   });
