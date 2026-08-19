@@ -34,6 +34,11 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
     isFeedbackCategory(requestedCategory) ? requestedCategory : null,
   );
   const [message, setMessage] = useState('');
+  // Honeypot: invisible to a sighted human and never reached by keyboard, but a
+  // form-filling bot commonly fills every input it finds. Any value here means
+  // a bot, not a real report to lose — fake success (skip the submit entirely)
+  // instead of an error, so it stops trying without ever touching the network.
+  const [companyWebsite, setCompanyWebsite] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
@@ -41,6 +46,11 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (companyWebsite.trim() !== '') {
+      setIsSent(true);
+      return;
+    }
 
     if (category === null) {
       setError('Pick a category first.');
@@ -81,6 +91,21 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
   return (
     <form className="flex flex-col gap-5" onSubmit={(event) => void handleSubmit(event)}>
       <RetroContainer className="flex flex-col gap-5 p-6">
+        {/* Honeypot: off-screen and out of the tab order, so no sighted or
+            keyboard user ever reaches it — only a bot that fills every input
+            it finds. */}
+        <input
+          type="text"
+          name="company_website"
+          data-testid="company-website-honeypot"
+          value={companyWebsite}
+          onChange={(event) => setCompanyWebsite(event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
+        />
+
         <header className="flex flex-col items-center gap-2 text-center">
           <PageTitle>CONTACT</PageTitle>
           <p className="font-terminal text-lg text-gray-500">
