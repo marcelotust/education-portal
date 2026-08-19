@@ -14,10 +14,11 @@ import { cn } from '@/utils/cn';
  * hardcoding a guess.
  *
  * The header itself carries no background — it sits directly on the page's
- * sky — so the logo rides its own cloud instead of a sky-colored bar that
- * made scrolled content look like it was sliding in behind the sky (#129).
- * The cloud is a plain CSS blob for now; swap the span below for a
- * pixel-art image once that asset exists.
+ * sky. Only once scrolled, when the logo shrinks, does it ride a small
+ * cloud: at full size against the sky there was nothing to separate it
+ * from, but shrunk it made scrolled content look like it was sliding in
+ * behind the sky itself (#129). The cloud is a plain CSS blob for now; swap
+ * the span below for a pixel-art image once that asset exists.
  */
 export const Header = () => {
   const scrolled = useScrolled();
@@ -46,7 +47,10 @@ export const Header = () => {
         <Link to="/" className="relative inline-flex items-center px-4 py-2">
           <span
             aria-hidden="true"
-            className="absolute inset-0 -z-10 border-4 border-ink bg-white [border-radius:63%_37%_54%_46%/55%_48%_52%_45%]"
+            className={cn(
+              'absolute inset-0 -z-10 border-4 border-ink bg-white transition-opacity duration-200 [border-radius:63%_37%_54%_46%/55%_48%_52%_45%]',
+              scrolled ? 'opacity-100' : 'opacity-0',
+            )}
           />
           <img
             src="/logo.png"
