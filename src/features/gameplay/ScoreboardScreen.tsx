@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
@@ -5,6 +6,7 @@ import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
+import { trackGameCompleted } from '@/lib/analytics';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
 
@@ -13,6 +15,14 @@ const MEDALS = ['1ST', '2ND', '3RD'];
 /** Standings after the Host confirmed the scores. */
 export const ScoreboardScreen = () => {
   const { state, isHost, dispatch } = useRoom();
+
+  // Every participant's browser mounts this screen once the FSM state syncs,
+  // so only the Host fires the event — otherwise one finished game would
+  // count once per person in the room instead of once per game.
+  useEffect(() => {
+    if (isHost) trackGameCompleted();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount, not on every isHost re-render.
+  }, []);
 
   const ranked = state.slots
     .filter((slot): slot is Player => slot !== null)

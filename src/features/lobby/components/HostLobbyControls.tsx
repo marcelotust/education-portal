@@ -6,6 +6,7 @@ import { QuizSetupPanel } from '@/features/gameplay/quiz/QuizSetupPanel';
 import { StopSetupPanel } from '@/features/gameplay/StopSetupPanel';
 import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
+import { trackGameStarted } from '@/lib/analytics';
 import { MIN_CATEGORIES } from '@/types';
 import { GameCartridgePicker } from './GameCartridgePicker';
 import { NewMatchControl } from './NewMatchControl';
@@ -100,7 +101,10 @@ export const HostLobbyControls = () => {
           (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES) ||
           (state.gameSetup.game === 'TABOO' && state.gameSetup.categories.length < 1)
         }
-        onClick={() => dispatch({ type: 'START_GAME' })}
+        onClick={() => {
+          if (state.selectedGameId !== null) trackGameStarted(state.selectedGameId);
+          dispatch({ type: 'START_GAME' });
+        }}
       >
         START GAME
       </RetroButton>

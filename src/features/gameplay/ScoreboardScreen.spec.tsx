@@ -5,9 +5,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
+import * as analytics from '@/lib/analytics';
 import { makeRoom } from '@/test/factories';
 import type { PlayerRole, RoomState } from '@/types';
 import { ScoreboardScreen } from './ScoreboardScreen';
+
+vi.mock('@/lib/analytics', () => ({ trackGameCompleted: vi.fn() }));
 
 const StatusProbe = () => {
   const { state } = useRoom();
@@ -34,6 +37,22 @@ const renderScoreboard = (role: PlayerRole, room: RoomState = standings()): void
 describe('Scoreboard', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.clearAllMocks();
+  });
+
+  // Every participant's browser mounts this screen once the FSM state
+  // syncs, so only the Host may fire the completion event — otherwise one
+  // finished game would count once per person in the room.
+  it('logs the game as completed for the Host', () => {
+    renderScoreboard('HOST');
+
+    expect(analytics.trackGameCompleted).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not log a completion for a Player — the Host already did', () => {
+    renderScoreboard('PLAYER');
+
+    expect(analytics.trackGameCompleted).not.toHaveBeenCalled();
   });
 
   it('ranks players by score, highest first', () => {

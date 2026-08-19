@@ -3,7 +3,7 @@ import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
 import { toJson, type RoomRow } from '@/types/database';
 import { RoomJoinError, type RoomService, type RoomSession } from '@/types/roomService';
 import { ROOM_LIFETIME_HOURS, countPlayers, generateRoomPin } from '@/utils/room';
-import { trackRoomCreated } from '../analytics';
+import { trackRoomCreated, trackRoomJoined } from '../analytics';
 import { ensureAnonymousSession } from '../auth';
 import { getSupabaseClient, type EduPartyClient } from '../supabase';
 import { rowToRoomState, toPersistedState } from './roomMapper';
@@ -125,6 +125,10 @@ const joinRoom = async (
 
   const isSeated = room.slots.some((slot) => slot?.id === playerId);
   if (!isSeated && countPlayers(room) >= MAX_PLAYERS) throw new RoomJoinError('ROOM_FULL');
+
+  // Only a genuinely new seat counts as a join — a refresh reclaiming an
+  // existing one is a reconnect, not a new arrival.
+  if (!isSeated) trackRoomJoined();
 
   return { room, playerId, role: 'PLAYER', nickname, joinedAt: new Date().toISOString() };
 };

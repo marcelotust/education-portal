@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { loadGoogleAnalytics, trackPageView, trackRoomCreated } from './analytics';
+import {
+  loadGoogleAnalytics,
+  trackContactSubmitted,
+  trackGameCompleted,
+  trackGameStarted,
+  trackPageView,
+  trackRoomCreated,
+  trackRoomJoined,
+} from './analytics';
 
 // gtag.js's bootstrapping relies on dataLayer entries being genuine
 // `arguments` objects (see analytics.ts) rather than arrays, so compare by
@@ -67,5 +75,61 @@ describe('trackRoomCreated', () => {
 
   it('is a no-op before gtag has been initialized', () => {
     expect(() => trackRoomCreated()).not.toThrow();
+  });
+});
+
+describe('trackRoomJoined', () => {
+  it('pushes a room_joined event once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackRoomJoined();
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'room_joined', {}]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackRoomJoined()).not.toThrow();
+  });
+});
+
+describe('trackGameStarted', () => {
+  it('pushes a game_started event with the game ID once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackGameStarted('STOP');
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_started', { game_id: 'STOP' }]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackGameStarted('STOP')).not.toThrow();
+  });
+});
+
+describe('trackGameCompleted', () => {
+  it('pushes a game_completed event once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackGameCompleted();
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', {}]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackGameCompleted()).not.toThrow();
+  });
+});
+
+describe('trackContactSubmitted', () => {
+  it('pushes a contact_submitted event with the category once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackContactSubmitted('BUG');
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'contact_submitted', { category: 'BUG' }]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackContactSubmitted('BUG')).not.toThrow();
   });
 });

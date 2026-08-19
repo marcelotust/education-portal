@@ -1,3 +1,6 @@
+import type { GameId } from '@/types/game';
+import type { FeedbackCategory } from '@/types/feedbackService';
+
 declare global {
   interface Window {
     dataLayer: unknown[];
@@ -52,4 +55,32 @@ export const trackRoomCreated = () => {
   if (typeof window.gtag !== 'function') return;
 
   window.gtag('event', 'room_created', {});
+};
+
+/** Fired once a Player is seated in a room (#126). No-op before gtag loads. */
+export const trackRoomJoined = () => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'room_joined', {});
+};
+
+/** Fired when the Host starts a match (#126). No-op before gtag loads. */
+export const trackGameStarted = (gameId: GameId) => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'game_started', { game_id: gameId });
+};
+
+/** Fired once the scoreboard is reached (#126). No-op before gtag loads. */
+export const trackGameCompleted = () => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'game_completed', {});
+};
+
+/** Fired once a contact-form submission is persisted (#126). No-op before gtag loads. */
+export const trackContactSubmitted = (category: FeedbackCategory) => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'contact_submitted', { category });
 };
