@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 
 import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
@@ -7,6 +7,7 @@ import { RetroInput } from '@/components/ui/RetroInput';
 import { rememberRoom } from '@/lib/recentRooms';
 import { RoomJoinError, type JoinRoom, type RoomSession } from '@/types/roomService';
 import { MAX_NICKNAME_LENGTH, PIN_LENGTH, isValidPin } from '@/utils/room';
+import { PinInput } from './PinInput';
 
 const FAILURE_MESSAGES: Record<string, string> = {
   ROOM_NOT_FOUND: 'There is no room with that PIN.',
@@ -34,6 +35,9 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const nicknameRef = useRef<HTMLInputElement>(null);
+
+  const canSubmit = isValidPin(pin.trim().toUpperCase()) && nickname.trim() !== '';
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -80,31 +84,35 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         </header>
 
-        <RetroInput
-          label="Room PIN"
-          value={pin}
-          maxLength={PIN_LENGTH}
-          autoComplete="off"
-          autoCapitalize="characters"
-          className="text-center uppercase tracking-[0.5em]"
-          onChange={(event) => setPin(event.target.value)}
-        />
+        <div className="flex flex-col gap-1">
+          <PinInput
+            value={pin}
+            onChange={setPin}
+            hasError={error !== null}
+            onComplete={() => nicknameRef.current?.focus()}
+          />
+
+          {error !== null && (
+            <p role="alert" className="text-center font-terminal text-lg text-rose-500">
+              {error}
+            </p>
+          )}
+        </div>
 
         <RetroInput
+          ref={nicknameRef}
           label="Nickname"
+          placeholder="PLAYER 2"
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"
+          autoCapitalize="characters"
+          containerClassName="items-center"
+          className="w-48 text-center text-3xl uppercase text-sky-600"
           onChange={(event) => setNickname(event.target.value)}
         />
 
-        {error !== null && (
-          <p role="alert" className="font-terminal text-lg text-rose-500">
-            {error}
-          </p>
-        )}
-
-        <RetroButton type="submit" tone="cyan" disabled={isJoining}>
+        <RetroButton type="submit" tone="cyan" disabled={isJoining || !canSubmit}>
           {isJoining ? 'JOINING...' : 'JOIN'}
         </RetroButton>
       </RetroContainer>

@@ -63,9 +63,13 @@ export const HostEntryScreen = ({
 
         <RetroInput
           label="Nickname"
+          placeholder="PLAYER 1"
           value={nickname}
           maxLength={MAX_NICKNAME_LENGTH}
           autoComplete="off"
+          autoCapitalize="characters"
+          containerClassName="items-center"
+          className="w-48 text-center text-3xl uppercase text-sky-600"
           onChange={(event) => setNickname(event.target.value)}
         />
 
