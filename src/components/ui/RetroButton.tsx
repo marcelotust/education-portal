@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@/utils/cn';
 
-type RetroButtonTone = 'green' | 'pink' | 'cyan' | 'yellow' | 'white';
+export type RetroButtonTone = 'green' | 'pink' | 'cyan' | 'yellow' | 'white';
 
 const TONE_STYLES: Record<RetroButtonTone, string> = {
   green: 'bg-green-500 text-white hover:bg-green-400',
