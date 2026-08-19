@@ -12,6 +12,12 @@ import { cn } from '@/utils/cn';
  * it. Publishes its own rendered height as `--header-height` so sticky
  * sub-headers elsewhere (round screens) can stack under it instead of
  * hardcoding a guess.
+ *
+ * The header itself carries no background — it sits directly on the page's
+ * sky — so the logo rides its own cloud instead of a sky-colored bar that
+ * made scrolled content look like it was sliding in behind the sky (#129).
+ * The cloud is a plain CSS blob for now; swap the span below for a
+ * pixel-art image once that asset exists.
  */
 export const Header = () => {
   const scrolled = useScrolled();
@@ -27,7 +33,7 @@ export const Header = () => {
     <header
       ref={headerRef}
       className={cn(
-        'sticky top-0 z-20 w-full bg-sky-400 px-4 pb-2 transition-[padding] duration-200',
+        'sticky top-0 z-20 w-full px-4 pb-2 transition-[padding] duration-200',
         scrolled ? 'pt-2' : 'pt-4',
       )}
     >
@@ -37,7 +43,11 @@ export const Header = () => {
           scrolled ? 'justify-start' : 'justify-center',
         )}
       >
-        <Link to="/">
+        <Link to="/" className="relative inline-flex items-center px-4 py-2">
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 border-4 border-ink bg-white [border-radius:63%_37%_54%_46%/55%_48%_52%_45%]"
+          />
           <img
             src="/logo.png"
             alt="EduParty"
