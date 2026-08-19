@@ -58,8 +58,18 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
     if (error === null) {
       // Best-effort: a failed log entry must never block the room a Host is
       // waiting on. `public.rooms` is deleted by the expiry sweep, so this
-      // is the only durable record that the room ever existed.
-      void client.from('room_events').insert({ event_type: 'ROOM_CREATED', pin, host_id: hostId });
+      // is the only durable record that the room ever existed. Supabase's
+      // query builder is a lazy thenable — the request only fires inside
+      // its own `.then()`, so this needs an explicit (no-op) `.then()` to
+      // actually go out; `void` alone on the un-awaited builder would
+      // silently never send it.
+      void client
+        .from('room_events')
+        .insert({ event_type: 'ROOM_CREATED', pin, host_id: hostId })
+        .then(
+          () => undefined,
+          () => undefined,
+        );
       trackRoomCreated();
 
       return {

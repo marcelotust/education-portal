@@ -41,8 +41,12 @@ const fakeClient = (uid: string, row: RoomRow | null): EduPartyClient => {
 describe('createRoom', () => {
   /**
    * Just enough of the client for `createRoom`: an already-signed-in Host, a
-   * `rooms` insert that succeeds, and a spy on the `room_events` insert so
-   * the best-effort log entry (#125) can be asserted on directly.
+   * `rooms` insert that succeeds, and a `room_events` insert that mimics
+   * postgrest-js's real shape — a lazy thenable whose request only "fires"
+   * once `.then()` is actually called, not the moment `.insert()` returns.
+   * A mock that resolves eagerly here would pass even if the real code only
+   * ever called `.insert()` and never `.then()`'d the result — exactly the
+   * bug this test exists to catch.
    */
   const fakeCreateClient = (hostId: string, row: RoomRow) => {
     const roomsChain = {
@@ -50,7 +54,11 @@ describe('createRoom', () => {
         select: () => ({ single: () => Promise.resolve({ data: row, error: null }) }),
       }),
     };
-    const roomEventsInsert = vi.fn(() => Promise.resolve({ data: null, error: null }));
+    const roomEventsInsert = vi.fn();
+    const thenSpy = vi.fn((onFulfilled: (value: { data: null; error: null }) => unknown) =>
+      Promise.resolve(onFulfilled({ data: null, error: null })),
+    );
+    roomEventsInsert.mockReturnValue({ then: thenSpy });
 
     const client = {
       auth: { getSession: () => Promise.resolve({ data: { session: { user: { id: hostId } } } }) },
@@ -58,12 +66,12 @@ describe('createRoom', () => {
         table === 'room_events' ? { insert: roomEventsInsert } : roomsChain,
     } as unknown as EduPartyClient;
 
-    return { client, roomEventsInsert };
+    return { client, roomEventsInsert, thenSpy };
   };
 
   it('logs a ROOM_CREATED event once the room is persisted', async () => {
     const room = makeRoom({ playerCount: 1 });
-    const { client, roomEventsInsert } = fakeCreateClient(room.hostId, toRow(room));
+    const { client, roomEventsInsert, thenSpy } = fakeCreateClient(room.hostId, toRow(room));
     const service = createSupabaseRoomService(client);
 
     await service.createRoom('HOST');
@@ -71,6 +79,10 @@ describe('createRoom', () => {
     expect(roomEventsInsert).toHaveBeenCalledWith(
       expect.objectContaining({ event_type: 'ROOM_CREATED', host_id: room.hostId }),
     );
+    // Calling .insert() alone never sends anything — postgrest-js only
+    // builds the request inside .then(), so the log entry is only real if
+    // that got called too.
+    expect(thenSpy).toHaveBeenCalled();
   });
 });
 
