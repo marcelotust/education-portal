@@ -4,10 +4,14 @@ import { cn } from '@/utils/cn';
 
 export type RetroButtonTone = 'green' | 'pink' | 'cyan' | 'yellow' | 'white';
 
+// Green, pink and cyan sit one shade darker than you'd reach for by default —
+// the -500 shades only clear ~2.3-3.7:1 against the white button text, short
+// of WCAG AA's 4.5:1 for normal-size text (flagged by the #56 Lighthouse
+// pass). Yellow and white already clear it comfortably with black text.
 const TONE_STYLES: Record<RetroButtonTone, string> = {
-  green: 'bg-green-500 text-white hover:bg-green-400',
-  pink: 'bg-rose-500 text-white hover:bg-rose-400',
-  cyan: 'bg-sky-500 text-white hover:bg-sky-400',
+  green: 'bg-green-700 text-white hover:bg-green-600',
+  pink: 'bg-rose-600 text-white hover:bg-rose-500',
+  cyan: 'bg-sky-700 text-white hover:bg-sky-600',
   yellow: 'bg-yellow-400 text-black hover:bg-yellow-300',
   white: 'bg-white text-black hover:bg-gray-100',
 };
