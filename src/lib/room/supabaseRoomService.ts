@@ -3,6 +3,7 @@ import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
 import { toJson, type RoomRow } from '@/types/database';
 import { RoomJoinError, type RoomService, type RoomSession } from '@/types/roomService';
 import { ROOM_LIFETIME_HOURS, countPlayers, generateRoomPin } from '@/utils/room';
+import { trackRoomCreated } from '../analytics';
 import { ensureAnonymousSession } from '../auth';
 import { getSupabaseClient, type EduPartyClient } from '../supabase';
 import { rowToRoomState, toPersistedState } from './roomMapper';
@@ -55,6 +56,22 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
       .single<RoomRow>();
 
     if (error === null) {
+      // Best-effort: a failed log entry must never block the room a Host is
+      // waiting on. `public.rooms` is deleted by the expiry sweep, so this
+      // is the only durable record that the room ever existed. Supabase's
+      // query builder is a lazy thenable — the request only fires inside
+      // its own `.then()`, so this needs an explicit (no-op) `.then()` to
+      // actually go out; `void` alone on the un-awaited builder would
+      // silently never send it.
+      void client
+        .from('room_events')
+        .insert({ event_type: 'ROOM_CREATED', pin, host_id: hostId })
+        .then(
+          () => undefined,
+          () => undefined,
+        );
+      trackRoomCreated();
+
       return {
         room: rowToRoomState(data),
         playerId: hostId,

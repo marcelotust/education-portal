@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { makePlayer, makeRoom } from '@/test/factories';
 import { toPersistedState } from './roomMapper';
@@ -37,6 +37,54 @@ const fakeClient = (uid: string, row: RoomRow | null): EduPartyClient => {
     from: () => chain,
   } as unknown as EduPartyClient;
 };
+
+describe('createRoom', () => {
+  /**
+   * Just enough of the client for `createRoom`: an already-signed-in Host, a
+   * `rooms` insert that succeeds, and a `room_events` insert that mimics
+   * postgrest-js's real shape — a lazy thenable whose request only "fires"
+   * once `.then()` is actually called, not the moment `.insert()` returns.
+   * A mock that resolves eagerly here would pass even if the real code only
+   * ever called `.insert()` and never `.then()`'d the result — exactly the
+   * bug this test exists to catch.
+   */
+  const fakeCreateClient = (hostId: string, row: RoomRow) => {
+    const roomsChain = {
+      insert: () => ({
+        select: () => ({ single: () => Promise.resolve({ data: row, error: null }) }),
+      }),
+    };
+    const roomEventsInsert = vi.fn();
+    const thenSpy = vi.fn((onFulfilled: (value: { data: null; error: null }) => unknown) =>
+      Promise.resolve(onFulfilled({ data: null, error: null })),
+    );
+    roomEventsInsert.mockReturnValue({ then: thenSpy });
+
+    const client = {
+      auth: { getSession: () => Promise.resolve({ data: { session: { user: { id: hostId } } } }) },
+      from: (table: string) =>
+        table === 'room_events' ? { insert: roomEventsInsert } : roomsChain,
+    } as unknown as EduPartyClient;
+
+    return { client, roomEventsInsert, thenSpy };
+  };
+
+  it('logs a ROOM_CREATED event once the room is persisted', async () => {
+    const room = makeRoom({ playerCount: 1 });
+    const { client, roomEventsInsert, thenSpy } = fakeCreateClient(room.hostId, toRow(room));
+    const service = createSupabaseRoomService(client);
+
+    await service.createRoom('HOST');
+
+    expect(roomEventsInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ event_type: 'ROOM_CREATED', host_id: room.hostId }),
+    );
+    // Calling .insert() alone never sends anything — postgrest-js only
+    // builds the request inside .then(), so the log entry is only real if
+    // that got called too.
+    expect(thenSpy).toHaveBeenCalled();
+  });
+});
 
 describe('joinRoom', () => {
   it('seats a newcomer as a client', async () => {

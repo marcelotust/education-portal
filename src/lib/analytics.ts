@@ -46,3 +46,10 @@ export const trackPageView = (path: string) => {
     page_title: document.title,
   });
 };
+
+/** Fired once a Host's room is persisted (#125). No-op before gtag loads. */
+export const trackRoomCreated = () => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'room_created', {});
+};
