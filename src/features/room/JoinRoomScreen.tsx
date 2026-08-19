@@ -100,7 +100,7 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           autoComplete="off"
           autoCapitalize="characters"
           containerClassName="items-center"
-          className="w-48 text-center uppercase text-sky-600"
+          className="w-48 text-center text-3xl uppercase text-sky-600"
           onChange={(event) => setNickname(event.target.value)}
         />
 
