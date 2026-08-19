@@ -107,7 +107,7 @@ export const PinInput = ({ value, onChange, hasError = false, onComplete }: PinI
             onPaste={handlePaste(index)}
             onFocus={(event) => event.target.select()}
             className={cn(
-              'h-14 w-12 border-4 bg-white text-center font-arcade text-2xl uppercase leading-[3.5rem] text-orange-500',
+              'h-14 w-12 border-4 bg-white pl-[2px] pt-[2px] text-center font-arcade text-2xl uppercase leading-[3.5rem] text-orange-500',
               'focus:bg-yellow-50 focus:shadow-[inset_2px_2px_0px_rgba(56,26,65,0.1)] focus:outline-none',
               hasError ? 'border-rose-500' : 'border-ink',
             )}
