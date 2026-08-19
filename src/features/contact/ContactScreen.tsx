@@ -109,7 +109,9 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
         <header className="flex flex-col items-center gap-2 text-center">
           <PageTitle>CONTACT</PageTitle>
           <p className="font-terminal text-lg text-gray-500">
-            Suggestions, new game requests, bug reports. This goes straight to us.
+            Suggestions, new game requests, bug reports.
+            <br />
+            This goes straight to us.
           </p>
         </header>
 
