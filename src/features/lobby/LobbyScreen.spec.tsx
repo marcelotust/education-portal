@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
+import * as analytics from '@/lib/analytics';
 import { makeRoom } from '@/test/factories';
 import type { PlayerRole, RoomState } from '@/types';
 import { LobbyScreen } from './LobbyScreen';
@@ -15,6 +16,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof ReactRouter>('react-router-dom');
   return { ...actual, useNavigate: () => navigate };
 });
+vi.mock('@/lib/analytics', () => ({ trackGameStarted: vi.fn() }));
 
 /** Test-only probe: exposes the FSM state so specs can assert transitions. */
 const StatusProbe = () => {
@@ -43,7 +45,7 @@ const markSlotZeroAsHost = (room: RoomState): RoomState => ({
 
 describe('Lobby feature', () => {
   beforeEach(() => {
-    navigate.mockClear();
+    vi.clearAllMocks();
   });
 
   describe('leaving the lobby', () => {
@@ -294,6 +296,7 @@ describe('Lobby feature', () => {
       await user.click(screen.getByRole('button', { name: /start game/i }));
 
       expect(status()).toBe('PLAYING_AD');
+      expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP');
     });
 
     it('reveals the match setup once a cartridge is chosen', async () => {

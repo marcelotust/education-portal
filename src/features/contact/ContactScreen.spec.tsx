@@ -2,8 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import type * as ReactRouter from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import * as analytics from '@/lib/analytics';
 import { ContactScreen } from './ContactScreen';
 
 const navigate = vi.fn();
@@ -11,6 +12,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof ReactRouter>('react-router-dom');
   return { ...actual, useNavigate: () => navigate };
 });
+vi.mock('@/lib/analytics', () => ({ trackContactSubmitted: vi.fn() }));
 
 const renderContact = (
   submitFeedback = vi.fn().mockResolvedValue(undefined),
@@ -25,6 +27,10 @@ const renderContact = (
 };
 
 describe('Contact screen', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('offers the three feedback categories, none selected at first', () => {
     renderContact();
 
@@ -67,6 +73,7 @@ describe('Contact screen', () => {
 
     expect(submitFeedback).toHaveBeenCalledWith('BUG', 'The countdown gets stuck sometimes.');
     expect(await screen.findByText(/thanks/i)).toBeInTheDocument();
+    expect(analytics.trackContactSubmitted).toHaveBeenCalledWith('BUG');
   });
 
   it('shows an error and keeps the form if the submission fails', async () => {
@@ -79,6 +86,7 @@ describe('Contact screen', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not send/i);
     expect(screen.getByLabelText(/message/i)).toHaveValue('More cartridges please.');
+    expect(analytics.trackContactSubmitted).not.toHaveBeenCalled();
   });
 
   it('fakes success without submitting when the honeypot field is filled', async () => {
@@ -94,6 +102,7 @@ describe('Contact screen', () => {
 
     expect(submitFeedback).not.toHaveBeenCalled();
     expect(await screen.findByText(/thanks/i)).toBeInTheDocument();
+    expect(analytics.trackContactSubmitted).not.toHaveBeenCalled();
   });
 
   it('preselects the category a link asked for', () => {

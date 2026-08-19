@@ -6,6 +6,7 @@ import { RetroButton, type RetroButtonTone } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroTextarea } from '@/components/ui/RetroTextarea';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { trackContactSubmitted } from '@/lib/analytics';
 import type { FeedbackCategory, SubmitFeedback } from '@/types/feedbackService';
 
 const CATEGORIES: readonly { id: FeedbackCategory; label: string; tone: RetroButtonTone }[] = [
@@ -66,6 +67,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
     setIsSubmitting(true);
     try {
       await submitFeedback(category, trimmed);
+      trackContactSubmitted(category);
       setIsSent(true);
     } catch {
       setError('Could not send that. Check your connection and try again.');

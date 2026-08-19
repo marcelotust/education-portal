@@ -1,12 +1,19 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { makePlayer, makeRoom } from '@/test/factories';
 import { toPersistedState } from './roomMapper';
 import { createSupabaseRoomService } from './supabaseRoomService';
 import { MAX_PLAYERS, type RoomState } from '@/types';
 import type { RoomRow } from '@/types/database';
+import * as analytics from '../analytics';
 import type { EduPartyClient } from '../supabase';
 import { RoomJoinError } from '@/types/roomService';
+
+vi.mock('../analytics', () => ({ trackRoomCreated: vi.fn(), trackRoomJoined: vi.fn() }));
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 const toRow = (state: RoomState): RoomRow => ({
   id: 'room-1',
@@ -95,6 +102,7 @@ describe('joinRoom', () => {
 
     expect(session.role).toBe('PLAYER');
     expect(session.nickname).toBe('ANA');
+    expect(analytics.trackRoomJoined).toHaveBeenCalledTimes(1);
   });
 
   it('still refuses a stranger when every seat is taken', async () => {
@@ -127,6 +135,8 @@ describe('joinRoom', () => {
     expect(session.playerId).toBe(room.hostId);
     // Its seat already has a name; typing a new one must not rename the Host.
     expect(session.nickname).toBe('HOST');
+    // The Host walking into its own room is a reconnect, not a Player joining.
+    expect(analytics.trackRoomJoined).not.toHaveBeenCalled();
   });
 
   it('lets a Host back in even when the board is full', async () => {
@@ -154,6 +164,8 @@ describe('joinRoom', () => {
 
     expect(session.role).toBe('PLAYER');
     expect(session.playerId).toBe(seated.id);
+    // Reclaiming an already-seated slot is a reconnect, not a new join.
+    expect(analytics.trackRoomJoined).not.toHaveBeenCalled();
   });
 
   it('keeps the name a returning Player types', async () => {
