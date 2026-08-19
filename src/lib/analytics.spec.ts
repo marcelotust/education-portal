@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { loadGoogleAnalytics, trackPageView } from './analytics';
+import { loadGoogleAnalytics, trackPageView, trackRoomCreated } from './analytics';
 
 // gtag.js's bootstrapping relies on dataLayer entries being genuine
 // `arguments` objects (see analytics.ts) rather than arrays, so compare by
@@ -53,5 +53,19 @@ describe('trackPageView', () => {
 
   it('is a no-op before gtag has been initialized', () => {
     expect(() => trackPageView('/host')).not.toThrow();
+  });
+});
+
+describe('trackRoomCreated', () => {
+  it('pushes a room_created event once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackRoomCreated();
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'room_created', {}]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackRoomCreated()).not.toThrow();
   });
 });

@@ -63,6 +63,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      room_events: {
+        Row: {
+          created_at: string;
+          event_type: string;
+          host_id: string;
+          id: string;
+          pin: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_type: string;
+          host_id: string;
+          id?: string;
+          pin: string;
+        };
+        Update: {
+          created_at?: string;
+          event_type?: string;
+          host_id?: string;
+          id?: string;
+          pin?: string;
+        };
+        Relationships: [];
+      };
       rooms: {
         Row: {
           created_at: string;

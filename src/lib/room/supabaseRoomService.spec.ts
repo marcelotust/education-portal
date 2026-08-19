@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { makePlayer, makeRoom } from '@/test/factories';
 import { toPersistedState } from './roomMapper';
@@ -37,6 +37,42 @@ const fakeClient = (uid: string, row: RoomRow | null): EduPartyClient => {
     from: () => chain,
   } as unknown as EduPartyClient;
 };
+
+describe('createRoom', () => {
+  /**
+   * Just enough of the client for `createRoom`: an already-signed-in Host, a
+   * `rooms` insert that succeeds, and a spy on the `room_events` insert so
+   * the best-effort log entry (#125) can be asserted on directly.
+   */
+  const fakeCreateClient = (hostId: string, row: RoomRow) => {
+    const roomsChain = {
+      insert: () => ({
+        select: () => ({ single: () => Promise.resolve({ data: row, error: null }) }),
+      }),
+    };
+    const roomEventsInsert = vi.fn(() => Promise.resolve({ data: null, error: null }));
+
+    const client = {
+      auth: { getSession: () => Promise.resolve({ data: { session: { user: { id: hostId } } } }) },
+      from: (table: string) =>
+        table === 'room_events' ? { insert: roomEventsInsert } : roomsChain,
+    } as unknown as EduPartyClient;
+
+    return { client, roomEventsInsert };
+  };
+
+  it('logs a ROOM_CREATED event once the room is persisted', async () => {
+    const room = makeRoom({ playerCount: 1 });
+    const { client, roomEventsInsert } = fakeCreateClient(room.hostId, toRow(room));
+    const service = createSupabaseRoomService(client);
+
+    await service.createRoom('HOST');
+
+    expect(roomEventsInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ event_type: 'ROOM_CREATED', host_id: room.hostId }),
+    );
+  });
+});
 
 describe('joinRoom', () => {
   it('seats a newcomer as a client', async () => {

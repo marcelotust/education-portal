@@ -3,6 +3,7 @@ import { MAX_PLAYERS, type AvatarId, type Player } from '@/types';
 import { toJson, type RoomRow } from '@/types/database';
 import { RoomJoinError, type RoomService, type RoomSession } from '@/types/roomService';
 import { ROOM_LIFETIME_HOURS, countPlayers, generateRoomPin } from '@/utils/room';
+import { trackRoomCreated } from '../analytics';
 import { ensureAnonymousSession } from '../auth';
 import { getSupabaseClient, type EduPartyClient } from '../supabase';
 import { rowToRoomState, toPersistedState } from './roomMapper';
@@ -55,6 +56,12 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
       .single<RoomRow>();
 
     if (error === null) {
+      // Best-effort: a failed log entry must never block the room a Host is
+      // waiting on. `public.rooms` is deleted by the expiry sweep, so this
+      // is the only durable record that the room ever existed.
+      void client.from('room_events').insert({ event_type: 'ROOM_CREATED', pin, host_id: hostId });
+      trackRoomCreated();
+
       return {
         room: rowToRoomState(data),
         playerId: hostId,
