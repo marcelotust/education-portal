@@ -81,6 +81,21 @@ describe('Contact screen', () => {
     expect(screen.getByLabelText(/message/i)).toHaveValue('More cartridges please.');
   });
 
+  it('fakes success without submitting when the honeypot field is filled', async () => {
+    const user = userEvent.setup();
+    const { submitFeedback } = renderContact();
+
+    await user.click(screen.getByRole('button', { name: /bug report/i }));
+    await user.type(screen.getByLabelText(/message/i), 'The countdown gets stuck sometimes.');
+    // A sighted/keyboard user never reaches this field — only a bot filling
+    // every input it finds would put something here.
+    await user.type(screen.getByTestId('company-website-honeypot'), 'https://spam.example');
+    await user.click(screen.getByRole('button', { name: /send/i }));
+
+    expect(submitFeedback).not.toHaveBeenCalled();
+    expect(await screen.findByText(/thanks/i)).toBeInTheDocument();
+  });
+
   it('preselects the category a link asked for', () => {
     renderContact(vi.fn(), ['/contact?category=GAME_REQUEST']);
 
