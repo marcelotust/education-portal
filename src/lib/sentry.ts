@@ -16,6 +16,13 @@ export const initSentry = (dsn: string) => {
     // Low on purpose: enough to catch systematically slow Realtime
     // round-trips without burning through the free tier's event quota.
     tracesSampleRate: 0.1,
+    // Facebook/Instagram's in-app browser injects its own script that talks
+    // to the native app over a Java bridge; when that bridge call fails it
+    // throws from injected code we don't control, with no relation to
+    // anything the app did. Confirmed via breadcrumbs on a real report: an
+    // fbclid/lm.facebook.com referrer and native-bridge logs immediately
+    // before the throw, with the app itself working fine in the same session.
+    ignoreErrors: [/Java exception was raised during method invocation/],
   });
 };
 
