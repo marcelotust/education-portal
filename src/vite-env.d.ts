@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_ADSENSE_PUBLISHER_ID: string;
   /** Empty/missing means GA4 is not configured yet — the gtag.js snippet never loads. */
   readonly VITE_GA_MEASUREMENT_ID: string;
+  /** Empty/missing means Sentry is not configured yet — it is never initialized. */
+  readonly VITE_SENTRY_DSN: string;
 }
 
 interface ImportMeta {
