@@ -2,16 +2,16 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { PageTitle } from '@/components/ui/PageTitle';
-import { RetroButton } from '@/components/ui/RetroButton';
+import { RetroButton, type RetroButtonTone } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { RetroTextarea } from '@/components/ui/RetroTextarea';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { FeedbackCategory, SubmitFeedback } from '@/types/feedbackService';
 
-const CATEGORIES: readonly { id: FeedbackCategory; label: string }[] = [
-  { id: 'SUGGESTION', label: 'Suggestion' },
-  { id: 'GAME_REQUEST', label: 'New Game Request' },
-  { id: 'BUG', label: 'Bug Report' },
+const CATEGORIES: readonly { id: FeedbackCategory; label: string; tone: RetroButtonTone }[] = [
+  { id: 'SUGGESTION', label: 'Suggestion', tone: 'yellow' },
+  { id: 'GAME_REQUEST', label: 'New Game Request', tone: 'cyan' },
+  { id: 'BUG', label: 'Bug Report', tone: 'pink' },
 ];
 
 const isFeedbackCategory = (value: string | null): value is FeedbackCategory =>
@@ -115,10 +115,10 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
 
         <div className="flex flex-col gap-2">
           <SectionLabel>Category</SectionLabel>
-          {CATEGORIES.map(({ id, label }) => (
+          {CATEGORIES.map(({ id, label, tone }) => (
             <RetroButton
               key={id}
-              tone="yellow"
+              tone={tone}
               pressed={category === id}
               aria-pressed={category === id}
               onClick={() => setCategory(id)}
