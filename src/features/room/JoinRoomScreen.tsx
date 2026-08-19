@@ -84,12 +84,20 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           </p>
         </header>
 
-        <PinInput
-          value={pin}
-          onChange={setPin}
-          hasError={error !== null}
-          onComplete={() => nicknameRef.current?.focus()}
-        />
+        <div className="flex flex-col gap-1">
+          <PinInput
+            value={pin}
+            onChange={setPin}
+            hasError={error !== null}
+            onComplete={() => nicknameRef.current?.focus()}
+          />
+
+          {error !== null && (
+            <p role="alert" className="text-center font-terminal text-lg text-rose-500">
+              {error}
+            </p>
+          )}
+        </div>
 
         <RetroInput
           ref={nicknameRef}
@@ -103,12 +111,6 @@ export const JoinRoomScreen = ({ joinRoom, onReady, initialPin }: JoinRoomScreen
           className="w-48 text-center text-3xl uppercase text-sky-600"
           onChange={(event) => setNickname(event.target.value)}
         />
-
-        {error !== null && (
-          <p role="alert" className="font-terminal text-lg text-rose-500">
-            {error}
-          </p>
-        )}
 
         <RetroButton type="submit" tone="cyan" disabled={isJoining || !canSubmit}>
           {isJoining ? 'JOINING...' : 'JOIN'}
