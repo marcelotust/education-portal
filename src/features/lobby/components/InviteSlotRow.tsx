@@ -28,9 +28,7 @@ export const InviteSlotRow = ({ pin }: InviteSlotRowProps) => {
         <span
           className={cn(
             'truncate font-arcade text-[10px]',
-            // green-600 only clears ~3.15:1 against bg-green-50, short of
-            // WCAG AA's 4.5:1 for normal text.
-            copied ? 'text-green-700' : 'text-yellow-700',
+            copied ? 'text-green-600' : 'text-yellow-700',
           )}
         >
           {copied ? 'COPIED!' : 'INVITE NEW PLAYERS'}

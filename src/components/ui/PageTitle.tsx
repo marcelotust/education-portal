@@ -4,14 +4,10 @@ import { cn } from '@/utils/cn';
 
 type PageTitleTone = 'pink' | 'yellow' | 'cyan';
 
-// One shade darker than the brand default in each case — the -500 shades
-// only clear ~1.9-3.7:1 against a white/light page background, short of
-// WCAG AA's 4.5:1 for normal-size text (flagged by the #56 Lighthouse
-// pass; the drop shadow doesn't count toward the contrast ratio).
 const TONE_STYLES: Record<PageTitleTone, string> = {
-  pink: 'text-rose-600',
-  yellow: 'text-yellow-700',
-  cyan: 'text-sky-700',
+  pink: 'text-rose-500',
+  yellow: 'text-yellow-500',
+  cyan: 'text-sky-500',
 };
 
 interface PageTitleProps {
@@ -27,7 +23,11 @@ interface PageTitleProps {
  */
 export const PageTitle = ({ tone = 'pink', className, children }: PageTitleProps) => (
   <h1
-    className={cn('text-solid-shadow text-center font-arcade text-lg', TONE_STYLES[tone], className)}
+    className={cn(
+      'text-solid-shadow text-center font-arcade text-lg',
+      TONE_STYLES[tone],
+      className,
+    )}
   >
     {children}
   </h1>
