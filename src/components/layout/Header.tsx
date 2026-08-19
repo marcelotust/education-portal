@@ -9,12 +9,12 @@ import { cn } from '@/utils/cn';
  * front door. Sticky, and compacts once the page actually scrolls — smaller
  * logo, less sky-blue margin, shifted from centered to the left edge of the
  * content column — so it stops competing with whatever's being read below
- * it. The sky-blue bar itself fades out top-to-bottom (solid at the top,
- * down to a near-transparent wash 10px past its own bottom edge) in both
- * sizes, so it reads as a backdrop rather than a hard-edged banner; the
- * logo stays fully opaque throughout. Publishes its own rendered height as
- * `--header-height` so sticky sub-headers elsewhere (round screens) can
- * stack under it instead of hardcoding a guess.
+ * it. The sky-blue bar itself stays solid through its first 30%, then
+ * fades out the rest of the way to a near-transparent wash 5px past its
+ * own bottom edge, in both sizes, so it reads as a backdrop rather than a
+ * hard-edged banner; the logo stays fully opaque throughout. Publishes its
+ * own rendered height as `--header-height` so sticky sub-headers elsewhere
+ * (round screens) can stack under it instead of hardcoding a guess.
  */
 export const Header = () => {
   const scrolled = useScrolled();
@@ -36,7 +36,7 @@ export const Header = () => {
     >
       <span
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 -bottom-2.5 -z-10 bg-gradient-to-b from-sky-400 to-sky-400/10"
+        className="absolute inset-x-0 top-0 -bottom-[5px] -z-10 bg-gradient-to-b from-sky-400 via-sky-400 via-30% to-sky-400/10"
       />
       <div
         className={cn(
