@@ -30,6 +30,21 @@ describe('initSentry', () => {
       expect.objectContaining({ dsn: 'https://examplePublicKey@o0.ingest.sentry.io/0' }),
     );
   });
+
+  // Facebook/Instagram's in-app browser throws this from its own injected
+  // bridge script, unrelated to anything the app does — filtered so it
+  // doesn't drown out real errors.
+  it('filters out the Facebook in-app-browser bridge error', () => {
+    initSentry('https://examplePublicKey@o0.ingest.sentry.io/0');
+
+    const config = init.mock.calls[0]?.[0] as { ignoreErrors: RegExp[] };
+    const matchesIgnoredError = config.ignoreErrors.some((pattern) =>
+      pattern.test(
+        'Error invoking postMessage: Java exception was raised during method invocation',
+      ),
+    );
+    expect(matchesIgnoredError).toBe(true);
+  });
 });
 
 describe('tagRoomContext', () => {
