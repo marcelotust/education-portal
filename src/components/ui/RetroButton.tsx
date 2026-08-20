@@ -12,6 +12,26 @@ const TONE_STYLES: Record<RetroButtonTone, string> = {
   white: 'bg-white text-black',
 };
 
+// Selected/pressed dims only the fill to 80% — border, shadow and text stay
+// at full opacity, so the control still reads crisp and just the color
+// itself recedes, instead of the whole element fading.
+const TONE_STYLES_SELECTED: Record<RetroButtonTone, string> = {
+  green: 'bg-green-500/80 text-white',
+  pink: 'bg-rose-500/80 text-white',
+  cyan: 'bg-sky-500/80 text-white',
+  yellow: 'bg-yellow-400/80 text-black',
+  white: 'bg-white/80 text-black',
+};
+
+// Same idea for the momentary :active press on a non-selected button.
+const TONE_ACTIVE_BG: Record<RetroButtonTone, string> = {
+  green: 'active:bg-green-500/80',
+  pink: 'active:bg-rose-500/80',
+  cyan: 'active:bg-sky-500/80',
+  yellow: 'active:bg-yellow-400/80',
+  white: 'active:bg-white/80',
+};
+
 interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tone?: RetroButtonTone;
   /**
@@ -28,11 +48,11 @@ interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 /**
  * Retro Platformer button: a border thinner than its offset shadow — the
  * shadow does the heavy lifting, not the outline. Every tone keeps its bold
- * fill in every state (#143) — what changes is opacity: 0.8 at rest, 1.0 the
- * instant it's pressed or permanently selected, 0.6 when disabled (border
- * and shadow fade along with the fill, since opacity dims the whole element
- * as one unit). Selection also swaps the border to `flare` so it doesn't
- * rely on the opacity bump alone to read as chosen.
+ * fill color family in every state (#143) — full opacity at rest, and when
+ * pressed or permanently selected only the *fill* dims to 80% (border,
+ * shadow, and text stay full-strength) so the control reads as physically
+ * recessed without going muddy. Disabled dims everything uniformly to 60%
+ * and drops the shadow, reading as flat rather than just faded.
  */
 export const RetroButton = ({
   tone = 'green',
@@ -45,15 +65,19 @@ export const RetroButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'min-h-11 border-[3px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-[transform,opacity]',
+      'min-h-11 px-4 py-3 font-arcade text-[10px] tracking-wider transition-[transform,border-width]',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
-      'disabled:cursor-not-allowed disabled:opacity-60',
-      TONE_STYLES[tone],
+      'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
       pressed
-        ? 'translate-x-[4px] translate-y-[4px] border-flare opacity-100 shadow-none'
+        ? cn(
+            'translate-x-[4px] translate-y-[4px] border-[5px] border-flare shadow-none',
+            TONE_STYLES_SELECTED[tone],
+          )
         : cn(
-            'border-ink opacity-80 shadow-retro',
-            'active:translate-x-[4px] active:translate-y-[4px] active:opacity-100 active:shadow-none',
+            'border-[3px] border-ink shadow-retro',
+            'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+            TONE_STYLES[tone],
+            TONE_ACTIVE_BG[tone],
           ),
       className,
     )}

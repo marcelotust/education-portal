@@ -150,13 +150,13 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => answer(index)}
               className={cn(
-                'flex w-full items-center gap-3 border-4 bg-sky-500 px-3 py-3 text-left font-terminal text-xl text-white transition-[transform,opacity]',
-                'disabled:cursor-not-allowed disabled:opacity-60',
+                'flex w-full items-center gap-3 px-3 py-3 text-left font-terminal text-xl text-white transition-[transform,border-width]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 picked === index
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none'
                   : cn(
-                      'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
-                      'active:opacity-100',
+                      'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-sky-500/80',
                     ),
               )}
             >

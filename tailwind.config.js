@@ -15,10 +15,8 @@ export default {
         },
         // Retro Platformer's shadow/outline color, in place of flat black.
         ink: '#381a41',
-        // Border color for a selected control (#143) — orange reads clearly
-        // against every tone's own fill, including yellow, unlike a
-        // same-family accent would.
-        flare: '#f97316',
+        // Border color for a selected control (#143).
+        flare: '#dcfa16',
       },
       fontFamily: {
         // Headings, buttons and any "arcade cabinet" chrome.

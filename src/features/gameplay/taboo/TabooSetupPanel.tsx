@@ -32,13 +32,13 @@ export const TabooSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 border-4 bg-sky-500 py-2 font-arcade text-[10px] text-white transition-[transform,opacity]',
-                'disabled:cursor-not-allowed disabled:opacity-60',
+                'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none'
                   : cn(
-                      'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
-                      'active:opacity-100',
+                      'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-sky-500/80',
                     ),
               )}
             >
@@ -64,13 +64,13 @@ export const TabooSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 border-4 bg-green-500 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,opacity]',
-                  'disabled:cursor-not-allowed disabled:opacity-60',
+                  'min-h-11 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,border-width]',
+                  'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                   isChosen
-                    ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
+                    ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-none'
                     : cn(
-                        'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
-                        'active:opacity-100',
+                        'border-4 border-ink bg-green-500 shadow-[2px_2px_0px_0px_#381a41]',
+                        'active:bg-green-500/80',
                       ),
                 )}
               >
