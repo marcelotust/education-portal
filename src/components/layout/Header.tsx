@@ -48,7 +48,7 @@ export const Header = () => {
           <img
             src="/logo.png"
             alt="EduParty"
-            width={485}
+            width={480}
             height={95}
             className={cn(
               'w-auto transition-[height] duration-200',
