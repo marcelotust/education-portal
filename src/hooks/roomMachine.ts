@@ -1,7 +1,7 @@
 import { DEFAULT_STOP_GAME_SETUP } from '@/features/gameplay/stopRound';
 import { DEFAULT_QUIZ_SETUP, computeQuizScores } from '@/features/gameplay/quiz/quizRound';
 import { computeRoundScores } from '@/features/gameplay/scoring';
-import { DEFAULT_TABOO_SETUP, computeTabooScores } from '@/features/gameplay/taboo/tabooRound';
+import { DEFAULT_TABOO_SETUP } from '@/features/gameplay/taboo/tabooRound';
 import {
   MAX_PLAYERS,
   MIN_CATEGORIES,
@@ -11,9 +11,17 @@ import {
   type RoomEventType,
   type RoomState,
 } from '@/types';
-import { releaseSlot, sameBoard, seatPlayer } from '@/utils/room';
+import { addPoints, releaseSlot, sameBoard, seatPlayer } from '@/utils/room';
 import { allAnswered, answerQuiz, nextQuestion } from './quizMachine';
-import { allTabooGuessed, guessTaboo, nextTabooTurn } from './tabooMachine';
+import {
+  allTabooGuessed,
+  approveRemainingGuesses,
+  endTabooTurn,
+  guessTaboo,
+  judgeGuess,
+  nextTabooTurn,
+  scoreTurn,
+} from './tabooMachine';
 
 /** Presence events are broadcast by the infrastructure, not by the Host. */
 const PRESENCE_EVENTS: readonly RoomEventType[] = [
@@ -65,21 +73,10 @@ const isSetupPlayable = (state: RoomState): boolean => {
   return true;
 };
 
-const addPoints = (
-  total: Readonly<Record<string, number>>,
-  earned: Readonly<Record<string, number>>,
-): Record<string, number> => {
-  const sum = { ...total };
-  for (const [playerId, points] of Object.entries(earned)) {
-    sum[playerId] = (sum[playerId] ?? 0) + points;
-  }
-  return sum;
-};
-
 /**
- * STOP hands the round to the Host to judge. QUIZ and TABOO have nothing to
- * judge, so each scores itself on the spot and stops on the reveal: the match
- * is only over once the Host walks past the last question or clue-giver.
+ * STOP and TABOO hand the round to the Host to judge before it counts. QUIZ
+ * has nothing to judge, so it scores itself on the spot and stops on the
+ * reveal: the match is only over once the Host walks past the last question.
  */
 const endRound = (state: RoomState): RoomState => {
   const round = state.currentRound;
@@ -93,28 +90,16 @@ const endRound = (state: RoomState): RoomState => {
     };
   }
 
-  if (round.game === 'QUIZ') {
-    const earned = computeQuizScores(round);
-    return {
-      ...state,
-      status: 'SHOWING_ANSWER',
-      scores: addPoints(state.scores, earned),
-      currentRound: {
-        ...round,
-        questionPoints: earned,
-        matchPoints: addPoints(round.matchPoints, earned),
-      },
-    };
-  }
+  if (round.game === 'TABOO') return endTabooTurn(state);
 
-  const earned = computeTabooScores(round);
+  const earned = computeQuizScores(round);
   return {
     ...state,
     status: 'SHOWING_ANSWER',
     scores: addPoints(state.scores, earned),
     currentRound: {
       ...round,
-      turnPoints: earned,
+      questionPoints: earned,
       matchPoints: addPoints(round.matchPoints, earned),
     },
   };
@@ -296,6 +281,15 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
 
     case 'ROUND_SCORED':
       return scoreRound(state);
+
+    case 'GUESS_JUDGED':
+      return judgeGuess(state, event);
+
+    case 'REMAINING_GUESSES_APPROVED':
+      return approveRemainingGuesses(state);
+
+    case 'TURN_SCORED':
+      return scoreTurn(state);
 
     case 'END_ROUND':
       return state.status === 'PLAYING' ? endRound(state) : state;

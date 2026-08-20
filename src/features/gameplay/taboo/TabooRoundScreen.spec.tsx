@@ -87,7 +87,7 @@ describe('TABOO round screen', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     // player-2 is the other guesser (player-0 is the clue-giver this turn).
-    act(() => receiveGuess?.({ playerId: 'player-2', value: 'elephant' }));
+    act(() => receiveGuess?.({ playerId: 'player-2', value: 'elephant', isValid: null }));
 
     expect(screen.getByRole('alert')).toHaveTextContent(/everyone has guessed/i);
   });

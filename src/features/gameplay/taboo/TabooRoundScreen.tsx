@@ -78,7 +78,7 @@ export const TabooRoundScreen = ({ playerId }: TabooRoundScreenProps) => {
     if (round === null || value === '' || hasSubmitted || hasGuessed(round, playerId)) return;
 
     setSubmittedFor(turnIndex);
-    const guess: TabooGuess = { playerId, value };
+    const guess: TabooGuess = { playerId, value, isValid: null };
     dispatch({ type: 'TABOO_GUESSED', guess });
     channel.sendGuess(guess);
   };

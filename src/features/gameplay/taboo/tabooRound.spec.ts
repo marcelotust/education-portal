@@ -136,11 +136,11 @@ describe('TABOO scoring', () => {
   /** The factory's first turn is ELEPHANT, guessed by whoever is not the clue-giver. */
   const roundWith = (guesses: readonly TabooGuess[]): TabooRound => makeTabooRound({ guesses });
 
-  it('scores everyone who guessed the word right', () => {
+  it('scores every guess the Host approved', () => {
     const scores = computeTabooScores(
       roundWith([
-        { playerId: 'player-1', value: 'elephant' },
-        { playerId: 'player-2', value: 'ELEPHANT' },
+        { playerId: 'player-1', value: 'elephant', isValid: true },
+        { playerId: 'player-2', value: 'ELEFANT', isValid: true },
       ]),
     );
 
@@ -148,11 +148,11 @@ describe('TABOO scoring', () => {
     expect(scores['player-2']).toBe(TABOO_CORRECT_POINTS);
   });
 
-  it('gives nothing for a wrong guess, unlike QUIZ there is no speed bonus either way', () => {
+  it('gives nothing for a rejected guess, unlike QUIZ there is no speed bonus either way', () => {
     const scores = computeTabooScores(
       roundWith([
-        { playerId: 'player-1', value: 'giraffe' },
-        { playerId: 'player-2', value: 'elephant' },
+        { playerId: 'player-1', value: 'giraffe', isValid: false },
+        { playerId: 'player-2', value: 'elephant', isValid: true },
       ]),
     );
 
@@ -160,8 +160,16 @@ describe('TABOO scoring', () => {
     expect(scores['player-2']).toBe(TABOO_CORRECT_POINTS);
   });
 
+  it('gives nothing for a guess still awaiting the Host, same as a rejected one', () => {
+    const scores = computeTabooScores(
+      roundWith([{ playerId: 'player-1', value: 'elephant', isValid: null }]),
+    );
+
+    expect(scores['player-1']).toBe(0);
+  });
+
   it('tracks who has already guessed', () => {
-    const round = roundWith([{ playerId: 'player-1', value: 'elephant' }]);
+    const round = roundWith([{ playerId: 'player-1', value: 'elephant', isValid: null }]);
 
     expect(hasGuessed(round, 'player-1')).toBe(true);
     expect(hasGuessed(round, 'player-2')).toBe(false);
@@ -169,8 +177,8 @@ describe('TABOO scoring', () => {
 
   it('is done once everyone but the clue-giver has guessed', () => {
     const round = roundWith([
-      { playerId: 'player-1', value: 'x' },
-      { playerId: 'player-2', value: 'y' },
+      { playerId: 'player-1', value: 'x', isValid: null },
+      { playerId: 'player-2', value: 'y', isValid: null },
     ]);
 
     // 3 seated, minus the clue-giver, minus the 2 who already guessed.

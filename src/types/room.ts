@@ -86,6 +86,9 @@ export type RoomEvent =
   | { type: 'ANSWER_JUDGED'; playerId: string; category: string; isValid: boolean }
   | { type: 'REMAINING_ANSWERS_APPROVED' }
   | { type: 'ROUND_SCORED' }
+  | { type: 'GUESS_JUDGED'; playerId: string; isValid: boolean }
+  | { type: 'REMAINING_GUESSES_APPROVED' }
+  | { type: 'TURN_SCORED' }
   | { type: 'END_ROUND' }
   | { type: 'RETURN_TO_LOBBY' }
   | { type: 'MATCH_RESET' }

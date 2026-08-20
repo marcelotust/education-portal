@@ -54,3 +54,19 @@ export const releaseSlot = (state: RoomState, playerId: string): RoomState => {
   const slots = state.slots.map((slot) => (slot?.id === playerId ? null : slot));
   return { ...state, slots };
 };
+
+/**
+ * Shared by every cartridge that scores itself onto the running total
+ * (QUIZ in roomMachine.ts, TABOO in tabooMachine.ts): sums earned points into
+ * what a player already has, rather than replacing it.
+ */
+export const addPoints = (
+  total: Readonly<Record<string, number>>,
+  earned: Readonly<Record<string, number>>,
+): Record<string, number> => {
+  const sum = { ...total };
+  for (const [playerId, points] of Object.entries(earned)) {
+    sum[playerId] = (sum[playerId] ?? 0) + points;
+  }
+  return sum;
+};

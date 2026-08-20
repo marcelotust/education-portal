@@ -8,6 +8,7 @@ import { QuizRoundScreen } from '@/features/gameplay/quiz/QuizRoundScreen';
 import { StopRoundScreen } from '@/features/gameplay/StopRoundScreen';
 import { TabooRevealScreen } from '@/features/gameplay/taboo/TabooRevealScreen';
 import { TabooRoundScreen } from '@/features/gameplay/taboo/TabooRoundScreen';
+import { TabooValidationScreen } from '@/features/gameplay/taboo/TabooValidationScreen';
 import { LobbyScreen } from '@/features/lobby/LobbyScreen';
 import { useRoom } from '@/hooks/useRoom';
 import type { RoomState } from '@/types';
@@ -34,8 +35,9 @@ const screenFor = (state: RoomState, playerId: string): ReactNode => {
       );
     case 'CALCULATING_SCORES':
       // The Host judges first; the standings replace the table once confirmed.
-      return state.currentRound?.isScored === true ? (
-        <ScoreboardScreen />
+      if (state.currentRound?.isScored === true) return <ScoreboardScreen />;
+      return state.currentRound?.game === 'TABOO' ? (
+        <TabooValidationScreen />
       ) : (
         <RoundValidationScreen />
       );

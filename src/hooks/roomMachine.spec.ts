@@ -577,11 +577,11 @@ describe('room FSM', () => {
       // Turn 0's clue-giver is player-0; player-1 is free to guess.
       const guessed = roomReducer(playingTaboo(), {
         type: 'TABOO_GUESSED',
-        guess: { playerId: 'player-1', value: 'wrong' },
+        guess: { playerId: 'player-1', value: 'wrong', isValid: null },
       });
       const again = roomReducer(guessed, {
         type: 'TABOO_GUESSED',
-        guess: { playerId: 'player-1', value: 'elephant' },
+        guess: { playerId: 'player-1', value: 'elephant', isValid: null },
       });
 
       const round = again.currentRound;
@@ -594,46 +594,152 @@ describe('room FSM', () => {
 
       const guessed = roomReducer(playing, {
         type: 'TABOO_GUESSED',
-        guess: { playerId: 'player-0', value: 'elephant' },
+        guess: { playerId: 'player-0', value: 'elephant', isValid: null },
       });
 
       expect(guessed).toBe(playing);
     });
 
-    it('scores the turn itself and stops on the reveal, with no Host judging', () => {
+    it('hands the turn to the Host to judge instead of scoring it on the spot', () => {
       const guessed = roomReducer(playingTaboo(), {
         type: 'TABOO_GUESSED',
-        guess: { playerId: 'player-1', value: 'elephant' },
+        guess: { playerId: 'player-1', value: 'elephant', isValid: null },
       });
 
       const ended = roomReducer(guessed, { type: 'END_ROUND' });
       const round = ended.currentRound;
 
-      expect(ended.status).toBe('SHOWING_ANSWER');
-      expect(ended.scores['player-1']).toBe(TABOO_CORRECT_POINTS);
-      expect(round?.game === 'TABOO' && round.turnPoints['player-1']).toBe(TABOO_CORRECT_POINTS);
-      expect(ended.currentRound?.isScored).toBe(false);
+      expect(ended.status).toBe('CALCULATING_SCORES');
+      expect(round?.isScored).toBe(false);
+      // Nothing is added to anyone's score until the Host confirms it.
+      expect(ended.scores['player-1']).toBeUndefined();
     });
 
-    it('gives a wrong guess nothing', () => {
+    it('pre-fills an exact match as valid, a suggestion the Host still has to confirm', () => {
       const guessed = roomReducer(playingTaboo(), {
         type: 'TABOO_GUESSED',
-        guess: { playerId: 'player-1', value: 'giraffe' },
+        guess: { playerId: 'player-1', value: 'elephant', isValid: null },
       });
 
-      expect(roomReducer(guessed, { type: 'END_ROUND' }).scores['player-1']).toBe(0);
+      const ended = roomReducer(guessed, { type: 'END_ROUND' });
+      const round = ended.currentRound;
+
+      expect(round?.game === 'TABOO' && round.guesses[0]?.isValid).toBe(true);
+    });
+
+    it('leaves a wrong guess pending rather than scoring it zero automatically', () => {
+      const guessed = roomReducer(playingTaboo(), {
+        type: 'TABOO_GUESSED',
+        guess: { playerId: 'player-1', value: 'giraffe', isValid: null },
+      });
+
+      const ended = roomReducer(guessed, { type: 'END_ROUND' });
+      const round = ended.currentRound;
+
+      expect(round?.game === 'TABOO' && round.guesses[0]?.isValid).toBeNull();
     });
 
     it('is a shared event: a Player must be able to send its own guess', () => {
       expect(
-        isHostOnlyEvent({ type: 'TABOO_GUESSED', guess: { playerId: 'player-0', value: 'x' } }),
+        isHostOnlyEvent({
+          type: 'TABOO_GUESSED',
+          guess: { playerId: 'player-0', value: 'x', isValid: null },
+        }),
       ).toBe(false);
+    });
+
+    describe('TABOO validation phase', () => {
+      const judging = (): RoomState => {
+        const guessed = roomReducer(playingTaboo(), {
+          type: 'TABOO_GUESSED',
+          guess: { playerId: 'player-1', value: 'giraffe', isValid: null },
+        });
+        return roomReducer(guessed, { type: 'END_ROUND' });
+      };
+
+      const tabooRoundOf = (state: RoomState) =>
+        state.currentRound?.game === 'TABOO' ? state.currentRound : null;
+
+      it('records the Host approving a near-miss the auto-match rejected', () => {
+        const state = roomReducer(judging(), {
+          type: 'GUESS_JUDGED',
+          playerId: 'player-1',
+          isValid: true,
+        });
+
+        expect(tabooRoundOf(state)?.guesses[0]?.isValid).toBe(true);
+      });
+
+      it('lets the Host change its mind about a guess', () => {
+        let state = roomReducer(judging(), {
+          type: 'GUESS_JUDGED',
+          playerId: 'player-1',
+          isValid: true,
+        });
+        state = roomReducer(state, {
+          type: 'GUESS_JUDGED',
+          playerId: 'player-1',
+          isValid: false,
+        });
+
+        expect(tabooRoundOf(state)?.guesses[0]?.isValid).toBe(false);
+      });
+
+      it('moves the turn on to the reveal once the Host confirms, adding the earned points', () => {
+        const approved = roomReducer(judging(), {
+          type: 'GUESS_JUDGED',
+          playerId: 'player-1',
+          isValid: true,
+        });
+        const scored = roomReducer(approved, { type: 'TURN_SCORED' });
+
+        expect(scored.status).toBe('SHOWING_ANSWER');
+        expect(scored.scores['player-1']).toBe(TABOO_CORRECT_POINTS);
+        expect(tabooRoundOf(scored)?.turnPoints['player-1']).toBe(TABOO_CORRECT_POINTS);
+        expect(tabooRoundOf(scored)?.isScored).toBe(true);
+      });
+
+      it('scores a rejected guess as nothing', () => {
+        const scored = roomReducer(judging(), { type: 'TURN_SCORED' });
+
+        expect(scored.scores['player-1']).toBe(0);
+      });
+
+      it('refuses to score the same turn twice', () => {
+        const scored = roomReducer(judging(), { type: 'TURN_SCORED' });
+
+        expect(roomReducer(scored, { type: 'TURN_SCORED' })).toBe(scored);
+      });
+
+      it('approves everything still pending, leaving what the Host already rejected alone', () => {
+        const rejected = roomReducer(judging(), {
+          type: 'GUESS_JUDGED',
+          playerId: 'player-1',
+          isValid: false,
+        });
+
+        const state = roomReducer(rejected, { type: 'REMAINING_GUESSES_APPROVED' });
+
+        expect(tabooRoundOf(state)?.guesses[0]?.isValid).toBe(false);
+      });
+
+      it('keeps judging and scoring Host-only', () => {
+        expect(
+          isHostOnlyEvent({ type: 'GUESS_JUDGED', playerId: 'player-1', isValid: true }),
+        ).toBe(true);
+        expect(isHostOnlyEvent({ type: 'REMAINING_GUESSES_APPROVED' })).toBe(true);
+        expect(isHostOnlyEvent({ type: 'TURN_SCORED' })).toBe(true);
+      });
     });
 
     describe('a match is a sequence of turns', () => {
       const NEXT_DEADLINE = '2026-07-25T10:02:00.000Z';
 
-      /** Whoever is seated and is not the clue-giver guesses the word right, then closes it. */
+      /**
+       * Whoever is seated and is not the clue-giver guesses the word right,
+       * then closes it and has the Host confirm the (already exact-matched)
+       * score, landing on the reveal exactly as before.
+       */
       const revealing = (state: RoomState): RoomState => {
         const round = state.currentRound;
         if (round?.game !== 'TABOO') return state;
@@ -642,9 +748,10 @@ describe('room FSM', () => {
 
         const guessed = roomReducer(state, {
           type: 'TABOO_GUESSED',
-          guess: { playerId: guesser ?? 'player-0', value: turn?.card.word ?? '' },
+          guess: { playerId: guesser ?? 'player-0', value: turn?.card.word ?? '', isValid: null },
         });
-        return roomReducer(guessed, { type: 'END_ROUND' });
+        const judging = roomReducer(guessed, { type: 'END_ROUND' });
+        return roomReducer(judging, { type: 'TURN_SCORED' });
       };
 
       it('moves to the next turn on a fresh clock, with the guesses cleared', () => {

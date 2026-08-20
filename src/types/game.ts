@@ -123,6 +123,8 @@ export interface TabooTurn {
 export interface TabooGuess {
   playerId: string;
   value: string;
+  /** `null` while the Host has not judged it yet. */
+  isValid: boolean | null;
 }
 
 /**

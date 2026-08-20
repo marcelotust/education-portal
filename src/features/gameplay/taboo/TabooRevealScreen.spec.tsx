@@ -20,8 +20,8 @@ const revealing = (round: Partial<TabooRound> = {}): RoomState => ({
   currentRound: makeTabooRound({
     currentIndex: 1,
     guesses: [
-      { playerId: 'player-0', value: 'titanic' },
-      { playerId: 'player-2', value: 'wrong' },
+      { playerId: 'player-0', value: 'titanic', isValid: true },
+      { playerId: 'player-2', value: 'wrong', isValid: false },
     ],
     turnPoints: { 'player-0': 10, 'player-2': 0 },
     matchPoints: { 'player-0': 10, 'player-2': 0 },

@@ -102,16 +102,16 @@ export const hasEveryoneGuessed = (round: TabooRound, seatedCount: number): bool
   round.guesses.length >= Math.max(0, seatedCount - 1);
 
 /**
- * TABOO needs no Host: a guess either matches the word or it does not. Unlike
- * QUIZ there is no speed bonus — the ask only wanted everyone who got it right
- * to score, not a race.
+ * What a guess is worth once the Host has judged it (#141). Unlike STOP's
+ * pending answers, a guess with no verdict yet is worth nothing: TABOO has no
+ * duplicate rule that needs it to count early, so nothing is awarded until
+ * the Host actively confirms it.
  */
 export const computeTabooScores = (round: TabooRound): Record<string, number> => {
-  const word = currentTurn(round)?.card.word ?? '';
   const scores: Record<string, number> = {};
 
   for (const guess of round.guesses) {
-    scores[guess.playerId] = isCorrectGuess(guess.value, word) ? TABOO_CORRECT_POINTS : 0;
+    scores[guess.playerId] = guess.isValid === true ? TABOO_CORRECT_POINTS : 0;
   }
 
   return scores;
