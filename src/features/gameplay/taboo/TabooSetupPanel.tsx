@@ -1,3 +1,4 @@
+import { retroSelectableClasses } from '@/components/ui/retroButtonStyles';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import { TABOO_ROUND_DURATIONS, type RoundDuration, type TabooSetup } from '@/types';
 import { cn } from '@/utils/cn';
@@ -32,15 +33,12 @@ export const TabooSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
-                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
-                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
-                setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
-                  : cn(
-                      'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
-                      'active:bg-sky-500/80',
-                    ),
+                'min-h-11 py-2 font-arcade text-[10px]',
+                retroSelectableClasses({
+                  tone: 'cyan',
+                  selected: setup.roundDurationSeconds === seconds,
+                  size: 'sm',
+                }),
               )}
             >
               {seconds}s
@@ -65,15 +63,8 @@ export const TabooSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,border-width]',
-                  '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
-                  'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
-                  isChosen
-                    ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
-                    : cn(
-                        'border-4 border-ink bg-green-500 shadow-[2px_2px_0px_0px_#381a41]',
-                        'active:bg-green-500/80',
-                      ),
+                  'min-h-11 px-3 py-2 font-arcade text-[9px]',
+                  retroSelectableClasses({ tone: 'green', selected: isChosen, size: 'sm' }),
                 )}
               >
                 {category}
