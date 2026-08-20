@@ -5,21 +5,10 @@ import { cn } from '@/utils/cn';
 export type RetroButtonTone = 'green' | 'pink' | 'cyan' | 'yellow' | 'white';
 
 const TONE_STYLES: Record<RetroButtonTone, string> = {
-  green: 'bg-green-500 text-white hover:bg-green-400',
-  pink: 'bg-rose-500 text-white hover:bg-rose-400',
-  cyan: 'bg-sky-500 text-white hover:bg-sky-400',
-  yellow: 'bg-yellow-400 text-black hover:bg-yellow-300',
-  white: 'bg-white text-black hover:bg-gray-100',
-};
-
-// Almost-white tint of the same tone, for a selected control: the color
-// stays bold until picked, then pales instead of the button turning plain
-// white or staying the same bold fill.
-const TONE_SELECTED_STYLES: Record<RetroButtonTone, string> = {
-  green: 'bg-selected-green text-black',
-  pink: 'bg-selected-rose text-black',
-  cyan: 'bg-selected-sky text-black',
-  yellow: 'bg-selected-yellow text-black',
+  green: 'bg-green-500 text-white',
+  pink: 'bg-rose-500 text-white',
+  cyan: 'bg-sky-500 text-white',
+  yellow: 'bg-yellow-400 text-black',
   white: 'bg-white text-black',
 };
 
@@ -38,9 +27,12 @@ interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Retro Platformer button: a border thinner than its offset shadow — the
- * shadow does the heavy lifting, not the outline — tone changes on hover. On
- * press it looks mechanically pushed in — shifts into the shadow and the
- * shadow disappears — instead of glowing.
+ * shadow does the heavy lifting, not the outline. Every tone keeps its bold
+ * fill in every state (#143) — what changes is opacity: 0.8 at rest, 1.0 the
+ * instant it's pressed or permanently selected, 0.6 when disabled (border
+ * and shadow fade along with the fill, since opacity dims the whole element
+ * as one unit). Selection also swaps the border to `flare` so it doesn't
+ * rely on the opacity bump alone to read as chosen.
  */
 export const RetroButton = ({
   tone = 'green',
@@ -53,22 +45,15 @@ export const RetroButton = ({
     type="button"
     {...buttonProps}
     className={cn(
-      'min-h-11 border-[3px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-transform',
+      'min-h-11 border-[3px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-[transform,opacity]',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
-      'disabled:cursor-not-allowed',
+      'disabled:cursor-not-allowed disabled:opacity-60',
+      TONE_STYLES[tone],
       pressed
-        ? // A pressed-and-disabled button (e.g. the Host's pick, shown read-only
-          // to a Player) still needs to read clearly, so it skips the generic
-          // disabled graying rather than fighting it for specificity. The
-          // border picks up the logo's pink to flag the selection itself.
-          cn(
-            'translate-x-[4px] translate-y-[4px] border-flare shadow-none',
-            TONE_SELECTED_STYLES[tone],
-          )
+        ? 'translate-x-[4px] translate-y-[4px] border-flare opacity-100 shadow-none'
         : cn(
-            'border-ink shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
-            'disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:hover:bg-gray-300',
-            TONE_STYLES[tone],
+            'border-ink opacity-80 shadow-retro',
+            'active:translate-x-[4px] active:translate-y-[4px] active:opacity-100 active:shadow-none',
           ),
       className,
     )}

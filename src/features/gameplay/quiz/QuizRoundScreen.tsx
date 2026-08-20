@@ -150,24 +150,17 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => answer(index)}
               className={cn(
-                'flex w-full items-center gap-3 border-4 px-3 py-3 text-left font-terminal text-xl transition-transform',
+                'flex w-full items-center gap-3 border-4 bg-sky-500 px-3 py-3 text-left font-terminal text-xl text-white transition-[transform,opacity]',
+                'disabled:cursor-not-allowed disabled:opacity-60',
                 picked === index
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
                   : cn(
-                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:opacity-60',
+                      'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:opacity-100',
                     ),
-                'disabled:cursor-not-allowed',
               )}
             >
-              <span
-                className={cn(
-                  'flex h-6 w-6 shrink-0 items-center justify-center border-2 font-arcade text-[10px]',
-                  picked === index
-                    ? 'border-black/40 text-black/70'
-                    : 'border-white/70 text-white/70',
-                )}
-              >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-white/70 font-arcade text-[10px] text-white/70">
                 {LETTERS[index]}
               </span>
               <span>{option}</span>

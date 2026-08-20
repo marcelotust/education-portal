@@ -33,12 +33,13 @@ export const StopSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 border-4 bg-sky-500 py-2 font-arcade text-[10px] text-white transition-[transform,opacity]',
+                'disabled:cursor-not-allowed disabled:opacity-60',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
                   : cn(
-                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                      'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:opacity-100',
                     ),
               )}
             >
@@ -64,12 +65,13 @@ export const StopSetupPanel = ({
                 disabled={isReadOnly}
                 onClick={() => onToggleCategory?.(category)}
                 className={cn(
-                  'min-h-11 border-4 px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
+                  'min-h-11 border-4 bg-green-500 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,opacity]',
+                  'disabled:cursor-not-allowed disabled:opacity-60',
                   isChosen
-                    ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-green text-black shadow-none'
+                    ? 'translate-x-[2px] translate-y-[2px] border-flare opacity-100 shadow-none'
                     : cn(
-                        'border-ink bg-green-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                        'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                        'border-ink opacity-80 shadow-[2px_2px_0px_0px_#381a41]',
+                        'active:opacity-100',
                       ),
                 )}
               >
