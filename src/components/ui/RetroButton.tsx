@@ -59,9 +59,11 @@ interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * shadow, and text stay full-strength) so the control reads as physically
  * recessed without going muddy. Disabled dims everything uniformly to 60%
  * and drops the shadow, reading as flat rather than just faded. Selection's
- * bright `flare` border gets a thin dark `outline` just outside it — an
- * `outline` sits outside the border without affecting layout, unlike a
- * second `border`, so it doesn't need its own box-model accounting.
+ * bright `flare` border gets a 1px two-tone bevel just outside it — black on
+ * the top/left edges, yellow on bottom/right — built from two stacked
+ * zero-blur `box-shadow`s rather than a real second border, since `border`
+ * can't vary color by side without extra elements and `box-shadow` doesn't
+ * add to the box model the way a second border would.
  */
 export const RetroButton = ({
   tone = 'green',
@@ -79,8 +81,8 @@ export const RetroButton = ({
       'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
       pressed
         ? cn(
-            'translate-x-[4px] translate-y-[4px] border-[5px] border-flare shadow-none',
-            'outline outline-1 outline-ink/50',
+            'translate-x-[4px] translate-y-[4px] border-[5px] border-flare',
+            'shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]',
             TONE_STYLES_SELECTED[tone],
           )
         : cn(

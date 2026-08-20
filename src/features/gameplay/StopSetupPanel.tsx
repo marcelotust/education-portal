@@ -37,7 +37,7 @@ export const StopSetupPanel = ({
                 '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                 'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none outline outline-1 outline-ink/50'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                   : cn(
                       'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
                       'active:bg-sky-500/80',
@@ -70,7 +70,7 @@ export const StopSetupPanel = ({
                   '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                   'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                   isChosen
-                    ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-none outline outline-1 outline-ink/50'
+                    ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                     : cn(
                         'border-4 border-ink bg-green-500 shadow-[2px_2px_0px_0px_#381a41]',
                         'active:bg-green-500/80',
