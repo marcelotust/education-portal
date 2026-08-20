@@ -36,7 +36,7 @@ export const Header = () => {
     >
       <span
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 -bottom-[5px] -z-10 bg-gradient-to-b from-sky-400 via-sky-400 via-30% to-sky-400/10"
+        className="absolute inset-x-0 -bottom-[5px] top-0 -z-10 bg-gradient-to-b from-sky-400 via-sky-400 via-30% to-sky-400/10"
       />
       <div
         className={cn(
@@ -52,7 +52,7 @@ export const Header = () => {
             height={95}
             className={cn(
               'w-auto transition-[height] duration-200',
-              scrolled ? 'h-6' : 'h-11 sm:h-14',
+              scrolled ? 'h-6 drop-shadow-[2px_2px_0_rgba(255,255,255,0.5)]' : 'h-11 sm:h-14',
             )}
           />
         </Link>
