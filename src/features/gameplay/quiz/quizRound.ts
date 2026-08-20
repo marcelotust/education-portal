@@ -18,6 +18,9 @@ export const DEFAULT_QUIZ_SETUP: QuizSetup = {
  * `quiz_questions` also means adding its name here.
  */
 export const QUIZ_TOPICS: readonly string[] = [
+  'ENGLISH A1/A2',
+  'ENGLISH B1/B2',
+  'ENGLISH C1/C2',
   'GENERAL',
   'SCIENCE',
   'HISTORY',
