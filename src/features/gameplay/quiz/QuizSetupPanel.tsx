@@ -39,12 +39,14 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
-                'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                   : cn(
-                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                      'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-sky-500/80',
                     ),
               )}
             >
@@ -66,12 +68,14 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectQuestionCount?.(count)}
               className={cn(
-                'min-h-11 border-4 py-2 font-arcade text-[10px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.questionCount === count
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-rose text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-rose-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                   : cn(
-                      'border-ink bg-rose-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                      'border-4 border-ink bg-rose-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-rose-500/80',
                     ),
               )}
             >
@@ -93,12 +97,14 @@ export const QuizSetupPanel = ({
               disabled={isReadOnly}
               onClick={() => onSelectTopic?.(topic)}
               className={cn(
-                'min-h-11 border-4 px-3 py-2 font-arcade text-[9px] transition-transform disabled:cursor-not-allowed',
+                'min-h-11 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.topic === topic
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-green text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                   : cn(
-                      'border-ink bg-green-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none',
+                      'border-4 border-ink bg-green-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-green-500/80',
                     ),
               )}
             >

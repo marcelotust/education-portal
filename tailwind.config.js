@@ -15,17 +15,8 @@ export default {
         },
         // Retro Platformer's shadow/outline color, in place of flat black.
         ink: '#381a41',
-        // The logo mark's pink outline — borrowed to flag a selected control.
-        flare: '#f8245c',
-        // Almost-white tints of each tone, for a selected control's fill —
-        // the tone itself is bold by default and pales once picked, instead
-        // of switching between "colored" and "plain white".
-        selected: {
-          yellow: '#ffffdd',
-          green: '#eaffef',
-          sky: '#eaf7ff',
-          rose: '#fff0f3',
-        },
+        // Border color for a selected control (#143).
+        flare: '#dcfa16',
       },
       fontFamily: {
         // Headings, buttons and any "arcade cabinet" chrome.

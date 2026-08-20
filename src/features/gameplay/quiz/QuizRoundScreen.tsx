@@ -150,24 +150,18 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => answer(index)}
               className={cn(
-                'flex w-full items-center gap-3 border-4 px-3 py-3 text-left font-terminal text-xl transition-transform',
+                'flex w-full items-center gap-3 px-3 py-3 text-left font-terminal text-xl text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 picked === index
-                  ? 'translate-x-[2px] translate-y-[2px] border-flare bg-selected-sky text-black shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-[-1px_-1px_0_0_#000000,1px_1px_0_0_#ffff00]'
                   : cn(
-                      'border-ink bg-sky-500 text-white shadow-[2px_2px_0px_0px_#381a41]',
-                      'disabled:opacity-60',
+                      'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
+                      'active:bg-sky-500/80',
                     ),
-                'disabled:cursor-not-allowed',
               )}
             >
-              <span
-                className={cn(
-                  'flex h-6 w-6 shrink-0 items-center justify-center border-2 font-arcade text-[10px]',
-                  picked === index
-                    ? 'border-black/40 text-black/70'
-                    : 'border-white/70 text-white/70',
-                )}
-              >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-white/70 font-arcade text-[10px] text-white/70">
                 {LETTERS[index]}
               </span>
               <span>{option}</span>
