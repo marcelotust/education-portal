@@ -151,9 +151,10 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
               onClick={() => answer(index)}
               className={cn(
                 'flex w-full items-center gap-3 px-3 py-3 text-left font-terminal text-xl text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                 'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 picked === index
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none outline outline-1 outline-ink/50'
                   : cn(
                       'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
                       'active:bg-sky-500/80',

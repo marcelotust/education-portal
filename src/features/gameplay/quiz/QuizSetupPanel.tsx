@@ -40,9 +40,10 @@ export const QuizSetupPanel = ({
               onClick={() => onSelectDuration?.(seconds)}
               className={cn(
                 'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                 'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.roundDurationSeconds === seconds
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-sky-500/80 shadow-none outline outline-1 outline-ink/50'
                   : cn(
                       'border-4 border-ink bg-sky-500 shadow-[2px_2px_0px_0px_#381a41]',
                       'active:bg-sky-500/80',
@@ -68,9 +69,10 @@ export const QuizSetupPanel = ({
               onClick={() => onSelectQuestionCount?.(count)}
               className={cn(
                 'min-h-11 py-2 font-arcade text-[10px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                 'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.questionCount === count
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-rose-500/80 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-rose-500/80 shadow-none outline outline-1 outline-ink/50'
                   : cn(
                       'border-4 border-ink bg-rose-500 shadow-[2px_2px_0px_0px_#381a41]',
                       'active:bg-rose-500/80',
@@ -96,9 +98,10 @@ export const QuizSetupPanel = ({
               onClick={() => onSelectTopic?.(topic)}
               className={cn(
                 'min-h-11 px-3 py-2 font-arcade text-[9px] text-white transition-[transform,border-width]',
+                '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
                 'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
                 setup.topic === topic
-                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-none'
+                  ? 'translate-x-[2px] translate-y-[2px] border-[6px] border-flare bg-green-500/80 shadow-none outline outline-1 outline-ink/50'
                   : cn(
                       'border-4 border-ink bg-green-500 shadow-[2px_2px_0px_0px_#381a41]',
                       'active:bg-green-500/80',

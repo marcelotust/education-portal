@@ -4,23 +4,29 @@ import { cn } from '@/utils/cn';
 
 export type RetroButtonTone = 'green' | 'pink' | 'cyan' | 'yellow' | 'white';
 
+// The label's text-shadow always opposes the text color — a dark shadow on
+// already-black text (yellow/white tones) would be invisible — so it's
+// bundled here rather than applied as one unconditional class.
+const DARK_TEXT_SHADOW = '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]';
+const LIGHT_TEXT_SHADOW = '[text-shadow:1px_1px_0_rgba(255,255,255,0.6)]';
+
 const TONE_STYLES: Record<RetroButtonTone, string> = {
-  green: 'bg-green-500 text-white',
-  pink: 'bg-rose-500 text-white',
-  cyan: 'bg-sky-500 text-white',
-  yellow: 'bg-yellow-400 text-black',
-  white: 'bg-white text-black',
+  green: `bg-green-500 text-white ${DARK_TEXT_SHADOW}`,
+  pink: `bg-rose-500 text-white ${DARK_TEXT_SHADOW}`,
+  cyan: `bg-sky-500 text-white ${DARK_TEXT_SHADOW}`,
+  yellow: `bg-yellow-400 text-black ${LIGHT_TEXT_SHADOW}`,
+  white: `bg-white text-black ${LIGHT_TEXT_SHADOW}`,
 };
 
 // Selected/pressed dims only the fill to 80% — border, shadow and text stay
 // at full opacity, so the control still reads crisp and just the color
 // itself recedes, instead of the whole element fading.
 const TONE_STYLES_SELECTED: Record<RetroButtonTone, string> = {
-  green: 'bg-green-500/80 text-white',
-  pink: 'bg-rose-500/80 text-white',
-  cyan: 'bg-sky-500/80 text-white',
-  yellow: 'bg-yellow-400/80 text-black',
-  white: 'bg-white/80 text-black',
+  green: `bg-green-500/80 text-white ${DARK_TEXT_SHADOW}`,
+  pink: `bg-rose-500/80 text-white ${DARK_TEXT_SHADOW}`,
+  cyan: `bg-sky-500/80 text-white ${DARK_TEXT_SHADOW}`,
+  yellow: `bg-yellow-400/80 text-black ${LIGHT_TEXT_SHADOW}`,
+  white: `bg-white/80 text-black ${LIGHT_TEXT_SHADOW}`,
 };
 
 // Same idea for the momentary :active press on a non-selected button.
@@ -52,7 +58,10 @@ interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * pressed or permanently selected only the *fill* dims to 80% (border,
  * shadow, and text stay full-strength) so the control reads as physically
  * recessed without going muddy. Disabled dims everything uniformly to 60%
- * and drops the shadow, reading as flat rather than just faded.
+ * and drops the shadow, reading as flat rather than just faded. Selection's
+ * bright `flare` border gets a thin dark `outline` just outside it — an
+ * `outline` sits outside the border without affecting layout, unlike a
+ * second `border`, so it doesn't need its own box-model accounting.
  */
 export const RetroButton = ({
   tone = 'green',
@@ -66,12 +75,12 @@ export const RetroButton = ({
     {...buttonProps}
     className={cn(
       'min-h-11 px-4 py-3 font-arcade text-[10px] tracking-wider transition-[transform,border-width]',
-      '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
       'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
       pressed
         ? cn(
             'translate-x-[4px] translate-y-[4px] border-[5px] border-flare shadow-none',
+            'outline outline-1 outline-ink/50',
             TONE_STYLES_SELECTED[tone],
           )
         : cn(
