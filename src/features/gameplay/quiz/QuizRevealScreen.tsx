@@ -5,7 +5,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
-import { CORRECT_POINTS, currentQuestion, isLastQuestion } from './quizRound';
+import { CORRECT_POINTS, SPEED_BONUS, currentQuestion, isLastQuestion } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -143,12 +143,20 @@ export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
             )}
           >
             <span className="flex-1 font-arcade text-[9px] text-black">{player.nickname}</span>
-            {gained > CORRECT_POINTS && (
-              <span className="font-arcade text-[8px] text-amber-600">FASTEST</span>
+            {gained > 0 ? (
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="font-arcade text-[8px] text-sky-600">
+                  +{CORRECT_POINTS} CORRECT
+                </span>
+                {gained > CORRECT_POINTS && (
+                  <span className="font-arcade text-[8px] text-amber-600">
+                    +{SPEED_BONUS} FASTEST
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className="font-arcade text-[9px] text-sky-600">—</span>
             )}
-            <span className="font-arcade text-[9px] text-sky-600">
-              {gained > 0 ? `+${gained}` : '—'}
-            </span>
             <span className="w-8 shrink-0 text-right font-arcade text-[10px] text-green-600">
               {total}
             </span>

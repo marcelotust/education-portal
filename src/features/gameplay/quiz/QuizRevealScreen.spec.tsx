@@ -89,20 +89,31 @@ describe('QUIZ reveal', () => {
     expect(screen.getByTestId('no-answer-players')).toHaveTextContent('BRUNO');
   });
 
-  it('shows what the question was worth to each player', () => {
+  it('breaks the fastest correct answer into its two points sources', () => {
     renderReveal('PLAYER');
 
     const ana = screen.getByTestId('reveal-row-player-0');
     expect(ana).toHaveTextContent('ANA');
-    expect(ana).toHaveTextContent('+15');
+    expect(ana).toHaveTextContent('+10 CORRECT');
+    expect(ana).toHaveTextContent('+5 FASTEST');
     expect(screen.getByTestId('reveal-row-player-1')).toHaveTextContent('—');
   });
 
-  it('explains the +15 as a speed bonus for answering fastest', () => {
-    renderReveal('PLAYER');
+  it('shows only the correct-answer points for a right answer that was not fastest', () => {
+    renderReveal(
+      'PLAYER',
+      revealing({
+        answers: [
+          { playerId: 'player-0', choice: 1, elapsedMs: 900 },
+          { playerId: 'player-1', choice: 1, elapsedMs: 1500 },
+        ],
+        questionPoints: { 'player-0': 15, 'player-1': 10 },
+      }),
+    );
 
-    expect(screen.getByTestId('reveal-row-player-0')).toHaveTextContent(/fastest/i);
-    expect(screen.getByTestId('reveal-row-player-1')).not.toHaveTextContent(/fastest/i);
+    const bruno = screen.getByTestId('reveal-row-player-1');
+    expect(bruno).toHaveTextContent('+10 CORRECT');
+    expect(bruno).not.toHaveTextContent(/fastest/i);
   });
 
   it('shows no speed-bonus badge when nobody earned one', () => {
