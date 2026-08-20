@@ -66,6 +66,7 @@ export const RetroButton = ({
     {...buttonProps}
     className={cn(
       'min-h-11 px-4 py-3 font-arcade text-[10px] tracking-wider transition-[transform,border-width]',
+      '[text-shadow:1px_1px_0_rgba(0,0,0,0.6)]',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
       'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
       pressed
