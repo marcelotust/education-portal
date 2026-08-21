@@ -6,9 +6,14 @@ import { RetroContainer } from '@/components/ui/RetroContainer';
 
 // Same "on the open sky background" placement as LandingScreen's hero, so
 // `text-ink` (not the panel-tuned text-gray-700 Legal/Contact use) is what
-// stays readable against bg-sky-400.
-const heading = 'font-arcade text-[11px] uppercase tracking-[0.3em] text-ink';
-const body = 'flex flex-col gap-3 font-terminal text-lg text-ink/80';
+// stays readable against bg-sky-400. The page scrolls well into the sky's
+// dustier purple tints (see SKY_TINTS in AppLayout.tsx) — a thin white
+// shadow keeps these small headings crisp there, the same hard-edge
+// white-at-half-opacity technique the header logo already uses at 2px
+// (Header.tsx), just 1px given how small this text is.
+const textShadow = '[text-shadow:1px_1px_0_rgba(255,255,255,0.5)]';
+const heading = `font-arcade text-[11px] uppercase tracking-[0.3em] text-ink ${textShadow}`;
+const body = 'flex flex-col gap-3 font-terminal text-lg text-ink/90';
 
 /**
  * The maker's own story and the product's differentiators (#152), not a
@@ -57,26 +62,26 @@ export const AboutScreen = () => {
         <h2 className={heading}>What makes it different ✨</h2>
         <ul className={body}>
           <li>
-            🚫🖥️ <strong>No screen-share, ever.</strong> Everyone plays on their own screen, synced
+            🚫🖥️ <strong className={textShadow}>No screen-share, ever.</strong> Everyone plays on their own screen, synced
             live, while the video call stays exactly where it already is.
           </li>
           <li>
-            🏆 <strong>One scoreboard across every game.</strong> Run a warm-up, a vocabulary quiz,
+            🏆 <strong className={textShadow}>One scoreboard across every game.</strong> Run a warm-up, a vocabulary quiz,
             and a speaking game in the same lesson, all counting toward the same running score.
             Switch games without starting over.
           </li>
           <li>
-            ✅ <strong>A validation step, not just auto-grading.</strong> A near-miss answer (a typo,
+            ✅ <strong className={textShadow}>A validation step, not just auto-grading.</strong> A near-miss answer (a typo,
             a plural, a different spelling) doesn&apos;t have to score zero. The Host reviews it, and
             that moment becomes a chance to actually talk about the answer with the class.
           </li>
           <li>
-            📚 <strong>Content built for ESL, kept current.</strong> TABOO is designed for
+            📚 <strong className={textShadow}>Content built for ESL, kept current.</strong> TABOO is designed for
             circumlocution and speaking practice, not repurposed trivia. QUIZ has levels from A1 to
             C1. New content keeps shipping, it doesn&apos;t sit still.
           </li>
           <li>
-            👾 <strong>Looks like a game, not a dashboard.</strong> Real 16-bit arcade style, thick
+            👾 <strong className={textShadow}>Looks like a game, not a dashboard.</strong> Real 16-bit arcade style, thick
             borders, chunky pixel fonts. Something worth opening, not one more gray tool to sit
             through.
           </li>
