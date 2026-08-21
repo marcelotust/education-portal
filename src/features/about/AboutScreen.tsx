@@ -4,19 +4,23 @@ import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 
-const heading = 'font-arcade text-[11px] uppercase tracking-[0.3em] text-gray-700';
-const body = 'flex flex-col gap-3 font-terminal text-lg text-gray-700';
+// Same "on the open sky background" placement as LandingScreen's hero, so
+// `text-ink` (not the panel-tuned text-gray-700 Legal/Contact use) is what
+// stays readable against bg-sky-400.
+const heading = 'font-arcade text-[11px] uppercase tracking-[0.3em] text-ink';
+const body = 'flex flex-col gap-3 font-terminal text-lg text-ink/80';
 
 /**
  * The maker's own story and the product's differentiators (#152), not a
  * feature list — why EduParty exists, in Marcelo's voice, followed by what
- * makes it different from a Kahoot/Quizizz-shaped tool.
+ * makes it different from a Kahoot/Quizizz-shaped tool. Text sits directly
+ * on the page background like the landing hero; only the CTAs are boxed.
  */
 export const AboutScreen = () => {
   const navigate = useNavigate();
 
   return (
-    <RetroContainer className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6">
       <header className="flex flex-col items-center gap-2 text-center">
         <PageTitle>ABOUT</PageTitle>
       </header>
@@ -90,7 +94,7 @@ export const AboutScreen = () => {
         </div>
       </section>
 
-      <div className="flex flex-col gap-3">
+      <RetroContainer className="flex flex-col gap-3 p-6">
         <RetroButton tone="green" onClick={() => void navigate('/host')}>
           CREATE A ROOM
         </RetroButton>
@@ -100,7 +104,7 @@ export const AboutScreen = () => {
         <RetroButton tone="white" onClick={() => void navigate('/')}>
           BACK
         </RetroButton>
-      </div>
-    </RetroContainer>
+      </RetroContainer>
+    </div>
   );
 };
