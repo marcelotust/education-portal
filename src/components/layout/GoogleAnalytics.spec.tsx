@@ -42,6 +42,7 @@ describe('GoogleAnalytics', () => {
   });
 
   it('does not load gtag until a measurement ID is configured (#91)', () => {
+    vi.stubEnv('PROD', true);
     vi.stubEnv('VITE_GA_MEASUREMENT_ID', '');
 
     render(
@@ -54,7 +55,24 @@ describe('GoogleAnalytics', () => {
     expect(analytics.trackPageView).not.toHaveBeenCalled();
   });
 
+  it('does not load gtag outside a production build, even with a measurement ID configured', () => {
+    // PROD is left at its real test-mode value (false) — a stray
+    // VITE_GA_MEASUREMENT_ID in .env.local must not leak dev traffic into
+    // the production GA4 property.
+    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST123');
+
+    render(
+      <MemoryRouter>
+        <GoogleAnalytics />
+      </MemoryRouter>,
+    );
+
+    expect(analytics.loadGoogleAnalytics).not.toHaveBeenCalled();
+    expect(analytics.trackPageView).not.toHaveBeenCalled();
+  });
+
   it('loads gtag and tracks the initial page once a measurement ID is configured', () => {
+    vi.stubEnv('PROD', true);
     vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST123');
 
     render(
@@ -68,6 +86,7 @@ describe('GoogleAnalytics', () => {
   });
 
   it('tracks a new page_view on every SPA route change', async () => {
+    vi.stubEnv('PROD', true);
     vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST123');
     const user = userEvent.setup();
 
