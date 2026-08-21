@@ -17,6 +17,9 @@ export const Footer = () => (
     }}
   >
     <div className="flex translate-y-2.5 flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center text-white/80">
+      <Link to="/about" className="font-terminal text-base underline hover:text-white">
+        About
+      </Link>
       <Link to="/legal" className="font-terminal text-base underline hover:text-white">
         Terms
       </Link>

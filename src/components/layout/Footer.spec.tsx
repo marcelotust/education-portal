@@ -16,6 +16,7 @@ describe('Footer', () => {
     renderFooter();
 
     expect(screen.getByText(/© 2026 eduparty/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^about$/i })).toHaveAttribute('href', '/about');
     expect(screen.getByRole('link', { name: /^terms$/i })).toHaveAttribute('href', '/legal');
     expect(screen.getByRole('link', { name: /^contact$/i })).toHaveAttribute('href', '/contact');
   });

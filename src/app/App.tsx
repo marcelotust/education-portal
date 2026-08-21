@@ -11,6 +11,7 @@ const LandingRoute = lazy(() =>
   import('./LandingRoute').then((m) => ({ default: m.LandingRoute })),
 );
 const RoomRoute = lazy(() => import('./RoomRoute').then((m) => ({ default: m.RoomRoute })));
+const AboutRoute = lazy(() => import('./AboutRoute').then((m) => ({ default: m.AboutRoute })));
 const LegalRoute = lazy(() => import('./LegalRoute').then((m) => ({ default: m.LegalRoute })));
 const ContactRoute = lazy(() =>
   import('./ContactRoute').then((m) => ({ default: m.ContactRoute })),
@@ -23,6 +24,7 @@ export const App = () => (
         <Route path="/" element={<LandingRoute />} />
         <Route path="/host" element={<RoomRoute role="HOST" />} />
         <Route path="/play" element={<RoomRoute role="PLAYER" />} />
+        <Route path="/about" element={<AboutRoute />} />
         <Route path="/legal" element={<LegalRoute />} />
         <Route path="/contact" element={<ContactRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
