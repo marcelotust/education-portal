@@ -5,8 +5,10 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { SentryErrorFallback } from './components/layout/SentryErrorFallback';
 import './index.css';
+import { recoverFromStaleChunk } from './lib/staleChunkRecovery';
 import { initSentry } from './lib/sentry';
 
+recoverFromStaleChunk();
 initSentry(import.meta.env.VITE_SENTRY_DSN);
 
 const rootElement = document.getElementById('root');
