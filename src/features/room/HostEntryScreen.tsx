@@ -55,7 +55,9 @@ export const HostEntryScreen = ({
 
       <RetroContainer className="flex flex-col gap-5 p-6">
         <header className="flex flex-col items-center gap-2">
-          <PageTitle>{resumableRoom == null ? 'NEW ROOM' : 'OR START A NEW ROOM'}</PageTitle>
+          <PageTitle tone="cyan">
+            {resumableRoom == null ? 'NEW ROOM' : 'OR START A NEW ROOM'}
+          </PageTitle>
           <p className="text-center font-terminal text-lg text-gray-600">
             You host the room and play as player 1 of 6.
           </p>

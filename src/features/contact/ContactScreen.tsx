@@ -79,7 +79,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
   if (isSent) {
     return (
       <RetroContainer className="flex flex-col items-center gap-5 p-6 text-center">
-        <PageTitle>THANKS!</PageTitle>
+        <PageTitle tone="royalBlue">THANKS!</PageTitle>
         <p className="font-terminal text-xl text-gray-700">
           Your message made it through. We read every one of these.
         </p>
@@ -109,7 +109,7 @@ export const ContactScreen = ({ submitFeedback }: ContactScreenProps) => {
         />
 
         <header className="flex flex-col items-center gap-2 text-center">
-          <PageTitle>CONTACT</PageTitle>
+          <PageTitle tone="royalBlue">CONTACT</PageTitle>
           <p className="font-terminal text-lg text-gray-500">
             Suggestions, new game requests, bug reports.
             <br />

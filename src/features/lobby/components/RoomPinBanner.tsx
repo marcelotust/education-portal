@@ -11,7 +11,7 @@ interface RoomPinBannerProps {
 /** Header of the lobby: the PIN Players type plus the seat counter. */
 export const RoomPinBanner = ({ pin, playerCount, maxPlayers }: RoomPinBannerProps) => (
   <header className="mb-5 flex flex-col items-center gap-2">
-    <PageTitle>LOBBY</PageTitle>
+    <PageTitle tone="cyan">LOBBY</PageTitle>
 
     <p className="border-4 border-ink bg-sky-500 px-3 py-2 font-arcade text-[8px] text-white">
       {playerCount}/{maxPlayers} PLAYERS

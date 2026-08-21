@@ -20,7 +20,7 @@ export const LegalScreen = () => {
   return (
     <RetroContainer className="flex flex-col gap-6 p-6">
       <header className="flex flex-col items-center gap-2 text-center">
-        <PageTitle>LEGAL</PageTitle>
+        <PageTitle tone="royalBlue">LEGAL</PageTitle>
         <p className="font-terminal text-lg text-gray-500">© 2026 EduParty</p>
       </header>
 
