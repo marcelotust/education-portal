@@ -299,6 +299,20 @@ describe('Lobby feature', () => {
       expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP');
     });
 
+    it('offers a How to play link, in a new tab, once a cartridge is chosen (#149)', async () => {
+      const user = userEvent.setup();
+      renderLobby('HOST');
+
+      await user.click(screen.getByRole('button', { name: /select game/i }));
+      expect(screen.queryByRole('link', { name: /how to play/i })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+      const link = screen.getByRole('link', { name: /how to play stop/i });
+      expect(link).toHaveAttribute('href', '/guides/stop');
+      expect(link).toHaveAttribute('target', '_blank');
+    });
+
     it('reveals the match setup once a cartridge is chosen', async () => {
       const user = userEvent.setup();
       renderLobby('HOST');

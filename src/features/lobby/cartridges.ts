@@ -1,4 +1,4 @@
-import type { GameCartridge } from '@/types';
+import type { GameCartridge, GameId } from '@/types';
 
 /** Cartridge catalog available to the Host. */
 export const GAME_CARTRIDGES: readonly GameCartridge[] = [
@@ -24,6 +24,14 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     roundDurationSeconds: 120,
   },
 ];
+
+/** Looks up a cartridge's own art/copy by its game ID — used wherever a game guide (#149) needs the same sprite the picker shows. */
+export const cartridgeFor = (gameId: GameId): GameCartridge => {
+  const cartridge = GAME_CARTRIDGES.find((entry) => entry.id === gameId);
+  // Every GameId has a matching cartridge by construction — the catalog above.
+  if (cartridge === undefined) throw new Error(`No cartridge registered for ${gameId}`);
+  return cartridge;
+};
 
 /**
  * The showcase grid's fourth slot: no cartridge behind it yet, just the

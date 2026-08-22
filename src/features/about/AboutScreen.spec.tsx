@@ -38,6 +38,23 @@ describe('About screen', () => {
     expect(screen.getByText(/looks like a game, not a dashboard/i)).toBeInTheDocument();
   });
 
+  it('links out to every game guide (#149)', () => {
+    renderAbout();
+
+    expect(screen.getByRole('link', { name: /how to play taboo/i })).toHaveAttribute(
+      'href',
+      '/guides/taboo',
+    );
+    expect(screen.getByRole('link', { name: /how to play stop/i })).toHaveAttribute(
+      'href',
+      '/guides/stop',
+    );
+    expect(screen.getByRole('link', { name: /how to play quiz/i })).toHaveAttribute(
+      'href',
+      '/guides/quiz',
+    );
+  });
+
   it("credits the name to the maker's nephew", () => {
     renderAbout();
 
