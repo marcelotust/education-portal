@@ -1,8 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { GUIDES } from '@/features/guides/guideMeta';
+import { cartridgeFor } from '@/features/lobby/cartridges';
 
 const heading = 'font-arcade text-[11px] uppercase tracking-[0.3em] text-gray-700';
 const body = 'flex flex-col gap-3 font-terminal text-lg text-gray-700';
@@ -28,24 +31,24 @@ export const AboutScreen = () => {
           <p>
             I&apos;m a Software Engineer 👨‍💻 and an Indie Maker 🛠️. I&apos;ve been studying English
             through online classes for many years, and from that seat, as a student, I kept noticing
-            the same thing: the games and sites teachers use in class are almost never built for this
-            environment. They&apos;re built for a classroom with a projector, or for a student
+            the same thing: the games and sites teachers use in class are almost never built for
+            this environment. They&apos;re built for a classroom with a projector, or for a student
             sitting alone with an app, not for two or three people on a video call trying to keep a
             lesson moving.
           </p>
           <p>
-            A game that fits that environment does more than fill time. It brings students a sense of
-            calm 🙂 during a video call, and it gives the teacher room to pause and actually discuss
-            an answer instead of racing to the next question.
+            A game that fits that environment does more than fill time. It brings students a sense
+            of calm 🙂 during a video call, and it gives the teacher room to pause and actually
+            discuss an answer instead of racing to the next question.
           </p>
           <p>
             I also noticed the harder problem underneath it: in Brazil 🇧🇷, a lot of teachers
-            can&apos;t justify paying for a more sophisticated subscription service, and the free ESL
-            portals that are left often sit with the same content for years without an update.
+            can&apos;t justify paying for a more sophisticated subscription service, and the free
+            ESL portals that are left often sit with the same content for years without an update.
           </p>
           <p>
-            So I built the tool I wished existed as a student. EduParty runs right inside the call, no
-            screen to share, no subscription to unlock the games you actually need.
+            So I built the tool I wished existed as a student. EduParty runs right inside the call,
+            no screen to share, no subscription to unlock the games you actually need.
           </p>
         </div>
       </section>
@@ -63,9 +66,9 @@ export const AboutScreen = () => {
             Switch games without starting over.
           </li>
           <li>
-            ✅ <strong>A validation step, not just auto-grading.</strong> A near-miss answer (a typo,
-            a plural, a different spelling) doesn&apos;t have to score zero. The Host reviews it, and
-            that moment becomes a chance to actually talk about the answer with the class.
+            ✅ <strong>A validation step, not just auto-grading.</strong> A near-miss answer (a
+            typo, a plural, a different spelling) doesn&apos;t have to score zero. The Host reviews
+            it, and that moment becomes a chance to actually talk about the answer with the class.
           </li>
           <li>
             📚 <strong>Content built for ESL, kept current.</strong> TABOO is designed for
@@ -84,11 +87,32 @@ export const AboutScreen = () => {
         <h2 className={heading}>The name 🍎</h2>
         <div className={body}>
           <p>
-            EduParty is also a small tribute. My nephew Eduardo is 10 years old and a great student in
-            his own online English classes, he&apos;s part of why I noticed any of this in the first
-            place.
+            EduParty is also a small tribute. My nephew Eduardo is 10 years old and a great student
+            in his own online English classes, he&apos;s part of why I noticed any of this in the
+            first place.
           </p>
         </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={heading}>Explore the games 🕹️</h2>
+        <ul className="flex flex-col gap-2">
+          {GUIDES.map((guide) => (
+            <li key={guide.slug}>
+              <Link
+                to={`/guides/${guide.slug}`}
+                className="flex items-center gap-2 text-sky-600 hover:text-sky-700"
+              >
+                {guide.gameId !== undefined && (
+                  <span className="w-8 shrink-0">
+                    <GameSpriteThumb spritePosition={cartridgeFor(guide.gameId).spritePosition} />
+                  </span>
+                )}
+                <span className="font-terminal text-lg underline">{guide.navLabel}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <div className="flex flex-col gap-3">

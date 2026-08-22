@@ -1,6 +1,7 @@
 import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { guideForGame } from '@/features/guides/guideMeta';
 import type { GameId } from '@/types';
 import { GAME_CARTRIDGES } from '../cartridges';
 import { ComingSoonCartridge } from './ComingSoonCartridge';
@@ -13,6 +14,7 @@ interface GameCartridgePickerProps {
 
 export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgePickerProps) => {
   const isReadOnly = onSelect === undefined;
+  const selectedGuide = selectedGameId === null ? undefined : guideForGame(selectedGameId);
 
   return (
     <div className="flex flex-col gap-2">
@@ -50,6 +52,19 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
           );
         })}
       </div>
+
+      {selectedGuide !== undefined && (
+        // A new tab, not an in-app Link: the lobby (with players already
+        // waiting) stays open behind it instead of navigating away from it.
+        <a
+          href={`/guides/${selectedGuide.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-center font-terminal text-sm text-sky-600 underline hover:text-sky-700"
+        >
+          How to play {selectedGameId} ↗
+        </a>
+      )}
 
       <ComingSoonCartridge />
     </div>
