@@ -724,9 +724,9 @@ describe('room FSM', () => {
       });
 
       it('keeps judging and scoring Host-only', () => {
-        expect(
-          isHostOnlyEvent({ type: 'GUESS_JUDGED', playerId: 'player-1', isValid: true }),
-        ).toBe(true);
+        expect(isHostOnlyEvent({ type: 'GUESS_JUDGED', playerId: 'player-1', isValid: true })).toBe(
+          true,
+        );
         expect(isHostOnlyEvent({ type: 'REMAINING_GUESSES_APPROVED' })).toBe(true);
         expect(isHostOnlyEvent({ type: 'TURN_SCORED' })).toBe(true);
       });

@@ -12,15 +12,15 @@ category browse.
 Content pages targeting these terms are tracked in #149; the Search Console
 baseline check-in against them is tracked in #150.
 
-| Term | Intent | Target page |
-| --- | --- | --- |
-| free esl games for zoom class | "I need something for tomorrow's class" | Free ESL Games for Zoom/Meet Classes |
-| online taboo game for esl students | Specific game, specific audience | How to Play TABOO Online for ESL Classes |
-| categories game esl no sign up | Specific game (STOP), "no sign up" is a real filter teachers search on | STOP/Categories Game for ESL — No Sign-Up |
-| esl warm up games online free | Warm-up/icebreaker use case | ESL Warm-Up & Icebreaker Games (Free, Online) |
-| multiplayer quiz game for english class | QUIZ cartridge, classroom framing | Multiplayer QUIZ Game for English Class |
-| esl speaking game no download | Speaking-practice framing, "no download" filter | (folds into the TABOO page above) |
-| free icebreaker games for online english teaching | Broader icebreaker intent | (folds into the warm-up page above) |
+| Term                                              | Intent                                                                 | Target page                                   |
+| ------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| free esl games for zoom class                     | "I need something for tomorrow's class"                                | Free ESL Games for Zoom/Meet Classes          |
+| online taboo game for esl students                | Specific game, specific audience                                       | How to Play TABOO Online for ESL Classes      |
+| categories game esl no sign up                    | Specific game (STOP), "no sign up" is a real filter teachers search on | STOP/Categories Game for ESL — No Sign-Up     |
+| esl warm up games online free                     | Warm-up/icebreaker use case                                            | ESL Warm-Up & Icebreaker Games (Free, Online) |
+| multiplayer quiz game for english class           | QUIZ cartridge, classroom framing                                      | Multiplayer QUIZ Game for English Class       |
+| esl speaking game no download                     | Speaking-practice framing, "no download" filter                        | (folds into the TABOO page above)             |
+| free icebreaker games for online english teaching | Broader icebreaker intent                                              | (folds into the warm-up page above)           |
 
 ## Secondary / long-tail variants worth watching
 
