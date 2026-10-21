@@ -35,9 +35,12 @@ Schema, RLS and the hourly `pg_cron` sweep that deletes rooms untouched for 5 ho
 | `npm test`                        | Vitest, single run                    |
 | `npm run test:watch`              | Vitest watch mode                     |
 | `npm run test:coverage`           | V8 coverage                           |
+| `npm run test:e2e`                | Playwright against the live project   |
 | `npm run lint` / `lint:fix`       | ESLint                                |
 | `npm run format` / `format:check` | Prettier                              |
 | `npm run typecheck`               | `tsc -b --noEmit`                     |
+
+`npm run test:e2e` drives the real app with two isolated browser contexts (separate `localStorage`, so two anonymous identities on one origin) against the project in `.env.local`. It creates real rooms and deletes only its own by PIN, so it stays out of `npm test` and is run on demand (#161).
 
 Run a single test file: `npx vitest run src/features/lobby/LobbyScreen.spec.tsx`
 Filter by name: `npx vitest run -t "Host clicks Start"`

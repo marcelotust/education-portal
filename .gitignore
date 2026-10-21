@@ -32,3 +32,8 @@ coverage
 # Playwright MCP artifacts
 .playwright-mcp
 .opencode
+
+# Playwright
+test-results
+playwright-report
+.playwright-mcp
