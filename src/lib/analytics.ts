@@ -64,18 +64,22 @@ export const trackRoomJoined = () => {
   window.gtag('event', 'room_joined', {});
 };
 
-/** Fired when the Host starts a match (#126). No-op before gtag loads. */
-export const trackGameStarted = (gameId: GameId) => {
+/**
+ * Fired when the Host starts a match (#126). `solo` marks a match with nobody
+ * else seated, so practice rounds do not read as real adoption (#156). No-op
+ * before gtag loads.
+ */
+export const trackGameStarted = (gameId: GameId, solo: boolean) => {
   if (typeof window.gtag !== 'function') return;
 
-  window.gtag('event', 'game_started', { game_id: gameId });
+  window.gtag('event', 'game_started', { game_id: gameId, solo });
 };
 
-/** Fired once the scoreboard is reached (#126). No-op before gtag loads. */
-export const trackGameCompleted = () => {
+/** Fired once the scoreboard is reached (#126), `solo` as in `trackGameStarted`. No-op before gtag loads. */
+export const trackGameCompleted = (solo: boolean) => {
   if (typeof window.gtag !== 'function') return;
 
-  window.gtag('event', 'game_completed', {});
+  window.gtag('event', 'game_completed', { solo });
 };
 
 /** Fired once a contact-form submission is persisted (#126). No-op before gtag loads. */

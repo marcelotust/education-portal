@@ -8,6 +8,8 @@ import { TabooSetupPanel } from '@/features/gameplay/taboo/TabooSetupPanel';
 import { useRoom } from '@/hooks/useRoom';
 import { trackGameStarted } from '@/lib/analytics';
 import { MIN_CATEGORIES } from '@/types';
+import { hasEnoughPlayers, isAlone } from '../canStart';
+import { cartridgeFor } from '../cartridges';
 import { GameCartridgePicker } from './GameCartridgePicker';
 import { NewMatchControl } from './NewMatchControl';
 
@@ -43,14 +45,17 @@ export const HostLobbyControls = () => {
 
   if (state.status !== 'CONFIGURING_GAME') return null;
 
-  // The Host holds a slot too; at least one other filled slot must belong to
-  // a Player, or there's no one to race/answer/guess against.
-  const hasAtLeastOnePlayer = state.slots.some((slot) => slot?.role === 'PLAYER');
+  // The Host holds a slot too. Alone, only a cartridge that plays without
+  // company may start (ADR 0006); the same rule drives the picker and the hint.
+  const alone = isAlone(state.slots);
+  const gameId = state.selectedGameId;
+  const hasCompany = gameId === null || hasEnoughPlayers(gameId, state.slots);
 
   return (
     <div className="flex flex-col gap-3">
       <GameCartridgePicker
         selectedGameId={state.selectedGameId}
+        isAlone={alone}
         onSelect={(gameId) => dispatch({ type: 'SELECT_GAME', gameId })}
       />
 
@@ -87,22 +92,29 @@ export const HostLobbyControls = () => {
         </div>
       )}
 
-      {!hasAtLeastOnePlayer && (
+      {!hasCompany && gameId !== null && (
         <p className="text-center font-terminal text-base text-gray-500">
-          Waiting for at least 1 more player to join...
+          {cartridgeFor(gameId).title} needs at least one real player. Invite someone, or try STOP
+          on your own.
+        </p>
+      )}
+
+      {hasCompany && alone && gameId === 'STOP' && (
+        <p className="text-center font-terminal text-base text-gray-500">
+          STOP is better with more people. Invite more players with the link above.
         </p>
       )}
 
       <RetroButton
         tone="green"
         disabled={
-          !hasAtLeastOnePlayer ||
           state.selectedGameId === null ||
+          !hasCompany ||
           (state.gameSetup.game === 'STOP' && state.gameSetup.categories.length < MIN_CATEGORIES) ||
           (state.gameSetup.game === 'TABOO' && state.gameSetup.categories.length < 1)
         }
         onClick={() => {
-          if (state.selectedGameId !== null) trackGameStarted(state.selectedGameId);
+          if (state.selectedGameId !== null) trackGameStarted(state.selectedGameId, alone);
           dispatch({ type: 'START_GAME' });
         }}
       >

@@ -47,6 +47,37 @@ describe('Scoreboard', () => {
     renderScoreboard('HOST');
 
     expect(analytics.trackGameCompleted).toHaveBeenCalledTimes(1);
+    expect(analytics.trackGameCompleted).toHaveBeenCalledWith(false);
+  });
+
+  describe('after a solo round (#156)', () => {
+    const soloStandings = (): RoomState => {
+      const room = makeRoom({ playerCount: 1, status: 'CALCULATING_SCORES' });
+      return {
+        ...room,
+        slots: room.slots.map((slot) => (slot ? { ...slot, role: 'HOST' } : slot)),
+        scores: { 'player-0': 30 },
+        lastRoundPoints: { 'player-0': 30 },
+      };
+    };
+
+    it('tags the completion as solo', () => {
+      renderScoreboard('HOST', soloStandings());
+
+      expect(analytics.trackGameCompleted).toHaveBeenCalledWith(true);
+    });
+
+    it('invites the Host to bring more players', () => {
+      renderScoreboard('HOST', soloStandings());
+
+      expect(screen.getByText(/stop is better with more people/i)).toBeInTheDocument();
+    });
+
+    it('stays quiet when other players were in the round', () => {
+      renderScoreboard('HOST');
+
+      expect(screen.queryByText(/stop is better with more people/i)).not.toBeInTheDocument();
+    });
   });
 
   it('does not log a completion for a Player — the Host already did', () => {

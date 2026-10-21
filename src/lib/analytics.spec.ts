@@ -96,13 +96,29 @@ describe('trackGameStarted', () => {
   it('pushes a game_started event with the game ID once gtag is initialized', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameStarted('STOP');
+    trackGameStarted('STOP', false);
 
-    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_started', { game_id: 'STOP' }]);
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_started',
+      { game_id: 'STOP', solo: false },
+    ]);
+  });
+
+  it('flags a match started with nobody else in the room as solo (#156)', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackGameStarted('STOP', true);
+
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_started',
+      { game_id: 'STOP', solo: true },
+    ]);
   });
 
   it('is a no-op before gtag has been initialized', () => {
-    expect(() => trackGameStarted('STOP')).not.toThrow();
+    expect(() => trackGameStarted('STOP', false)).not.toThrow();
   });
 });
 
@@ -110,13 +126,21 @@ describe('trackGameCompleted', () => {
   it('pushes a game_completed event once gtag is initialized', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameCompleted();
+    trackGameCompleted(false);
 
-    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', {}]);
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', { solo: false }]);
+  });
+
+  it('flags a match finished with nobody else in the room as solo (#156)', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackGameCompleted(true);
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', { solo: true }]);
   });
 
   it('is a no-op before gtag has been initialized', () => {
-    expect(() => trackGameCompleted()).not.toThrow();
+    expect(() => trackGameCompleted(false)).not.toThrow();
   });
 });
 

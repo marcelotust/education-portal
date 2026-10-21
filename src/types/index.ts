@@ -4,6 +4,7 @@ export type {
   GameCartridge,
   GameId,
   GameSetup,
+  PlaysWithout,
   QuizAnswer,
   QuizQuestion,
   QuizQuestionCount,

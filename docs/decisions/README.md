@@ -17,3 +17,4 @@ its record is marked superseded and the new one links back to it.
 | [0003](0003-anyone-can-host.md)      | Anyone can host, and the Host is player 1 of 6                 | Accepted |
 | [0004](0004-room-expiry.md)          | Rooms expire after 5 hours, swept hourly                       | Accepted |
 | [0005](0005-cartridge-shape.md)      | Cartridges are a discriminated union, not a shared round shape | Accepted |
+| [0006](0006-stop-plays-solo.md)      | STOP can be played solo; other cartridges still need company   | Accepted |

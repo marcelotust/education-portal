@@ -8,6 +8,7 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     tagline: 'Categories against the clock',
     spritePosition: '100% 0%',
     roundDurationSeconds: 60,
+    playsWithout: 'NOTHING',
   },
   {
     id: 'QUIZ',
@@ -15,6 +16,7 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     tagline: 'Multiple choice, fastest wins',
     spritePosition: '100% 100%',
     roundDurationSeconds: 30,
+    playsWithout: 'PLAYERS',
   },
   {
     id: 'TABOO',
@@ -22,6 +24,7 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     tagline: 'Say anything but the word',
     spritePosition: '0% 100%',
     roundDurationSeconds: 120,
+    playsWithout: 'PLAYERS',
   },
 ];
 

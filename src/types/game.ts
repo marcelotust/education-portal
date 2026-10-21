@@ -1,6 +1,12 @@
 /** Game "cartridges" the Host can load without dropping the room. */
 export type GameId = 'STOP' | 'QUIZ' | 'TABOO';
 
+/**
+ * What a cartridge needs before the Host can start it: nothing (a solo
+ * practice round), a bot, or at least one other real Player. See ADR 0006.
+ */
+export type PlaysWithout = 'NOTHING' | 'BOT' | 'PLAYERS';
+
 export interface GameCartridge {
   id: GameId;
   title: string;
@@ -9,6 +15,8 @@ export interface GameCartridge {
   spritePosition: string;
   /** Seconds the typing phase lasts. */
   roundDurationSeconds: number;
+  /** The least company this cartridge can start with. */
+  playsWithout: PlaysWithout;
 }
 
 /** Round lengths STOP and QUIZ offer, in seconds. */
