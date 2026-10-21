@@ -2,7 +2,8 @@ import { GameSpriteThumb } from '@/components/ui/GameSpriteThumb';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import { guideForGame } from '@/features/guides/guideMeta';
-import type { GameId } from '@/types';
+import type { GameId, PlaysWithout } from '@/types';
+import { cn } from '@/utils/cn';
 import { GAME_CARTRIDGES } from '../cartridges';
 import { ComingSoonCartridge } from './ComingSoonCartridge';
 
@@ -10,9 +11,21 @@ interface GameCartridgePickerProps {
   selectedGameId: GameId | null;
   /** Omitted for Players: they see the same shelf, read-only. */
   onSelect?: ((gameId: GameId) => void) | undefined;
+  /** The Host is the only one seated: cartridges that need company are flagged. */
+  isAlone?: boolean;
 }
 
-export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgePickerProps) => {
+const PLAY_MODE_TAGS: Record<PlaysWithout, string> = {
+  NOTHING: 'SOLO OK',
+  BOT: 'BOT OK',
+  PLAYERS: 'NEEDS PLAYERS',
+};
+
+export const GameCartridgePicker = ({
+  selectedGameId,
+  onSelect,
+  isAlone = false,
+}: GameCartridgePickerProps) => {
   const isReadOnly = onSelect === undefined;
   const selectedGuide = selectedGameId === null ? undefined : guideForGame(selectedGameId);
 
@@ -23,6 +36,8 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
       <div className="grid grid-cols-3 gap-3">
         {GAME_CARTRIDGES.map((cartridge) => {
           const isSelected = selectedGameId === cartridge.id;
+          // Flagged, never disabled: the Host can still read the setup before inviting anyone.
+          const needsCompany = !isReadOnly && isAlone && cartridge.playsWithout !== 'NOTHING';
 
           return (
             <RetroButton
@@ -38,7 +53,11 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
               // correction, jumping the page under the Host's thumb.
               onMouseDown={(event) => event.preventDefault()}
               onClick={onSelect === undefined ? undefined : () => onSelect(cartridge.id)}
-              className="flex flex-col items-center gap-2 text-center"
+              data-needs-players={needsCompany ? 'true' : undefined}
+              className={cn(
+                'flex flex-col items-center gap-2 text-center',
+                needsCompany && 'opacity-60',
+              )}
             >
               <GameSpriteThumb
                 spritePosition={cartridge.spritePosition}
@@ -48,6 +67,11 @@ export const GameCartridgePicker = ({ selectedGameId, onSelect }: GameCartridgeP
               <span className="font-terminal text-sm normal-case opacity-80">
                 {cartridge.tagline}
               </span>
+              {!isReadOnly && (
+                <span className="font-arcade text-[8px]">
+                  {PLAY_MODE_TAGS[cartridge.playsWithout]}
+                </span>
+              )}
             </RetroButton>
           );
         })}

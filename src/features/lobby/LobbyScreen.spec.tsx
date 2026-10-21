@@ -261,17 +261,57 @@ describe('Lobby feature', () => {
       expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
     });
 
-    it('blocks the start and explains why when the Host is alone in the lobby', async () => {
-      const user = userEvent.setup();
-      const soloHostRoom: RoomState = markSlotZeroAsHost(
-        makeRoom({ playerCount: 1, status: 'CONFIGURING_GAME' }),
-      );
-      renderLobby('HOST', soloHostRoom);
+    describe('when the Host is alone in the room', () => {
+      const soloRoom = (): RoomState =>
+        markSlotZeroAsHost(makeRoom({ playerCount: 1, status: 'CONFIGURING_GAME' }));
 
-      await user.click(screen.getByRole('button', { name: /^stop$/i }));
+      it('blocks a cartridge that needs people and says what to do instead', async () => {
+        const user = userEvent.setup();
+        renderLobby('HOST', soloRoom());
 
-      expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
-      expect(screen.getByText(/waiting for at least 1 more player/i)).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: /^taboo$/i }));
+
+        expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
+        expect(
+          screen.getByText(/taboo needs at least one real player.*try stop on your own/i),
+        ).toBeInTheDocument();
+      });
+
+      it('lets the Host start STOP alone and invites more players (#156)', async () => {
+        const user = userEvent.setup();
+        renderLobby('HOST', soloRoom());
+
+        await user.click(screen.getByRole('button', { name: /^stop$/i }));
+
+        expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
+        expect(screen.getByText(/stop is better with more people/i)).toBeInTheDocument();
+        expect(screen.queryByText(/needs at least one real player/i)).not.toBeInTheDocument();
+      });
+
+      it('follows the game picked last, whichever order the Host went in', async () => {
+        const user = userEvent.setup();
+        renderLobby('HOST', soloRoom());
+
+        await user.click(screen.getByRole('button', { name: /^taboo$/i }));
+        expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
+
+        await user.click(screen.getByRole('button', { name: /^stop$/i }));
+        expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
+
+        await user.click(screen.getByRole('button', { name: /^quiz$/i }));
+        expect(screen.getByRole('button', { name: /start game/i })).toBeDisabled();
+      });
+
+      it('starts a solo STOP match and tags the start as solo', async () => {
+        const user = userEvent.setup();
+        renderLobby('HOST', soloRoom());
+
+        await user.click(screen.getByRole('button', { name: /^stop$/i }));
+        await user.click(screen.getByRole('button', { name: /start game/i }));
+
+        expect(status()).toBe('PLAYING_AD');
+        expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', true);
+      });
     });
 
     it('enables the start once a second player is seated', async () => {
@@ -284,7 +324,20 @@ describe('Lobby feature', () => {
       await user.click(screen.getByRole('button', { name: /^stop$/i }));
 
       expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
-      expect(screen.queryByText(/waiting for at least 1 more player/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/needs at least one real player/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/stop is better with more people/i)).not.toBeInTheDocument();
+    });
+
+    it('lets TABOO start once a Player is seated', async () => {
+      const user = userEvent.setup();
+      const withPlayer = markSlotZeroAsHost(
+        makeRoom({ playerCount: 2, status: 'CONFIGURING_GAME' }),
+      );
+      renderLobby('HOST', withPlayer);
+
+      await user.click(screen.getByRole('button', { name: /^taboo$/i }));
+
+      expect(screen.getByRole('button', { name: /start game/i })).toBeEnabled();
     });
 
     it('transitions CONFIGURING_GAME -> PLAYING_AD when the Host starts the selected game', async () => {
@@ -296,7 +349,7 @@ describe('Lobby feature', () => {
       await user.click(screen.getByRole('button', { name: /start game/i }));
 
       expect(status()).toBe('PLAYING_AD');
-      expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP');
+      expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', false);
     });
 
     it('offers a How to play link, in a new tab, once a cartridge is chosen (#149)', async () => {

@@ -5,6 +5,7 @@ import { InlineAdSlot } from '@/components/layout/InlineAdSlot';
 import { PageTitle } from '@/components/ui/PageTitle';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
+import { isAlone } from '@/features/lobby/canStart';
 import { useRoom } from '@/hooks/useRoom';
 import { trackGameCompleted } from '@/lib/analytics';
 import type { Player } from '@/types';
@@ -20,7 +21,7 @@ export const ScoreboardScreen = () => {
   // so only the Host fires the event — otherwise one finished game would
   // count once per person in the room instead of once per game.
   useEffect(() => {
-    if (isHost) trackGameCompleted();
+    if (isHost) trackGameCompleted(isAlone(state.slots));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount, not on every isHost re-render.
   }, []);
 
@@ -58,6 +59,12 @@ export const ScoreboardScreen = () => {
           </li>
         ))}
       </ol>
+
+      {isHost && isAlone(state.slots) && (
+        <p className="text-center font-terminal text-base text-gray-600">
+          STOP is better with more people. Share the invite link and PIN to invite more players.
+        </p>
+      )}
 
       <InlineAdSlot label="AD SPACE" />
 
