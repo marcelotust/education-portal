@@ -9,7 +9,7 @@ export interface PresencePayload {
 }
 
 /** Seat colour is derived from the seat, so two players never share one. */
-const AVATARS: readonly AvatarId[] = ['GREEN', 'PINK', 'CYAN', 'YELLOW', 'RED', 'BLUE'];
+export const AVATARS: readonly AvatarId[] = ['GREEN', 'PINK', 'CYAN', 'YELLOW', 'RED', 'BLUE'];
 
 const toPlayer = (payload: PresencePayload, seat: number, hostId: string): Player => ({
   id: payload.playerId,

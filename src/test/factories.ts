@@ -114,15 +114,29 @@ export const makeTabooRound = (overrides: Partial<TabooRound> = {}): TabooRound 
   ...overrides,
 });
 
+/** The Host-run bot, as the reducer seats it. */
+export const makeBotPlayer = (overrides: Partial<Player> = {}): Player => ({
+  id: 'bot:1',
+  nickname: 'BOT',
+  avatarId: 'CYAN',
+  role: 'PLAYER',
+  isReady: true,
+  joinedAt: new Date(2026, 0, 1, 10, 30).toISOString(),
+  isBot: true,
+  ...overrides,
+});
+
 interface MakeRoomOptions {
   playerCount?: number;
   status?: RoomState['status'];
+  bot?: Player | null;
 }
 
 /** Mock room used by the specs while the Supabase layer does not exist yet. */
 export const makeRoom = ({
   playerCount = 3,
   status = 'LOBBY_IDLE',
+  bot = null,
 }: MakeRoomOptions = {}): RoomState => {
   const slots = Array.from({ length: MAX_PLAYERS }, (_, index) =>
     index < playerCount ? makePlayer(index) : null,
@@ -136,6 +150,7 @@ export const makeRoom = ({
     selectedGameId: null,
     currentRound: null,
     gameSetup: DEFAULT_STOP_GAME_SETUP,
+    bot,
     scores: {},
     lastRoundPoints: {},
   };

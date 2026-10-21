@@ -17,8 +17,9 @@ before seeing any game.
 
 Each cartridge declares what it can start without (`playsWithout` on
 `GameCartridge`): `NOTHING`, `BOT` or `PLAYERS`. STOP is `NOTHING`; QUIZ and
-TABOO stay `PLAYERS` (QUIZ becomes `BOT` with
-[#155](https://github.com/marcelotust/education-portal/issues/155)).
+TABOO started as `PLAYERS`; QUIZ became `BOT` with
+[#155](https://github.com/marcelotust/education-portal/issues/155) (see
+[0007](0007-bot-seat-outside-presence.md)).
 
 "Can this room start?" is one derived rule, `hasEnoughPlayers` in
 `src/features/lobby/canStart.ts`: a real Player always suffices, and a Host

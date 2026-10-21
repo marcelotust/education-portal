@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
-import { makeQuizRound, makeRoom } from '@/test/factories';
+import { makeBotPlayer, makeQuizRound, makeRoom } from '@/test/factories';
 import type { PlayerRole, QuizRound, RoomState } from '@/types';
 import { QuizRevealScreen } from './QuizRevealScreen';
 
@@ -161,5 +161,19 @@ describe('QUIZ reveal', () => {
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(screen.getByText(/waiting for the Host/i)).toBeInTheDocument();
+  });
+
+  it('shows the bot among the voters and the standings (#155)', () => {
+    const room = revealing({
+      answers: [
+        { playerId: 'player-0', choice: 1, elapsedMs: 900 },
+        { playerId: 'bot:1', choice: 1, elapsedMs: 4000 },
+      ],
+      questionPoints: { 'player-0': 15, 'bot:1': 10 },
+    });
+
+    renderReveal('PLAYER', { ...room, bot: makeBotPlayer(), scores: { 'bot:1': 10 } });
+
+    expect(screen.getAllByText('BOT').length).toBeGreaterThan(0);
   });
 });

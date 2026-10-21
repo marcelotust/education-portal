@@ -29,6 +29,12 @@ export interface RoomState {
   status: RoomStatus;
   /** Fixed-length board of 6 slots; `null` means the slot is open. */
   slots: readonly PlayerSlot[];
+  /**
+   * The one optional bot (#155). It lives beside `slots`, not in them: Presence
+   * rewrites the slots on every sync, and the join guard counts them as real
+   * people. Use `seatedBoard` / `seatedPlayers` wherever the bot should show.
+   */
+  bot: Player | null;
   /** Cartridge chosen in CONFIGURING_GAME; `null` while none is loaded. */
   selectedGameId: GameId | null;
   /** Only present while the STOP cartridge is running. */
@@ -48,7 +54,10 @@ export interface RoomState {
 }
 
 /** The room row stores everything except the PIN and host, which are columns. */
-export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId'>;
+export type PersistedRoomState = Omit<RoomState, 'pin' | 'hostId' | 'bot'> & {
+  /** Rows written before bots existed have no `bot`; they read as none. */
+  bot?: Player | null;
+};
 
 /**
  * Events the FSM understands. Control events (everything except the
@@ -64,6 +73,8 @@ export type RoomEvent =
   | { type: 'QUIZ_QUESTION_COUNT_SELECTED'; count: QuizQuestionCount }
   /** The Host has finished the reveal: on to the next question, or the end. */
   | { type: 'NEXT_QUESTION'; endsAt: string }
+  | { type: 'ADD_BOT' }
+  | { type: 'REMOVE_BOT' }
   | { type: 'START_GAME' }
   | { type: 'AD_FINISHED'; round: Round }
   | { type: 'ANSWERS_SUBMITTED'; playerId: string; answers: readonly StopAnswer[] }

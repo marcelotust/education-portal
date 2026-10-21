@@ -42,6 +42,8 @@ export const rowToRoomState = (row: RoomRow): RoomState => ({
   hostId: row.host_id,
   status: toStatus(row.state.status),
   slots: toSlots(row.state.slots),
+  // Rows written before bots existed have none.
+  bot: row.state.bot ?? null,
   selectedGameId: row.state.selectedGameId,
   currentRound: row.state.currentRound,
   gameSetup: row.state.gameSetup ?? DEFAULT_STOP_GAME_SETUP,
@@ -54,6 +56,7 @@ export const rowToRoomState = (row: RoomRow): RoomState => ({
 export const toPersistedState = (state: RoomState): PersistedRoomState => ({
   status: state.status,
   slots: state.slots,
+  bot: state.bot,
   selectedGameId: state.selectedGameId,
   currentRound: state.currentRound,
   gameSetup: state.gameSetup,

@@ -78,4 +78,17 @@ describe('room mapper', () => {
 
     expect(roundTripped.slots).toEqual(original.slots);
   });
+
+  it('reads a row written before bots existed as a room with no bot (#155)', () => {
+    expect(rowToRoomState(makeRow()).bot).toBeNull();
+  });
+
+  it('keeps the bot through the payload, so a Host refresh does not lose it (#155)', () => {
+    const bot = makePlayer(9, { id: 'bot:1', nickname: 'BOT', isBot: true });
+    const original = rowToRoomState(makeRow({ bot }));
+
+    const roundTripped = rowToRoomState({ ...makeRow(), state: toPersistedState(original) });
+
+    expect(roundTripped.bot).toEqual(bot);
+  });
 });

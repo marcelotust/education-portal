@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   loadGoogleAnalytics,
+  trackBotAdded,
   trackContactSubmitted,
   trackGameCompleted,
   trackGameStarted,
@@ -96,29 +97,29 @@ describe('trackGameStarted', () => {
   it('pushes a game_started event with the game ID once gtag is initialized', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameStarted('STOP', false);
+    trackGameStarted('STOP', false, false);
 
     expect(dataLayerAsArrays()).toContainEqual([
       'event',
       'game_started',
-      { game_id: 'STOP', solo: false },
+      { game_id: 'STOP', solo: false, has_bot: false },
     ]);
   });
 
   it('flags a match started with nobody else in the room as solo (#156)', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameStarted('STOP', true);
+    trackGameStarted('STOP', true, false);
 
     expect(dataLayerAsArrays()).toContainEqual([
       'event',
       'game_started',
-      { game_id: 'STOP', solo: true },
+      { game_id: 'STOP', solo: true, has_bot: false },
     ]);
   });
 
   it('is a no-op before gtag has been initialized', () => {
-    expect(() => trackGameStarted('STOP', false)).not.toThrow();
+    expect(() => trackGameStarted('STOP', false, false)).not.toThrow();
   });
 });
 
@@ -126,21 +127,61 @@ describe('trackGameCompleted', () => {
   it('pushes a game_completed event once gtag is initialized', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameCompleted(false);
+    trackGameCompleted(false, false);
 
-    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', { solo: false }]);
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_completed',
+      { solo: false, has_bot: false },
+    ]);
   });
 
   it('flags a match finished with nobody else in the room as solo (#156)', () => {
     loadGoogleAnalytics('G-TEST123');
 
-    trackGameCompleted(true);
+    trackGameCompleted(true, false);
 
-    expect(dataLayerAsArrays()).toContainEqual(['event', 'game_completed', { solo: true }]);
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_completed',
+      { solo: true, has_bot: false },
+    ]);
   });
 
   it('is a no-op before gtag has been initialized', () => {
-    expect(() => trackGameCompleted(false)).not.toThrow();
+    expect(() => trackGameCompleted(false, false)).not.toThrow();
+  });
+});
+
+describe('bot tracking (#155)', () => {
+  it('pushes a bot_added event once gtag is initialized', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackBotAdded();
+
+    expect(dataLayerAsArrays()).toContainEqual(['event', 'bot_added', {}]);
+  });
+
+  it('flags a match that had the bot seated, so bot rounds do not read as real adoption', () => {
+    loadGoogleAnalytics('G-TEST123');
+
+    trackGameStarted('QUIZ', true, true);
+    trackGameCompleted(true, true);
+
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_started',
+      { game_id: 'QUIZ', solo: true, has_bot: true },
+    ]);
+    expect(dataLayerAsArrays()).toContainEqual([
+      'event',
+      'game_completed',
+      { solo: true, has_bot: true },
+    ]);
+  });
+
+  it('is a no-op before gtag has been initialized', () => {
+    expect(() => trackBotAdded()).not.toThrow();
   });
 });
 

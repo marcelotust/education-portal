@@ -44,6 +44,7 @@ const createRoom = async (client: EduPartyClient, nickname: string): Promise<Roo
             hostId,
             status: 'LOBBY_IDLE',
             slots,
+            bot: null,
             selectedGameId: null,
             currentRound: null,
             gameSetup: DEFAULT_STOP_GAME_SETUP,

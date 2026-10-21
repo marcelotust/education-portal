@@ -10,6 +10,7 @@ import { trackGameStarted } from '@/lib/analytics';
 import { MIN_CATEGORIES } from '@/types';
 import { hasEnoughPlayers, isAlone } from '../canStart';
 import { cartridgeFor } from '../cartridges';
+import { BotControl } from './BotControl';
 import { GameCartridgePicker } from './GameCartridgePicker';
 import { NewMatchControl } from './NewMatchControl';
 
@@ -37,6 +38,8 @@ export const HostLobbyControls = () => {
           SELECT GAME
         </RetroButton>
 
+        <BotControl />
+
         {/* Kept well away from START GAME: a mis-tap here wipes the session. */}
         {hasPlayed && <NewMatchControl onConfirm={() => dispatch({ type: 'MATCH_RESET' })} />}
       </div>
@@ -49,13 +52,15 @@ export const HostLobbyControls = () => {
   // company may start (ADR 0006); the same rule drives the picker and the hint.
   const alone = isAlone(state.slots);
   const gameId = state.selectedGameId;
-  const hasCompany = gameId === null || hasEnoughPlayers(gameId, state.slots);
+  const hasBot = state.bot !== null;
+  const hasCompany = gameId === null || hasEnoughPlayers(gameId, state.slots, hasBot);
 
   return (
     <div className="flex flex-col gap-3">
       <GameCartridgePicker
         selectedGameId={state.selectedGameId}
         isAlone={alone}
+        hasBot={hasBot}
         onSelect={(gameId) => dispatch({ type: 'SELECT_GAME', gameId })}
       />
 
@@ -94,8 +99,9 @@ export const HostLobbyControls = () => {
 
       {!hasCompany && gameId !== null && (
         <p className="text-center font-terminal text-base text-gray-500">
-          {cartridgeFor(gameId).title} needs at least one real player. Invite someone, or try STOP
-          on your own.
+          {cartridgeFor(gameId).playsWithout === 'BOT'
+            ? `${cartridgeFor(gameId).title} needs a real player or a bot. Invite someone, add a bot, or try STOP on your own.`
+            : `${cartridgeFor(gameId).title} needs at least one real player. Invite someone, or try STOP on your own.`}
         </p>
       )}
 
@@ -104,6 +110,8 @@ export const HostLobbyControls = () => {
           STOP is better with more people. Invite more players with the link above.
         </p>
       )}
+
+      <BotControl />
 
       <RetroButton
         tone="green"
@@ -114,7 +122,7 @@ export const HostLobbyControls = () => {
           (state.gameSetup.game === 'TABOO' && state.gameSetup.categories.length < 1)
         }
         onClick={() => {
-          if (state.selectedGameId !== null) trackGameStarted(state.selectedGameId, alone);
+          if (state.selectedGameId !== null) trackGameStarted(state.selectedGameId, alone, hasBot);
           dispatch({ type: 'START_GAME' });
         }}
       >

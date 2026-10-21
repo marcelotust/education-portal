@@ -21,12 +21,13 @@ export const ScoreboardScreen = () => {
   // so only the Host fires the event — otherwise one finished game would
   // count once per person in the room instead of once per game.
   useEffect(() => {
-    if (isHost) trackGameCompleted(isAlone(state.slots));
+    if (isHost) trackGameCompleted(isAlone(state.slots), state.bot !== null);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount, not on every isHost re-render.
   }, []);
 
-  const ranked = state.slots
-    .filter((slot): slot is Player => slot !== null)
+  // The bot only ranks once it has played: in STOP and TABOO it sits out.
+  const bot = state.bot !== null && state.scores[state.bot.id] !== undefined ? [state.bot] : [];
+  const ranked = [...state.slots.filter((slot): slot is Player => slot !== null), ...bot]
     .map((player) => ({
       player,
       score: state.scores[player.id] ?? 0,

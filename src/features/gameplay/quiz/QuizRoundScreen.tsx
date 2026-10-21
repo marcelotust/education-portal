@@ -8,8 +8,9 @@ import { useQuizAnswerBroadcast } from '@/hooks/useQuizAnswerBroadcast';
 import { useRoom } from '@/hooks/useRoom';
 import type { QuizAnswer } from '@/types';
 import { cn } from '@/utils/cn';
-import { countPlayers } from '@/utils/room';
+import { seatedCount } from '@/utils/room';
 import { currentQuestion, hasAnswered, hasEveryoneAnswered } from './quizRound';
+import { useQuizBot } from './useQuizBot';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -69,11 +70,12 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     [dispatch],
   );
   const channel = useQuizAnswerBroadcast({ pin: state.pin, onAnswer, onDeadline });
+  useQuizBot({ round, bot: state.bot, isHost, dispatch });
 
   useEffect(() => {
     // Only the Host pulls the deadline in, so it happens once for everyone.
     if (!isHost || round === null || allAnsweredFor.current === questionIndex) return;
-    if (!hasEveryoneAnswered(round, countPlayers(state))) return;
+    if (!hasEveryoneAnswered(round, seatedCount(state))) return;
 
     allAnsweredFor.current = questionIndex;
     const endsAt = new Date(Date.now() + QUIZ_GRACE_MS).toISOString();
@@ -99,7 +101,7 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
   if (round === null || question === undefined) return null;
 
   const urgency = urgencyFor(secondsLeft);
-  const everyoneAnswered = hasEveryoneAnswered(round, countPlayers(state));
+  const everyoneAnswered = hasEveryoneAnswered(round, seatedCount(state));
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">

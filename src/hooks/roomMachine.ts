@@ -12,6 +12,7 @@ import {
   type RoomState,
 } from '@/types';
 import { addPoints, releaseSlot, sameBoard, seatPlayer } from '@/utils/room';
+import { addBot, removeBot, yieldSeatToPlayers } from './botMachine';
 import { allAnswered, answerQuiz, nextQuestion } from './quizMachine';
 import {
   allTabooGuessed,
@@ -256,6 +257,12 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
     case 'NEXT_TABOO_TURN':
       return nextTabooTurn(state, event.endsAt);
 
+    case 'ADD_BOT':
+      return addBot(state);
+
+    case 'REMOVE_BOT':
+      return removeBot(state);
+
     case 'START_GAME':
       // Each cartridge decides what "ready" means, here and not just in the UI.
       return state.status === 'CONFIGURING_GAME' && isSetupPlayable(state)
@@ -303,7 +310,7 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
       return resetMatch(state);
 
     case 'PLAYER_JOINED':
-      return seatPlayer(state, event);
+      return yieldSeatToPlayers(seatPlayer(state, event));
 
     case 'PLAYER_LEFT':
       return releaseSlot(state, event.playerId);
@@ -323,7 +330,7 @@ export const roomReducer = (state: RoomState, event: RoomEvent): RoomState => {
     case 'PLAYERS_SYNCED': {
       // Realtime Presence owns the board; it arrives already normalised to 6.
       const slots = Array.from({ length: MAX_PLAYERS }, (_, index) => event.slots[index] ?? null);
-      return sameBoard(state.slots, slots) ? state : { ...state, slots };
+      return yieldSeatToPlayers(sameBoard(state.slots, slots) ? state : { ...state, slots });
     }
   }
 };
