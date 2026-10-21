@@ -1,10 +1,4 @@
-import {
-  useId,
-  useRef,
-  type ChangeEvent,
-  type ClipboardEvent,
-  type KeyboardEvent,
-} from 'react';
+import { useId, useRef, type ChangeEvent, type ClipboardEvent, type KeyboardEvent } from 'react';
 
 import { cn } from '@/utils/cn';
 import { PIN_LENGTH } from '@/utils/room';
@@ -63,7 +57,10 @@ export const PinInput = ({ value, onChange, hasError = false, onComplete }: PinI
   };
 
   const handlePaste = (index: number) => (event: ClipboardEvent<HTMLInputElement>) => {
-    const pasted = event.clipboardData.getData('text').toUpperCase().replace(/[^A-Z]/g, '');
+    const pasted = event.clipboardData
+      .getData('text')
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '');
     if (pasted === '') return;
     event.preventDefault();
 
@@ -84,10 +81,7 @@ export const PinInput = ({ value, onChange, hasError = false, onComplete }: PinI
 
   return (
     <div className="flex flex-col gap-1 text-center">
-      <span
-        id={labelId}
-        className="font-terminal text-sm uppercase tracking-[0.3em] text-gray-500"
-      >
+      <span id={labelId} className="font-terminal text-sm uppercase tracking-[0.3em] text-gray-500">
         Room PIN
       </span>
       <div role="group" aria-labelledby={labelId} className="flex justify-center gap-2">
