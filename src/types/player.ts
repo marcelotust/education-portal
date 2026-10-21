@@ -16,6 +16,8 @@ export interface Player {
   isReady: boolean;
   /** ISO timestamp, used to keep slot ordering stable across presence syncs. */
   joinedAt: string;
+  /** The Host-run bot (#155); it holds a seat on the board but never a Presence slot. */
+  isBot?: boolean;
 }
 
 /** A lobby slot is either taken by a player or empty (`null`). */

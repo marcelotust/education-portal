@@ -18,7 +18,7 @@ describe('GameCartridgePicker play-mode tags', () => {
     renderPicker({ selectedGameId: null, onSelect: vi.fn() });
 
     expect(within(card(/^stop$/i)).getByText('SOLO OK')).toBeInTheDocument();
-    expect(within(card(/^quiz$/i)).getByText('NEEDS PLAYERS')).toBeInTheDocument();
+    expect(within(card(/^quiz$/i)).getByText('BOT OK')).toBeInTheDocument();
     expect(within(card(/^taboo$/i)).getByText('NEEDS PLAYERS')).toBeInTheDocument();
   });
 
@@ -42,5 +42,12 @@ describe('GameCartridgePicker play-mode tags', () => {
     renderPicker({ selectedGameId: null, onSelect: vi.fn(), isAlone: false });
 
     expect(card(/^taboo$/i)).not.toHaveAttribute('data-needs-players');
+  });
+
+  it('stops flagging QUIZ once the Host has added a bot, but keeps flagging TABOO', () => {
+    renderPicker({ selectedGameId: null, onSelect: vi.fn(), isAlone: true, hasBot: true });
+
+    expect(card(/^quiz$/i)).not.toHaveAttribute('data-needs-players');
+    expect(card(/^taboo$/i)).toHaveAttribute('data-needs-players', 'true');
   });
 });

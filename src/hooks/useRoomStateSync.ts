@@ -7,6 +7,7 @@ import type { PersistedRoomState, RoomState } from '@/types';
 const toPayload = (state: RoomState): PersistedRoomState => ({
   status: state.status,
   slots: state.slots,
+  bot: state.bot,
   selectedGameId: state.selectedGameId,
   currentRound: state.currentRound,
   gameSetup: state.gameSetup,

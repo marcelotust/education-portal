@@ -12,7 +12,7 @@ Status: the MVP in `blueprint.md` is complete and runs against a live Supabase p
 
 ## Decisions
 
-Contested choices are recorded in `docs/decisions/` — read it before reversing something that looks odd. Notably: why seats, FSM and answers use three different transports; why scores live on the room and not on the player; and why rooms expire after 5 hours. STOP can be started with nobody else in the room, other cartridges cannot (`docs/decisions/0006-stop-plays-solo.md`).
+Contested choices are recorded in `docs/decisions/` — read it before reversing something that looks odd. Notably: why seats, FSM and answers use three different transports; why scores live on the room and not on the player; and why rooms expire after 5 hours. STOP can be started with nobody else in the room, other cartridges cannot (`docs/decisions/0006-stop-plays-solo.md`); the Host can seat one bot for QUIZ, kept outside Presence (`docs/decisions/0007-bot-seat-outside-presence.md`).
 
 ## Backend model
 

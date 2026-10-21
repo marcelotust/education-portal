@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroContainer } from '@/components/ui/RetroContainer';
 import { useRoom } from '@/hooks/useRoom';
-import { MAX_PLAYERS, type Player } from '@/types';
-import { countPlayers } from '@/utils/room';
+import { MAX_PLAYERS } from '@/types';
+import { seatedBoard, seatedCount, seatedPlayers } from '@/utils/room';
 import { CharacterSelectGrid } from './components/CharacterSelectGrid';
 import { LastRoundStandings } from './components/LastRoundStandings';
 import { PlayerLobbyControls } from './components/PlayerLobbyControls';
@@ -23,11 +23,11 @@ export const LobbyScreen = () => {
 
   const board = (
     <>
-      <CharacterSelectGrid slots={state.slots} scores={state.scores} pin={state.pin} />
+      <CharacterSelectGrid slots={seatedBoard(state)} scores={state.scores} pin={state.pin} />
 
       {Object.keys(state.lastRoundPoints).length > 0 && (
         <LastRoundStandings
-          players={state.slots.filter((slot): slot is Player => slot !== null)}
+          players={seatedPlayers(state)}
           scores={state.scores}
           lastRoundPoints={state.lastRoundPoints}
         />
@@ -39,7 +39,7 @@ export const LobbyScreen = () => {
 
   return (
     <RetroContainer className="flex flex-col gap-5 p-6">
-      <RoomPinBanner pin={state.pin} playerCount={countPlayers(state)} maxPlayers={MAX_PLAYERS} />
+      <RoomPinBanner pin={state.pin} playerCount={seatedCount(state)} maxPlayers={MAX_PLAYERS} />
 
       {setupFirst ? (
         <>

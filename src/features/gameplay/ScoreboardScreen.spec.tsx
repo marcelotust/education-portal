@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
 import * as analytics from '@/lib/analytics';
-import { makeRoom } from '@/test/factories';
+import { makeBotPlayer, makeRoom } from '@/test/factories';
 import type { PlayerRole, RoomState } from '@/types';
 import { ScoreboardScreen } from './ScoreboardScreen';
 
@@ -47,7 +47,7 @@ describe('Scoreboard', () => {
     renderScoreboard('HOST');
 
     expect(analytics.trackGameCompleted).toHaveBeenCalledTimes(1);
-    expect(analytics.trackGameCompleted).toHaveBeenCalledWith(false);
+    expect(analytics.trackGameCompleted).toHaveBeenCalledWith(false, false);
   });
 
   describe('after a solo round (#156)', () => {
@@ -64,7 +64,7 @@ describe('Scoreboard', () => {
     it('tags the completion as solo', () => {
       renderScoreboard('HOST', soloStandings());
 
-      expect(analytics.trackGameCompleted).toHaveBeenCalledWith(true);
+      expect(analytics.trackGameCompleted).toHaveBeenCalledWith(true, false);
     });
 
     it('invites the Host to bring more players', () => {
@@ -84,6 +84,37 @@ describe('Scoreboard', () => {
     renderScoreboard('PLAYER');
 
     expect(analytics.trackGameCompleted).not.toHaveBeenCalled();
+  });
+
+  describe('with the bot at the table (#155)', () => {
+    const withBot = (scores: Record<string, number>): RoomState => ({
+      ...makeRoom({ playerCount: 1, status: 'CALCULATING_SCORES', bot: makeBotPlayer() }),
+      slots: makeRoom({ playerCount: 1 }).slots.map((slot) =>
+        slot ? { ...slot, role: 'HOST' as const } : slot,
+      ),
+      scores,
+      lastRoundPoints: scores,
+    });
+
+    it('ranks the bot among the players once it has scored', () => {
+      renderScoreboard('HOST', withBot({ 'player-0': 10, 'bot:1': 25 }));
+
+      const rows = screen.getAllByTestId('scoreboard-row');
+      expect(rows[0]).toHaveTextContent('BOT');
+      expect(rows[1]).toHaveTextContent('ANA');
+    });
+
+    it('leaves a bot that sat out the round off the board', () => {
+      renderScoreboard('HOST', withBot({ 'player-0': 10 }));
+
+      expect(screen.getAllByTestId('scoreboard-row')).toHaveLength(1);
+    });
+
+    it('tags the completion as solo with a bot', () => {
+      renderScoreboard('HOST', withBot({ 'player-0': 10, 'bot:1': 25 }));
+
+      expect(analytics.trackGameCompleted).toHaveBeenCalledWith(true, true);
+    });
   });
 
   it('ranks players by score, highest first', () => {

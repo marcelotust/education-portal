@@ -310,7 +310,7 @@ describe('Lobby feature', () => {
         await user.click(screen.getByRole('button', { name: /start game/i }));
 
         expect(status()).toBe('PLAYING_AD');
-        expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', true);
+        expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', true, false);
       });
     });
 
@@ -349,7 +349,7 @@ describe('Lobby feature', () => {
       await user.click(screen.getByRole('button', { name: /start game/i }));
 
       expect(status()).toBe('PLAYING_AD');
-      expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', false);
+      expect(analytics.trackGameStarted).toHaveBeenCalledWith('STOP', false, false);
     });
 
     it('offers a How to play link, in a new tab, once a cartridge is chosen (#149)', async () => {

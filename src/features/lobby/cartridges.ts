@@ -16,7 +16,7 @@ export const GAME_CARTRIDGES: readonly GameCartridge[] = [
     tagline: 'Multiple choice, fastest wins',
     spritePosition: '100% 100%',
     roundDurationSeconds: 30,
-    playsWithout: 'PLAYERS',
+    playsWithout: 'BOT',
   },
   {
     id: 'TABOO',

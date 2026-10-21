@@ -66,20 +66,28 @@ export const trackRoomJoined = () => {
 
 /**
  * Fired when the Host starts a match (#126). `solo` marks a match with nobody
- * else seated, so practice rounds do not read as real adoption (#156). No-op
+ * else seated and `hasBot` one with the bot at the table, so practice rounds do
+ * not read as real adoption (#156, #155). No-op
  * before gtag loads.
  */
-export const trackGameStarted = (gameId: GameId, solo: boolean) => {
+export const trackGameStarted = (gameId: GameId, solo: boolean, hasBot: boolean) => {
   if (typeof window.gtag !== 'function') return;
 
-  window.gtag('event', 'game_started', { game_id: gameId, solo });
+  window.gtag('event', 'game_started', { game_id: gameId, solo, has_bot: hasBot });
 };
 
 /** Fired once the scoreboard is reached (#126), `solo` as in `trackGameStarted`. No-op before gtag loads. */
-export const trackGameCompleted = (solo: boolean) => {
+export const trackGameCompleted = (solo: boolean, hasBot: boolean) => {
   if (typeof window.gtag !== 'function') return;
 
-  window.gtag('event', 'game_completed', { solo });
+  window.gtag('event', 'game_completed', { solo, has_bot: hasBot });
+};
+
+/** Fired when the Host seats the bot (#155). No-op before gtag loads. */
+export const trackBotAdded = () => {
+  if (typeof window.gtag !== 'function') return;
+
+  window.gtag('event', 'bot_added', {});
 };
 
 /** Fired once a contact-form submission is persisted (#126). No-op before gtag loads. */

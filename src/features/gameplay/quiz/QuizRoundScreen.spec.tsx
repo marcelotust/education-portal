@@ -1,10 +1,10 @@
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoomProvider } from '@/hooks/RoomProvider';
 import { useRoom } from '@/hooks/useRoom';
-import { makeQuizRound, makeRoom } from '@/test/factories';
+import { makeBotPlayer, makeQuizRound, makeRoom } from '@/test/factories';
 import type { PlayerRole, QuizAnswer, QuizRound, RoomState } from '@/types';
 import { QuizRoundScreen } from './QuizRoundScreen';
 
@@ -142,5 +142,69 @@ describe('QUIZ round screen', () => {
     const secondsAfter = Number(screen.getByTestId('round-timer').textContent);
     expect(secondsAfter).toBeLessThan(secondsBefore);
     expect(secondsAfter).toBeLessThanOrEqual(3);
+  });
+
+  describe('with the bot at the table (#155)', () => {
+    const withBot = (): RoomState => ({
+      ...makeRoom({ playerCount: 1, status: 'PLAYING', bot: makeBotPlayer() }),
+      currentRound: makeQuizRound({ endsAt: new Date(Date.now() + 30_000).toISOString() }),
+    });
+
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    });
+
+    it('answers for the bot after a pause, so the round ends once the Host has answered too', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderRound(withBot());
+
+      await user.click(screen.getByRole('button', { name: /Mercury/ }));
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(13_000);
+      });
+
+      expect(screen.getByRole('alert')).toHaveTextContent(/everyone has answered/i);
+    });
+
+    it('does not answer before its thinking time is up', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderRound(withBot());
+
+      await user.click(screen.getByRole('button', { name: /Mercury/ }));
+      act(() => {
+        vi.advanceTimersByTime(5_000);
+      });
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it("never plays the bot from a Player's screen: only the Host speaks for it", () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const room = withBot();
+      // The only other seat has already answered, so the bot is the last one missing.
+      const waitingOnBot: RoomState = {
+        ...room,
+        currentRound: makeQuizRound({
+          endsAt: new Date(Date.now() + 30_000).toISOString(),
+          answers: [{ playerId: 'player-0', choice: 1, elapsedMs: 900 }],
+        }),
+      };
+      renderRound(waitingOnBot, 'PLAYER');
+
+      act(() => {
+        vi.advanceTimersByTime(26_000);
+      });
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });

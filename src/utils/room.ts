@@ -1,4 +1,4 @@
-import { MAX_PLAYERS, type PlayerSlot, type RoomEvent, type RoomState } from '@/types';
+import { MAX_PLAYERS, type Player, type PlayerSlot, type RoomEvent, type RoomState } from '@/types';
 
 const PIN_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
@@ -28,6 +28,26 @@ export const createEmptySlots = (): PlayerSlot[] => Array.from({ length: MAX_PLA
 
 export const countPlayers = (state: RoomState): number =>
   state.slots.filter((slot) => slot !== null).length;
+
+/**
+ * Everyone at the table: the real people in the slots, then the bot. Use this
+ * for what the room shows and plays; `countPlayers` stays the real-people
+ * count the join guard needs, so a bot can never turn a person away.
+ */
+export const seatedPlayers = (state: RoomState): Player[] => {
+  const people = state.slots.filter((slot): slot is Player => slot !== null);
+  return state.bot === null ? people : [...people, state.bot];
+};
+
+export const seatedCount = (state: RoomState): number => seatedPlayers(state).length;
+
+/** The 6-seat board with the bot on the first open seat. */
+export const seatedBoard = (state: RoomState): PlayerSlot[] => {
+  if (state.bot === null) return [...state.slots];
+
+  const open = state.slots.findIndex((slot) => slot === null);
+  return state.slots.map((slot, index) => (index === open ? state.bot : slot));
+};
 
 export const isRoomFull = (state: RoomState): boolean => countPlayers(state) >= MAX_PLAYERS;
 

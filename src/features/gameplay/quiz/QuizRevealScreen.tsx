@@ -5,6 +5,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useRoom } from '@/hooks/useRoom';
 import type { Player } from '@/types';
 import { cn } from '@/utils/cn';
+import { seatedPlayers } from '@/utils/room';
 import { CORRECT_POINTS, SPEED_BONUS, currentQuestion, isLastQuestion } from './quizRound';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
@@ -28,8 +29,8 @@ export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
   const ownWrongIndex =
     ownAnswer !== undefined && ownAnswer.choice !== question.correctIndex ? ownAnswer.choice : null;
 
-  const seatedPlayers = state.slots.filter((slot): slot is Player => slot !== null);
-  const playersById = new Map(seatedPlayers.map((player) => [player.id, player]));
+  const players = seatedPlayers(state);
+  const playersById = new Map(players.map((player) => [player.id, player]));
 
   const votersByOption: Player[][] = question.options.map((_, index) =>
     round.answers
@@ -38,11 +39,11 @@ export const QuizRevealScreen = ({ playerId }: QuizRevealScreenProps) => {
       .filter((player): player is Player => player !== undefined),
   );
 
-  const noAnswerPlayers = seatedPlayers.filter(
+  const noAnswerPlayers = players.filter(
     (player) => !round.answers.some((answer) => answer.playerId === player.id),
   );
 
-  const scored = seatedPlayers
+  const scored = players
     .map((player) => ({
       player,
       gained: round.questionPoints[player.id] ?? 0,

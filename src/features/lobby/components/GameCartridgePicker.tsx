@@ -4,6 +4,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { guideForGame } from '@/features/guides/guideMeta';
 import type { GameId, PlaysWithout } from '@/types';
 import { cn } from '@/utils/cn';
+import { playsAlone } from '../canStart';
 import { GAME_CARTRIDGES } from '../cartridges';
 import { ComingSoonCartridge } from './ComingSoonCartridge';
 
@@ -13,6 +14,8 @@ interface GameCartridgePickerProps {
   onSelect?: ((gameId: GameId) => void) | undefined;
   /** The Host is the only one seated: cartridges that need company are flagged. */
   isAlone?: boolean;
+  /** A bot is seated, which is enough company for the cartridges that accept one. */
+  hasBot?: boolean;
 }
 
 const PLAY_MODE_TAGS: Record<PlaysWithout, string> = {
@@ -25,6 +28,7 @@ export const GameCartridgePicker = ({
   selectedGameId,
   onSelect,
   isAlone = false,
+  hasBot = false,
 }: GameCartridgePickerProps) => {
   const isReadOnly = onSelect === undefined;
   const selectedGuide = selectedGameId === null ? undefined : guideForGame(selectedGameId);
@@ -37,7 +41,7 @@ export const GameCartridgePicker = ({
         {GAME_CARTRIDGES.map((cartridge) => {
           const isSelected = selectedGameId === cartridge.id;
           // Flagged, never disabled: the Host can still read the setup before inviting anyone.
-          const needsCompany = !isReadOnly && isAlone && cartridge.playsWithout !== 'NOTHING';
+          const needsCompany = !isReadOnly && isAlone && !playsAlone(cartridge.id, hasBot);
 
           return (
             <RetroButton
