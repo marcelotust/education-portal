@@ -7,10 +7,11 @@ import { makeBotPlayer, makeRoom, makeRound, makeTabooRound } from '@/test/facto
 import type { RoomState } from '@/types';
 import { AdBreakScreen } from './AdBreakScreen';
 import { RoundValidationScreen } from './RoundValidationScreen';
+import type * as TabooRoundModule from './taboo/tabooRound';
 import { createTabooRound, DEFAULT_TABOO_SETUP } from './taboo/tabooRound';
 
 vi.mock('./taboo/tabooRound', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('./taboo/tabooRound')>()),
+  ...(await importOriginal<typeof TabooRoundModule>()),
   createTabooRound: vi.fn(),
 }));
 
