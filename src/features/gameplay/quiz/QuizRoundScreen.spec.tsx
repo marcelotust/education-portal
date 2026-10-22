@@ -39,11 +39,22 @@ const AdvanceProbe = () => {
   );
 };
 
+/** Test-only: exposes who has answered, and how fast, for the bot specs. */
+const AnswersProbe = () => {
+  const { state } = useRoom();
+  const answers = state.currentRound?.game === 'QUIZ' ? state.currentRound.answers : [];
+  return <span data-testid="answers">{JSON.stringify(answers)}</span>;
+};
+
+const answers = (): QuizAnswer[] =>
+  JSON.parse(screen.getByTestId('answers').textContent ?? '[]') as QuizAnswer[];
+
 const renderRound = (room: RoomState = playing(), role: PlayerRole = 'HOST') =>
   render(
     <RoomProvider initialState={room} role={role}>
       <QuizRoundScreen playerId="player-0" />
       <AdvanceProbe />
+      <AnswersProbe />
     </RoomProvider>,
   );
 
@@ -174,17 +185,75 @@ describe('QUIZ round screen', () => {
       expect(screen.getByRole('alert')).toHaveTextContent(/everyone has answered/i);
     });
 
-    it('does not answer before its thinking time is up', async () => {
+    it('does not answer before its thinking time is up while the Host is still thinking', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0);
+      renderRound(withBot());
+
+      act(() => {
+        vi.advanceTimersByTime(5_000);
+      });
+
+      expect(answers()).toHaveLength(0);
+    });
+
+    it('answers within a couple of seconds once the Host has answered, not at its planned pace (#165)', async () => {
+      // 0.99 plans the slowest pause (about 25 s) and a wrong pick.
+      vi.spyOn(Math, 'random').mockReturnValue(0.99);
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       renderRound(withBot());
 
       await user.click(screen.getByRole('button', { name: /Mercury/ }));
       act(() => {
-        vi.advanceTimersByTime(5_000);
+        vi.advanceTimersByTime(500);
+      });
+      expect(answers().map((answer) => answer.playerId)).toEqual(['player-0']);
+
+      act(() => {
+        vi.advanceTimersByTime(2_000);
       });
 
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(answers().map((answer) => answer.playerId)).toEqual(['player-0', 'bot:1']);
+      expect(screen.getByRole('alert')).toHaveTextContent(/everyone has answered/i);
+    });
+
+    it('keeps its planned pace while another real Player has not answered yet (#165)', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const crowded: RoomState = {
+        ...makeRoom({ playerCount: 2, status: 'PLAYING', bot: makeBotPlayer() }),
+        currentRound: makeQuizRound({ endsAt: new Date(Date.now() + 30_000).toISOString() }),
+      };
+      renderRound(crowded);
+
+      await user.click(screen.getByRole('button', { name: /Mercury/ }));
+      act(() => {
+        vi.advanceTimersByTime(5_000);
+      });
+      // player-1 is still thinking, so the bot is too.
+      expect(answers().map((answer) => answer.playerId)).toEqual(['player-0']);
+
+      act(() => {
+        vi.advanceTimersByTime(8_000);
+      });
+      expect(answers().map((answer) => answer.playerId)).toContain('bot:1');
+    });
+
+    it('never records the bot as faster than the human who triggered it (#165)', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.99);
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      renderRound(withBot());
+
+      act(() => {
+        vi.advanceTimersByTime(4_000);
+      });
+      await user.click(screen.getByRole('button', { name: /Mercury/ }));
+      act(() => {
+        vi.advanceTimersByTime(2_500);
+      });
+
+      const [human, bot] = answers();
+      expect(bot?.playerId).toBe('bot:1');
+      expect(bot?.elapsedMs ?? 0).toBeGreaterThan(human?.elapsedMs ?? Infinity);
     });
 
     it("never plays the bot from a Player's screen: only the Host speaks for it", () => {

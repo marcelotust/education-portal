@@ -70,7 +70,13 @@ export const QuizRoundScreen = ({ playerId }: QuizRoundScreenProps) => {
     [dispatch],
   );
   const channel = useQuizAnswerBroadcast({ pin: state.pin, onAnswer, onDeadline });
-  useQuizBot({ round, bot: state.bot, isHost, dispatch });
+  useQuizBot({
+    round,
+    bot: state.bot,
+    humanIds: state.slots.flatMap((slot) => (slot === null ? [] : [slot.id])),
+    isHost,
+    dispatch,
+  });
 
   useEffect(() => {
     // Only the Host pulls the deadline in, so it happens once for everyone.
