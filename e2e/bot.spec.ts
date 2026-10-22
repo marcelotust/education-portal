@@ -49,6 +49,35 @@ test.describe('the bot and solo STOP on the real transports (#155, #156)', () =>
     await player.context.close();
   });
 
+  test('the bot answers promptly once the humans have, so the round does not run the full clock (#165)', async ({
+    browser,
+  }) => {
+    const host = await openParticipant(browser);
+    const player = await openParticipant(browser);
+
+    const pin = await createRoom(host.page);
+    await joinRoom(player.page, pin);
+    await host.page.getByRole('button', { name: 'ADD BOT' }).click();
+
+    await host.page.getByRole('button', { name: 'SELECT GAME' }).click();
+    await host.page.getByRole('button', { name: 'QUIZ' }).click();
+    await host.page.getByRole('button', { name: 'START GAME' }).click();
+
+    await expect(host.page.getByTestId('question-progress')).toHaveText('1/5', { timeout: 30_000 });
+    await expect(player.page.getByTestId('question-progress')).toHaveText('1/5');
+
+    // Both humans answer at once; the bot should follow within a few seconds,
+    // not wait out its planned 12-25 s pause.
+    await host.page.locator('ul button').first().click();
+    await player.page.locator('ul button').first().click();
+
+    const botVote = host.page.locator('li li').filter({ hasText: /^BOT$/ });
+    await expect(botVote).toBeVisible({ timeout: 12_000 });
+
+    await host.context.close();
+    await player.context.close();
+  });
+
   test('a Host with nobody else can start STOP, but not the games that need company', async ({
     browser,
   }) => {
